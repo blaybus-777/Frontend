@@ -7,9 +7,11 @@
 ## 🎯 Squash and Merge
 
 ### 규칙
+
 - 모든 Pull Request(PR)는 **Squash and Merge** 방식으로 병합합니다.
 
 ### 목적
+
 - **히스토리 단순화**: `main` 및 `develop` 브랜치의 커밋 로그를 깔끔하게 유지합니다.
 - **의미 단위 보존**: 자잘한 작업 커밋(typo fix, wip 등)을 제거하고, 기능 단위의 커밋만 남깁니다.
 
