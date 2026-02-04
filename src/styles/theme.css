@@ -1,0 +1,35 @@
+@theme {
+  --color-foundation-blue-1: #eaeaff;
+  --color-foundation-blue-2: #cbceff;
+  --color-foundation-blue-3: #a3a6ff;
+  --color-foundation-blue-4: #787dff;
+  --color-foundation-blue-5: #4f56ff;
+  --color-foundation-blue-6: #2831ff;
+  --color-foundation-blue-7: #222ad9;
+  --color-foundation-blue-8: #1c23b5;
+  --color-foundation-blue-9: #101aff;
+  --color-foundation-blue-10: #121673;
+  --color-foundation-gray-2: #fcfcfc;
+  --color-foundation-gray-3: #f5f5f5;
+  --color-foundation-gray-4: #f0f0f0;
+  --color-foundation-gray-5: #d9d9d9;
+  --color-foundation-gray-6: #bfbfbf;
+  --color-foundation-gray-7: #8c8c8c;
+  --color-foundation-gray-8: #595959;
+  --color-foundation-gray-9: #454545;
+  --color-foundation-gray-10: #262626;
+  --color-foundation-gray-11: #1f1f1f;
+  --color-foundation-white-bg: #ffffff;
+  --color-foundation-white-text: #ffffff;
+  --color-foundation-black-bg: #141414;
+  --color-foundation-black-text: #141414;
+  --font-pretendard: Pretendard;
+  --text-xs: 0.5rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.25rem;
+  --shadow-card-hover: 0px 3px 15px 0px rgba(0,0,0,0.15);
+}
