@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
 import { theme as projectTheme } from './src/styles/theme';
 
 // Helper to sanitize Figma naming conventions to Tailwind CSS class friendly names
@@ -16,24 +17,6 @@ const colors = Object.entries(projectTheme.colors).reduce((acc, [key, value]) =>
   return acc;
 }, {} as Record<string, string>);
 
-const fontSize = Object.entries(projectTheme.typography).reduce((acc, [key, value]) => {
-  const sanitizedKey = sanitizeKey(key);
-  // Cast value to any to access properties safely since the const assertion makes it strict
-  const typography = value as any;
-  
-  if (!typography.fontSize) return acc;
-
-  acc[sanitizedKey] = [
-    typography.fontSize,
-    {
-      lineHeight: typography.lineHeight,
-      letterSpacing: typography.letterSpacing,
-      fontWeight: typography.fontWeight ? String(typography.fontWeight) : undefined,
-    },
-  ];
-  return acc;
-}, {} as Record<string, [string, { lineHeight?: string; letterSpacing?: string; fontWeight?: string }]>);
-
 export default {
   content: [
     "./index.html",
@@ -42,12 +25,29 @@ export default {
   theme: {
     extend: {
       colors,
-      fontSize,
       fontFamily: {
         'pretendard': ['Pretendard', 'sans-serif'],
         'inter': ['Inter', 'sans-serif'],
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function({ addUtilities }) {
+      const typographyUtilities = Object.entries(projectTheme.typography).reduce((acc, [key, value]) => {
+        const sanitizedKey = sanitizeKey(key);
+        const typography = value as any;
+        
+        acc[`.text-${sanitizedKey}`] = {
+          fontSize: typography.fontSize,
+          lineHeight: typography.lineHeight,
+          letterSpacing: typography.letterSpacing,
+          fontWeight: typography.fontWeight ? String(typography.fontWeight) : undefined,
+          fontFamily: typography.fontFamily,
+        };
+        return acc;
+      }, {} as Record<string, any>);
+
+      addUtilities(typographyUtilities);
+    })
+  ],
 } satisfies Config;
