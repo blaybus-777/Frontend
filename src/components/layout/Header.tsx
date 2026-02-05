@@ -14,7 +14,7 @@ function Header() {
             <nav className="mx-auto flex items-center px-60 h-20 relative">
                 <div className="bg-linear-to-r from-[#42C2FF] to-foundation-blue-9 bg-clip-text text-3xl font-extrabold font-pretendard text-transparent">
                     simvex
-                </div> 
+                </div>
                 <div className="absolute left-1/2 -translate-x-1/2 flex gap-10">
                     <Link to="/" className={`font-bold ${getLinkColor('/')}`}>
                         Explore
