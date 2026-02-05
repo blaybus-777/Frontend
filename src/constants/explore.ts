@@ -9,4 +9,7 @@ export const CATEGORIES = [
   "V4 엔진",
 ] as const;
 
+
 export type Category = (typeof CATEGORIES)[number];
+
+export const TAGS = ["전체", "초급", "중급", "고급"];
