@@ -3,5 +3,5 @@ export interface ModelItem{
     name: string;
     tags:string[];
     modelUrl: string[];
-    thumbnail: string
+    thumbnail: string;
 }

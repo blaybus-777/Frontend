@@ -1,14 +1,14 @@
 import type { ModelItem } from "@/types/model";
 import { useModelStore } from "@/stores/modelStore";
 import ModelPreview from "./ModelPreview";
-import {useState} from "react";
+import { useState } from "react";
 
-interface Props {
+interface ModelCardProps {
   item: ModelItem;
 }
 
-export default function ModelCard({ item }: Props) {
-  const { select } = useModelStore();
+export default function ModelCard({ item }: ModelCardProps) {
+  const select = useModelStore((state) => state.select);
   const [isHovered, setIsHovered] = useState(false);
   return (
     <div
@@ -39,7 +39,7 @@ export default function ModelCard({ item }: Props) {
           {item.tags.map((tag) => (
             <span
               key={tag}
-              className=" rounded-md bg-#F3F4F7 px-3 py-1 text-xs text-#222"
+              className="rounded-md bg-[#F3F4F7] px-3 py-1 text-xs text-[#222]"
             >
               {tag}
             </span>

@@ -1,6 +1,6 @@
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
-import { useEffect, useRef } from "react";
+import { type PropsWithChildren, useEffect, useRef } from "react";
 import * as THREE from "three";
 
 interface Props {
@@ -11,7 +11,7 @@ function Model({ url, position }: { url: string; position: [number, number, numb
   const { scene } = useGLTF(url);
   return <primitive object={scene} position={position} />;
 }
-function FitCamera({ children }: any) {
+function FitCamera({ children }: PropsWithChildren<{}>) {
   const ref = useRef<THREE.Group>(null);
   const { camera } = useThree();
 
