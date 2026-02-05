@@ -4,7 +4,7 @@ import ExploreSidebar from "@/components/explore/ExploreSidebar";
 function ExplorePage() {
   return (
     <>
-    <div className="w-full max-w-[1200px] mt-20 mx-auto flex gap-10">
+    <div className="h-full max-w-[1200px] w-[62.5%] my-20 mx-auto flex gap-10">
       <div>
         <ExploreSidebar />
       </div>
