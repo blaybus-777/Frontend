@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 interface CourseCardProps {
   id: string;
@@ -10,14 +11,20 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({
+  id,
   title,
   image,
   level,
   category,
   tags,
 }: CourseCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="group cursor-pointer flex flex-col h-full bg-foundation-white-bg border border-foundation-gray-4 rounded-sm p-3 gap-4 hover:shadow-card-hover transition-shadow duration-300">
+    <div 
+      onClick={() => navigate(`/course/${id}`)}
+      className="group cursor-pointer flex flex-col h-full bg-foundation-white-bg border border-foundation-gray-4 rounded-sm p-3 gap-4 hover:shadow-card-hover transition-shadow duration-300"
+    >
       {/* Thumbnail */}
       <div className="aspect-3/2 w-full overflow-hidden rounded-sm bg-foundation-gray-1 border border-foundation-gray-4">
         <img
