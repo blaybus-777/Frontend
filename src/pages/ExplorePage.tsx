@@ -6,6 +6,7 @@ import { useState } from "react";
 import { TAGS } from "@/constants/explore";
 // import { MOCK_COURSES } from "@/data/mockCourses";
 import { useModelList } from "@/hooks/useModelList";
+import type { ExtendedModel } from "@/hooks/useModelList";
 
 
 function ExplorePage() {
@@ -61,7 +62,7 @@ function ExplorePage() {
             ) : isError ? (
               <div>Error loading courses</div>
             ) : (
-              modelList?.map((course: any) => (
+              modelList?.map((course: ExtendedModel) => (
                 <CourseCard
                   key={course.modelId}
                   id={String(course.modelId)}
