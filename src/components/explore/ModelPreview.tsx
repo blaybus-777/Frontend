@@ -11,7 +11,7 @@ function Model({ url, position }: { url: string; position: [number, number, numb
   const { scene } = useGLTF(url);
   return <primitive object={scene} position={position} />;
 }
-function FitCamera({ children }: PropsWithChildren<{}>) {
+function FitCamera({ children }: PropsWithChildren<unknown>) {
   const ref = useRef<THREE.Group>(null);
   const { camera } = useThree();
 
