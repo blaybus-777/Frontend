@@ -63,6 +63,7 @@ function ExplorePage() {
                 level={course.level}
                 category={course.category}
                 tags={course.tags}
+                modelUrls={course.modelUrls}
               />
             ))}
           </div>
