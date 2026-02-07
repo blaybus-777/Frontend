@@ -4,11 +4,14 @@ import CourseCard from "@/components/explore/CourseCard";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { TAGS } from "@/constants/explore";
-import { MOCK_COURSES } from "@/data/mockCourses";
+// import { MOCK_COURSES } from "@/data/mockCourses";
+import { useModelList } from "@/hooks/useModelList";
+import type { ExtendedModel } from "@/hooks/useModelList";
 
 
 function ExplorePage() {
   const [selectedTag, setSelectedTag] = useState("전체");
+  const { data: modelList, isLoading, isError } = useModelList();
 
   return (
     <>
@@ -54,18 +57,24 @@ function ExplorePage() {
 
           {/* Courses Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
-            {MOCK_COURSES.map((course) => (
-              <CourseCard
-                key={course.id}
-                id={course.id}
-                title={course.title}
-                image={course.image}
-                level={course.level}
-                category={course.category}
-                tags={course.tags}
-                modelUrls={course.modelUrls}
-              />
-            ))}
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : isError ? (
+              <div>Error loading courses</div>
+            ) : (
+              modelList?.map((course: ExtendedModel) => (
+                <CourseCard
+                  key={course.modelId}
+                  id={String(course.modelId)}
+                  title={course.title}
+                  image={course.image}
+                  level={course.tags?.[0] || "Level"}
+                  category={course.tags?.[1] || "Category"}
+                  tags={course.tags?.slice(2) || []}
+                  modelUrls={course.modelUrls}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
