@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useCourseStore } from "@/store/useCourseStore";
 
 // Icon imports
 import StudyIcon from "@/assets/icons/study.svg";
@@ -7,12 +8,11 @@ import AiTutorIcon from "@/assets/icons/ai-tutor.svg";
 
 interface CourseRightSidebarProps {
   className?: string;
-  selectedPartId?: string | null;
-  activeTab?: 'study' | 'memo' | 'ai-tutor';
-  onTabChange?: (tab: 'study' | 'memo' | 'ai-tutor') => void;
 }
 
-export default function CourseRightSidebar({ className, selectedPartId: _selectedPartId, activeTab = 'study', onTabChange }: CourseRightSidebarProps) {
+export default function CourseRightSidebar({ className }: CourseRightSidebarProps) {
+  const { activeTab, setActiveTab } = useCourseStore();
+
   return (
     <aside
       className={cn(
@@ -26,15 +26,15 @@ export default function CourseRightSidebar({ className, selectedPartId: _selecte
           icon={StudyIcon}
           label="학습"
           isActive={activeTab === 'study'}
-          onClick={() => onTabChange?.('study')}
+          onClick={() => setActiveTab('study')}
         />
         
         {/* Memo Button */}
         <SidebarItem
-            icon={MemoIcon}
-            label="메모"
-            isActive={activeTab === 'memo'}
-            onClick={() => onTabChange?.('memo')}
+          icon={MemoIcon}
+          label="메모"
+          isActive={activeTab === 'memo'}
+          onClick={() => setActiveTab('memo')}
         />
 
         {/* AI Tutor Button */}
@@ -42,7 +42,7 @@ export default function CourseRightSidebar({ className, selectedPartId: _selecte
           icon={AiTutorIcon}
           label="AI 튜터"
           isActive={activeTab === 'ai-tutor'}
-          onClick={() => onTabChange?.('ai-tutor')}
+          onClick={() => setActiveTab('ai-tutor')}
         />
       </div>
     </aside>

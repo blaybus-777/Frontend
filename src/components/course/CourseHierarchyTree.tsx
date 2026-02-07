@@ -88,8 +88,6 @@ interface CourseHierarchyTreeProps {
 }
 
 export default function CourseHierarchyTree({ selectedPartId, onSelectPart }: CourseHierarchyTreeProps) {
-  console.log(selectedPartId);
-  
   return (
     <div className="w-full text-black flex flex-col h-full bg-gray-50">
       <div className="p-4 pt-6 border-b border-gray-200 shrink-0">
