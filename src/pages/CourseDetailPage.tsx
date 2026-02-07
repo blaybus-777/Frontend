@@ -8,7 +8,6 @@ function CourseDetailPage() {
   // 3D Control States
   const [viewMode, setViewMode] = useState<'general' | 'wireframe'>('general');
   const [assemblyMode, setAssemblyMode] = useState<'single' | 'assembly'>('assembly');
-  const [explosionLevel, setExplosionLevel] = useState(0);
 
   return (
     <div className="max-w-[1440px] w-full mx-auto px-4 md:px-6">
@@ -20,8 +19,6 @@ function CourseDetailPage() {
             onViewModeChange={setViewMode}
             assemblyMode={assemblyMode}
             onAssemblyModeChange={setAssemblyMode}
-            explosionLevel={explosionLevel}
-            onExplosionLevelChange={setExplosionLevel}
           />
         </div>
 
@@ -34,7 +31,6 @@ function CourseDetailPage() {
                     <ul className="list-disc pl-5 mt-2 space-y-1">
                         <li>View Mode: {viewMode}</li>
                         <li>Assembly Mode: {assemblyMode}</li>
-                        <li>Explosion: {explosionLevel}%</li>
                     </ul>
                 </div>
             </div>
