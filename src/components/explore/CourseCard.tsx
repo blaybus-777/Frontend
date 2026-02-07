@@ -27,7 +27,6 @@ export default function CourseCard({
 
   return (
     <div 
-      onClick={() => navigate(`/course/${id}`)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group cursor-pointer flex flex-col h-full bg-foundation-white-bg border border-foundation-gray-4 rounded-sm p-3 gap-4 hover:shadow-card-hover transition-shadow duration-300"
@@ -48,7 +47,10 @@ export default function CourseCard({
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-3 flex-1">
+      <div 
+        onClick={() => navigate(`/course/${id}`)}
+        className="flex flex-col gap-3 flex-1"
+      >
         <h3 className="text-lg font-bold text-foundation-black-text line-clamp-1" title={title}>
           {title}
         </h3>
