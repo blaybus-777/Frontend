@@ -45,9 +45,9 @@ function CourseDetailPage() {
         </div>
 
         {/* Right Side Wrapper: Viewer + Sidebar */}
-        <div className="flex flex-1 overflow-hidden border border-gray-200">
+        <div className="flex flex-1 overflow-hidden">
           {/* Center: 3D Viewer Placeholder */}
-          <div className="flex-1 bg-gray-100 flex items-center justify-center relative overflow-hidden border-r border-gray-200">
+          <div className="flex-1 bg-gray-100 flex items-center justify-center relative overflow-hidden">
               <div className="text-center">
                   <h2 className="text-xl font-bold text-gray-400 mb-4">3D Viewer Area</h2>
                   <div className="text-left text-sm text-gray-500 bg-white p-4 rounded shadow-sm inline-block">

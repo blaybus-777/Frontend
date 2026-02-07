@@ -59,7 +59,7 @@ export default function CourseAssistantPanel() {
   };
 
   return (
-    <div className="absolute top-0 bottom-0 right-0 w-[320px] bg-white border-l border-y border-gray-200 flex flex-col z-20 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
+    <div className="absolute top-0 bottom-0 right-0 w-[320px] bg-white flex flex-col z-20 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar pt-4 px-4 pb-4">
         {/* Common Part List Section */}
@@ -78,10 +78,6 @@ export default function CourseAssistantPanel() {
 function PartListSection({ selectedPartId }: { selectedPartId: string | null }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // Determines the visible height based on state
-    // grid-cols-4 means 4 items per row.
-    // 1 row showing = collapsed, 2 rows showing = expanded (with scroll if more)
-    // Adjust max-height logic as needed for precise pixel values of items
     return (
         <section>
             <h3 className="text-sm font-semibold text-gray-900 mb-3">부품 리스트</h3>
@@ -91,8 +87,6 @@ function PartListSection({ selectedPartId }: { selectedPartId: string | null }) 
                     className={cn(
                         "transition-all duration-300 ease-in-out overflow-hidden",
                         isExpanded ? "max-h-[180px] overflow-y-auto custom-scrollbar" : "max-h-[72px] overflow-hidden" 
-                        // Assuming approx 72px for one row of items (aspect-square + text) + gaps
-                        // We might need to adjust these pixel values after seeing the rendering
                     )}
                 >
                     <div className="grid grid-cols-4 gap-2 pb-2">
