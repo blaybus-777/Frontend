@@ -30,7 +30,7 @@ function TreeNode({ node, level, selectedPartId, onSelectPart }: TreeNodeProps) 
       <div
         className={cn(
           "flex items-center py-1 rounded-sm hover:bg-gray-100 cursor-pointer text-sm select-none transition-colors",
-          isSelected && "bg-blue-50 text-[#2831ff] font-medium",
+          isSelected && "text-active font-medium",
           level > 0 && "ml-4"
         )}
         onClick={handleSelect}
@@ -40,7 +40,7 @@ function TreeNode({ node, level, selectedPartId, onSelectPart }: TreeNodeProps) 
               <span 
                 className={cn(
                   "flex items-center justify-center size-4 shrink-0 text-gray-500 hover:text-gray-700",
-                  isSelected && "text-[#2831ff]"
+                  isSelected && "text-active"
                 )}
                 onClick={(e) => {
                    e.stopPropagation();
@@ -57,7 +57,7 @@ function TreeNode({ node, level, selectedPartId, onSelectPart }: TreeNodeProps) 
               <span className="size-4" /> // Placeholder for alignment
             )}
             
-            <span className={cn("truncate", hasChildren ? "font-medium" : "text-gray-600", isSelected && "text-[#2831ff]")}>
+            <span className={cn("truncate", hasChildren ? "font-medium" : "text-gray-600", isSelected && "text-active")}>
                 {node.name}
             </span>
         </div>
