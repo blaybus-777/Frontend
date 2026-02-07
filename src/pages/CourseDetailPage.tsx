@@ -1,13 +1,25 @@
-import { useParams } from 'react-router-dom';
+import { useCourseDetail } from '@/hooks/useCourseDetail';
+import CourseDetailLayout from '@/components/course/CourseDetailLayout';
 
 function CourseDetailPage() {
-  const { id } = useParams();
+  const {
+    viewMode,
+    assemblyMode,
+    selectedPartId,
+    setViewMode,
+    setAssemblyMode,
+    setSelectedPartId
+  } = useCourseDetail();
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Course Detail Page</h1>
-      <p>학습 상세 페이지 (ID: {id})</p>
-    </div>
+    <CourseDetailLayout 
+      viewMode={viewMode}
+      assemblyMode={assemblyMode}
+      selectedPartId={selectedPartId}
+      onViewModeChange={setViewMode}
+      onAssemblyModeChange={setAssemblyMode}
+      onSelectPart={setSelectedPartId}
+    />
   );
 }
 
