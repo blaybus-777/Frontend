@@ -1,7 +1,7 @@
 import { useCourseStore } from "@/store/useCourseStore";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronsDown, ChevronsUp } from "lucide-react";
 
 // Mock Data for "Study" Tab
 const MOCK_PARTS = [
@@ -122,7 +122,7 @@ function PartListSection({ selectedPartId }: { selectedPartId: string | null }) 
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="w-full h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-b-lg text-gray-500 transition-colors"
                 >
-                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    {isExpanded ? <ChevronsUp size={16} /> : <ChevronsDown size={16} />}
                 </button>
             </div>
         </section>
