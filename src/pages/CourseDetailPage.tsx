@@ -50,16 +50,6 @@ function CourseDetailPage() {
           <div className="flex-1 bg-gray-100 flex items-center justify-center relative overflow-hidden">
               <div className="text-center">
                   <h2 className="text-xl font-bold text-gray-400 mb-4">3D Viewer Area</h2>
-                  <div className="text-left text-sm text-gray-500 bg-white p-4 rounded shadow-sm inline-block">
-                      <p>Current State:</p>
-                      <ul className="list-disc pl-5 mt-2 space-y-1">
-                          <li>View Mode: {viewMode}</li>
-                          <li>Assembly Mode: {assemblyMode}</li>
-                          <li>Selected Part: {selectedPartId || 'None'}</li>
-                          <li>Active Tab: {activeTab}</li>
-                          <li>Panel Open: {isPanelOpen ? 'Yes' : 'No'}</li>
-                      </ul>
-                  </div>
               </div>
 
               {/* Assistant Panel Overlay */}
