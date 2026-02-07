@@ -61,7 +61,7 @@ export default function CourseAssistantPanel() {
   return (
     <div className="absolute top-0 bottom-0 right-0 w-[320px] bg-white flex flex-col z-20 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar pt-4 px-4 pb-4">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         {/* Common Part List Section */}
         <PartListSection selectedPartId={selectedPartId} />
         
@@ -80,49 +80,51 @@ function PartListSection({ selectedPartId }: { selectedPartId: string | null }) 
 
     return (
         <section>
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">부품 리스트</h3>
+            <h3 className="text-sm font-bold text-neutral-700 px-4 py-2 border-b">부품 리스트</h3>
             
-            <div className="relative">
-                <div 
-                    className={cn(
-                        "transition-all duration-300 ease-in-out overflow-hidden",
-                        isExpanded ? "max-h-[180px] overflow-y-auto custom-scrollbar" : "max-h-[72px] overflow-hidden" 
-                    )}
-                >
-                    <div className="grid grid-cols-4 gap-2 pb-2">
-                        {MOCK_PARTS.map((part) => (
-                            <button 
-                                key={part.id} 
-                                className="flex flex-col items-center gap-1 w-full shrink-0 group focus:outline-none"
-                            >
-                                <div className={cn(
-                                    "w-full aspect-square rounded-lg overflow-hidden border transition-all",
-                                    selectedPartId === part.id 
-                                        ? "border-blue-500 shadow-sm ring-1 ring-blue-500 bg-blue-50" 
-                                        : "border-gray-200 hover:border-blue-300 bg-gray-50"
-                                )}>
-                                    <img src={part.image} alt={part.name} className="w-full h-full object-cover" />
-                                </div>
-                                <span className={cn(
-                                    "text-[10px] truncate w-full text-center transition-colors",
-                                    selectedPartId === part.id ? "text-blue-600 font-medium" : "text-gray-500"
-                                )}>
-                                    {part.name}
-                                </span>
-                            </button>
-                        ))}
+            <div className="relative py-3 px-4">
+                <div className="border border-b-0 rounded-t-lg p-3 pb-2">
+                    <div 
+                        className={cn(
+                            "transition-all duration-300 ease-in-out overflow-y-auto custom-scrollbar",
+                            isExpanded ? "max-h-[170px]" : "max-h-[80px]" 
+                        )}
+                        style={{ height: 'auto' }}
+                    >
+                        <div className="grid grid-cols-4 gap-2 pb-2">
+                            {MOCK_PARTS.map((part) => (
+                                <button 
+                                    key={part.id} 
+                                    className="flex flex-col items-center gap-1 w-full shrink-0 group focus:outline-none"
+                                >
+                                    <div className={cn(
+                                        "w-full aspect-square rounded-lg overflow-hidden border transition-all",
+                                        selectedPartId === part.id 
+                                            ? "border-blue-500 shadow-sm ring-1 ring-blue-500 bg-blue-50" 
+                                            : "border-gray-200 hover:border-blue-300 bg-gray-50"
+                                    )}>
+                                        <img src={part.image} alt={part.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <span className={cn(
+                                        "text-[10px] truncate w-full text-center transition-colors",
+                                        selectedPartId === part.id ? "text-blue-600 font-medium" : "text-gray-500"
+                                    )}>
+                                        {part.name}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Toggle Button */}
-            <button 
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full mt-2 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-gray-500 transition-colors"
-            >
-                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-            <div className="my-4 border-b border-gray-100" />
+                {/* Toggle Button */}
+                <button 
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="w-full h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-b-lg text-gray-500 transition-colors"
+                >
+                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+            </div>
         </section>
     );
 }
