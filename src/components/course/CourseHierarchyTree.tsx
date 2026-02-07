@@ -3,7 +3,6 @@ import { ChevronRight, ChevronDown } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { DRONE_PARTS, type PartNode } from "@/data/droneParts";
 import { cn } from "@/lib/utils";
