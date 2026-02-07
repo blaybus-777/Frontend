@@ -60,12 +60,12 @@ export default function CourseAssistantPanel() {
 
   return (
     <div className="absolute top-0 bottom-0 right-0 w-[320px] bg-white flex flex-col z-20 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
-      {/* Content Area */}
+      {/* Part List Section - Fixed */}
+      <PartListSection selectedPartId={selectedPartId} />
+
+      {/* Content Area - Scrollable */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {/* Common Part List Section */}
-        <PartListSection selectedPartId={selectedPartId} />
-        
-        <div className="mt-4">
+        <div className="">
              {renderContent()}
         </div>
       </div>
@@ -82,7 +82,7 @@ function PartListSection({ selectedPartId }: { selectedPartId: string | null }) 
         <section>
             <h3 className="text-sm font-bold text-neutral-700 px-4 py-2 border-b">부품 리스트</h3>
             
-            <div className="relative py-3 px-4">
+            <div className="relative py-3 px-4 border-b">
                 <div className="border border-b-0 rounded-t-lg p-3 pb-2">
                     <div 
                         className={cn(
@@ -134,9 +134,9 @@ function StudyTabContent() {
         <div className="flex flex-col gap-6">
             {/* Learning Point Section */}
             <section>
-                <h3 className="text-sm font-semibold text-gray-500 mb-3">학습 포인트</h3>
+                <h3 className="text-sm font-semibold text-gray-500 py-2 px-4 border-b border-gray-200">학습 포인트</h3>
                 
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 text-sm">
+                <div className="bg-neutral-100 p-4 text-sm">
                     <h4 className="text-base font-bold mb-4">{MOCK_LEARNING_CONTENT.title}</h4>
                     
                     <div className="space-y-4">
