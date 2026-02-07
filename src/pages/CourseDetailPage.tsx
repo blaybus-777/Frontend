@@ -29,7 +29,7 @@ function CourseDetailPage() {
                 onAssemblyModeChange={setAssemblyMode}
               />
             </div>
-            <div className="bg-gray-50 flex-1 overflow-hidden border border-gray-200 rounded-md">
+            <div className="bg-gray-50 flex-1 overflow-hidden">
                <CourseHierarchyTree 
                   selectedPartId={selectedPartId}
                   onSelectPart={setSelectedPartId}
