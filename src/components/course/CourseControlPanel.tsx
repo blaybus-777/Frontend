@@ -14,7 +14,7 @@ export default function CourseControlPanel({
   onAssemblyModeChange,
 }: CourseControlPanelProps) {
   return (
-    <div className="w-3xs bg-white text-black rounded-md shadow-card-hover flex flex-col">
+    <div className="w-full flex flex-col">
       {/* Assembly Mode Section */}
       <div className="flex flex-col gap-3 p-4 border-b border-gray-200">
         <h2 className="text-base font-bold pl-1">쿼드콥터 드론 시스템</h2>

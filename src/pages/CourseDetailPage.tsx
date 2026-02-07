@@ -1,9 +1,10 @@
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import CourseControlPanel from '@/components/course/CourseControlPanel';
+import CourseHierarchyTree from '@/components/course/CourseHierarchyTree';
 
 function CourseDetailPage() {
-  const { id } = useParams();
+  // const { id } = useParams();
   
   // 3D Control States
   const [viewMode, setViewMode] = useState<'general' | 'wireframe'>('general');
@@ -11,15 +12,22 @@ function CourseDetailPage() {
 
   return (
     <div className="max-w-[1440px] w-full mx-auto px-4 md:px-6">
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row">
         {/* Left Side: Control Panel */}
         <div className="shrink-0 p-3">
-          <CourseControlPanel 
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            assemblyMode={assemblyMode}
-            onAssemblyModeChange={setAssemblyMode}
-          />
+          <div className="w-3xs text-black flex flex-col h-[calc(100vh-120px)]">
+            <div className="bg-white border border-gray-200 rounded-md shrink-0">
+              <CourseControlPanel 
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                assemblyMode={assemblyMode}
+                onAssemblyModeChange={setAssemblyMode}
+              />
+            </div>
+            <div className="bg-gray-50 flex-1 overflow-hidden">
+               <CourseHierarchyTree />
+            </div>
+          </div>
         </div>
 
         {/* Right Side: 3D Viewer Placeholder */}
