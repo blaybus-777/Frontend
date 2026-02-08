@@ -1,7 +1,13 @@
-import { useCourseStore } from '@/store/useCourseStore';
+import { useCourseStore } from '@/stores/useCourseStore';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
+import NoteList from './note/NoteList';
+import NoteDetail from './note/NoteDetail';
+import NoteEditor from './note/NoteEditor';
+import { useShallow } from 'zustand/react/shallow';
+import { useNoteStore } from '@/stores/useNoteStore';
+import { useParams } from 'react-router-dom';
 
 // Mock Data for "Study" Tab
 const MOCK_PARTS = [
@@ -87,7 +93,7 @@ export default function CourseAssistantPanel() {
       case 'study':
         return <StudyTabContent />;
       case 'memo':
-        return <MemoTabContent />;
+        return <NoteTabContent />;
       case 'ai-tutor':
         return <AiTutorTabContent />;
       default:
@@ -96,13 +102,13 @@ export default function CourseAssistantPanel() {
   };
 
   return (
-    <div className="absolute top-0 right-0 bottom-0 z-20 flex w-[320px] flex-col bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
+    <div className="absolute top-0 right-0 bottom-0 flex w-[320px] flex-col bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
       {/* Part List Section - Fixed */}
       <PartListSection selectedPartId={selectedPartId} />
 
       {/* Content Area - Scrollable */}
-      <div className="custom-scrollbar flex-1 overflow-y-auto">
-        <div className="">{renderContent()}</div>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {renderContent()}
       </div>
     </div>
   );
@@ -128,7 +134,11 @@ function PartListSection({
               'custom-scrollbar overflow-y-auto transition-all duration-300 ease-in-out',
               isExpanded ? 'max-h-[170px]' : 'max-h-[80px]'
             )}
-            style={{ height: 'auto' }}
+            style={{
+              height: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y',
+            }}
           >
             <div className="grid grid-cols-4 gap-2 pb-2">
               {MOCK_PARTS.map((part) => (
@@ -180,7 +190,13 @@ function PartListSection({
 
 function StudyTabContent() {
   return (
-    <div className="flex flex-col gap-6">
+    <div
+      className="custom-scrollbar flex h-full flex-col gap-6 overflow-y-auto"
+      style={{
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-y',
+      }}
+    >
       {/* Learning Point Section */}
       <section>
         <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
@@ -240,10 +256,64 @@ function StudyTabContent() {
   );
 }
 
-function MemoTabContent() {
+function NoteTabContent() {
+  const { id } = useParams<{ id: string }>();
+  // Assuming id from URL is the modelId
+  const modelId = id ? parseInt(id, 10) : 0;
+
+  const { selectedNoteId, isCreating, setIsCreating, createNote } =
+    useNoteStore(
+      useShallow((state) => ({
+        selectedNoteId: state.selectedNoteId,
+        isCreating: state.isCreating,
+        setIsCreating: state.setIsCreating,
+        createNote: state.createNote,
+      }))
+    );
+
+  const handleCreateSubmit = async (title: string, content: string) => {
+    if (modelId === 0) {
+      alert('모델 ID를 찾을 수 없습니다.');
+      return;
+    }
+    await createNote(modelId, title, content);
+  };
+
+  if (isCreating) {
+    return (
+      <NoteEditor
+        onSubmit={handleCreateSubmit}
+        onCancel={() => setIsCreating(false)}
+      />
+    );
+  }
+
+  if (selectedNoteId) {
+    return <NoteDetail />;
+  }
+
   return (
-    <div className="flex h-full flex-col items-center justify-center p-4 text-gray-400">
-      <p>메모 기능 준비중...</p>
+    <div className="flex h-full flex-col">
+      <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
+        메모
+      </h3>
+      <div
+        className="flex-1 overflow-y-auto bg-neutral-100"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
+        }}
+      >
+        <NoteList />
+      </div>
+      <div className="flex justify-center bg-neutral-100 p-4 pt-2">
+        <button
+          className="w-40 rounded-full bg-gray-200 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-300"
+          onClick={() => setIsCreating(true)}
+        >
+          메모 추가
+        </button>
+      </div>
     </div>
   );
 }
