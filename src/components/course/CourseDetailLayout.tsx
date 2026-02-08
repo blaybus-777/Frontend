@@ -2,6 +2,10 @@ import CourseControlPanel from '@/components/course/CourseControlPanel';
 import CourseHierarchyTree from '@/components/course/CourseHierarchyTree';
 import CourseRightSidebar from '@/components/course/CourseRightSidebar';
 import CourseAssistantPanel from '@/components/course/CourseAssistantPanel';
+import ModelViewer from '@/components/course/ModelViewer';
+import { useCourseDetail } from '@/hooks/useCourseDetail';
+import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
+import { useParams } from 'react-router-dom';
 
 interface CourseDetailLayoutProps {
   selectedPartId: string | null;
@@ -12,6 +16,13 @@ export default function CourseDetailLayout({
   selectedPartId,
   onSelectPart,
 }: CourseDetailLayoutProps) {
+  const { id } = useParams();
+  const { viewMode, assemblyMode, explosionLevel, explodeSpace } =
+    useCourseDetail();
+  const { detail, isLoading, isError } = useCourseModelDetail(id);
+
+  const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 2;
+
   return (
     <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6">
       <div className="flex h-[calc(100dvh-81px)] flex-col lg:flex-row">
@@ -34,11 +45,27 @@ export default function CourseDetailLayout({
         <div className="flex flex-1 overflow-hidden">
           {/* Center: 3D Viewer Placeholder */}
           <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gray-100">
-            <div className="text-center">
-              <h2 className="mb-4 text-xl font-bold text-gray-400">
-                3D Viewer Area
-              </h2>
-            </div>
+            {isLoading ? (
+              <div className="text-center text-sm text-gray-500">
+                3D 모델을 불러오는 중입니다.
+              </div>
+            ) : isError || !detail ? (
+              <div className="text-center text-sm text-gray-500">
+                3D 모델을 불러올 수 없습니다.
+              </div>
+            ) : (
+              <div className="h-full w-full">
+                <ModelViewer
+                  urls={detail.modelUrls}
+                  selectedPartId={selectedPartId}
+                  viewMode={viewMode}
+                  assemblyMode={assemblyMode}
+                  explodeDistance={explodeDistance}
+                  explodeSpace={explodeSpace}
+                  assetKey={detail.assetKey}
+                />
+              </div>
+            )}
 
             {/* Assistant Panel Overlay */}
             <CourseAssistantPanel />

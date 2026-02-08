@@ -21,6 +21,9 @@ interface CourseState {
 
   assemblyMode: 'single' | 'assembly';
   setAssemblyMode: (mode: 'single' | 'assembly') => void;
+
+  explodeSpace: 'local' | 'world';
+  setExplodeSpace: (space: 'local' | 'world') => void;
 }
 
 export const useCourseStore = create<CourseState>((set) => ({
@@ -55,4 +58,7 @@ export const useCourseStore = create<CourseState>((set) => ({
 
   assemblyMode: 'assembly',
   setAssemblyMode: (mode) => set({ assemblyMode: mode }),
+
+  explodeSpace: 'local',
+  setExplodeSpace: (space) => set({ explodeSpace: space }),
 }));

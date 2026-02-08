@@ -13,6 +13,9 @@ export default function CourseControlPanel() {
   const assemblyMode = useCourseStore((state) => state.assemblyMode);
   const setAssemblyMode = useCourseStore((state) => state.setAssemblyMode);
 
+  const explodeSpace = useCourseStore((state) => state.explodeSpace);
+  const setExplodeSpace = useCourseStore((state) => state.setExplodeSpace);
+
   return (
     <div className="flex w-full flex-col">
       {/* Assembly Mode Section */}
@@ -64,6 +67,18 @@ export default function CourseControlPanel() {
             <span className="w-10 text-right text-sm font-medium">
               {explosionLevel[0]}%
             </span>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <ControlToggleButton
+              label="로컬 좌표"
+              isActive={explodeSpace === 'local'}
+              onClick={() => setExplodeSpace('local')}
+            />
+            <ControlToggleButton
+              label="월드 좌표"
+              isActive={explodeSpace === 'world'}
+              onClick={() => setExplodeSpace('world')}
+            />
           </div>
         </div>
       )}

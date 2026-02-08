@@ -12,6 +12,9 @@ export const useCourseDetail = () => {
     setViewMode,
     assemblyMode,
     setAssemblyMode,
+    explodeSpace,
+    setExplodeSpace,
+    explosionLevel,
   } = useCourseStore(
     useShallow((state) => ({
       selectedPartId: state.selectedPartId,
@@ -22,6 +25,9 @@ export const useCourseDetail = () => {
       setViewMode: state.setViewMode,
       assemblyMode: state.assemblyMode,
       setAssemblyMode: state.setAssemblyMode,
+      explodeSpace: state.explodeSpace,
+      setExplodeSpace: state.setExplodeSpace,
+      explosionLevel: state.explosionLevel,
     }))
   );
 
@@ -29,6 +35,8 @@ export const useCourseDetail = () => {
     // State
     viewMode,
     assemblyMode,
+    explodeSpace,
+    explosionLevel,
     selectedPartId,
     activeTab,
     isPanelOpen,
@@ -36,6 +44,7 @@ export const useCourseDetail = () => {
     // Actions
     setViewMode,
     setAssemblyMode,
+    setExplodeSpace,
     setSelectedPartId,
   };
 };

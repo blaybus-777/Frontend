@@ -3,6 +3,21 @@ export interface AssetData {
   modelUrls: string[];
 }
 
+export const FINAL_ASSET_URLS: Partial<Record<keyof typeof ASSETS, string>> = {
+  DRONE: "/models/final/Drone2.glb",
+};
+
+export const MODEL_ID_TO_ASSET_KEY: Record<string, keyof typeof ASSETS> = {
+  "1": "DRONE",
+  "24": "DRONE",
+  "2": "LEAF_SPRING",
+  "3": "MACHINE_VISE",
+  "4": "ROBOT_ARM",
+  "5": "ROBOT_GRIPPER",
+  "6": "SUSPENSION",
+  "7": "V4_ENGINE",
+};
+
 export const ASSETS: Record<string, AssetData> = {
   DRONE: {
     image: '/img/1.png',
