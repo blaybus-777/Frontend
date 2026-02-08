@@ -17,8 +17,10 @@ import {
   codeBlockPlugin,
   InsertCodeBlock,
   BlockTypeSelect,
-  CodeToggle
+  CodeToggle,
+  type MDXEditorMethods
 } from '@mdxeditor/editor';
+import { useRef } from 'react';
 import '@mdxeditor/editor/style.css';
 import { Save, X } from 'lucide-react';
 
@@ -45,6 +47,7 @@ export default function NoteEditor({
   submitLabel = '저장',
 }: NoteEditorProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const editorRef = useRef<MDXEditorMethods>(null);
 
   const {
     register,
@@ -90,16 +93,33 @@ export default function NoteEditor({
           </div>
 
           {/* Editor Area */}
-          <div className="flex-1">
+          <div 
+            className="flex-1 flex flex-col cursor-text" 
+            onClick={(e) => {
+              const target = e.target as HTMLElement;
+              // 버튼, 입력창, 링크, 다이얼로그 내부 클릭 시에는 포커스 강제 이동 방지
+              if (
+                target.tagName === 'BUTTON' || target.closest('button') ||
+                target.tagName === 'INPUT' || target.closest('input') ||
+                target.tagName === 'A' || target.closest('a') ||
+                target.closest('[role="dialog"]') ||
+                target.closest('.mdxeditor-toolbar')
+              ) {
+                return;
+              }
+              editorRef.current?.focus();
+            }}
+          >
             <Controller
               control={control}
               name="content"
               render={({ field: { onChange, value } }) => (
                 <MDXEditor
+                  ref={editorRef}
                   markdown={value || ''}
                   onChange={onChange}
-                  className="h-full flex flex-col note-editor-root"
-                  contentEditableClassName="mdxeditor-root-contenteditable prose prose-sm max-w-none px-6 py-4 focus:outline-none h-full overflow-y-auto custom-scrollbar"
+                  className="flex-1 flex flex-col note-editor-root [&_.mdxeditor-rich-text-editor]:flex-1 [&_.mdxeditor-rich-text-editor]:flex [&_.mdxeditor-rich-text-editor]:flex-col"
+                  contentEditableClassName="mdxeditor-root-contenteditable prose prose-sm max-w-none px-6 py-4 focus:outline-none flex-1 min-h-full overflow-y-auto custom-scrollbar"
                   placeholder="마크다운을 이용해서 편리하게 글을 작성할 수 있어요."
                   autoFocus={false}
                   plugins={[
@@ -115,7 +135,7 @@ export default function NoteEditor({
                       toolbarContents: () => (
                         <>
                           {' '}
-                          <div className="flex items-center gap-1 border-b border-gray-100 px-2 py-1">
+                          <div className="mdxeditor-toolbar flex items-center gap-1 border-b border-gray-100 px-2 py-1">
                             <BoldItalicUnderlineToggles />
                             <div className="mx-1 h-4 w-px bg-gray-200" />
                             <CreateLink />
