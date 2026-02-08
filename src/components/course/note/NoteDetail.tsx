@@ -4,18 +4,51 @@ import { useShallow } from 'zustand/react/shallow';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import { useState } from 'react';
 import useNoteDetail from '@/hooks/useNoteDetail';
+import {
+  MDXEditor,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  markdownShortcutPlugin,
+  linkPlugin
+} from '@mdxeditor/editor';
+import '@mdxeditor/editor/style.css';
+import NoteEditor from './NoteEditor';
 
 export default function NoteDetail() {
-  const { selectedNoteId, setSelectedNoteId, deleteNote } = useNoteStore(
+  const { selectedNoteId, setSelectedNoteId, deleteNote, updateNote } = useNoteStore(
     useShallow((state) => ({
       selectedNoteId: state.selectedNoteId,
       setSelectedNoteId: state.setSelectedNoteId,
       deleteNote: state.deleteNote,
+      updateNote: state.updateNote,
     }))
   );
 
   const { note, isLoading, error } = useNoteDetail(selectedNoteId);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // If editing, render the editor instead of the detail view
+  if (isEditing && note) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center p-4 text-gray-500">
+        <NoteEditor
+          initialTitle={note.title}
+          initialContent={note.content}
+          onSubmit={async (title, content) => {
+            if (selectedNoteId) {
+              await updateNote(selectedNoteId, title, content);
+              setIsEditing(false);
+            }
+          }}
+          onCancel={() => setIsEditing(false)}
+          submitLabel="수정 완료"
+        />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -73,17 +106,27 @@ export default function NoteDetail() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden p-4">
-        <div className="h-full overflow-y-auto rounded-lg bg-white p-5 shadow-sm">
-          <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
-            {note.content}
-          </div>
+        <div className="h-full overflow-y-auto rounded-lg bg-white p-5 shadow-sm custom-scrollbar">
+          <MDXEditor
+            markdown={note.content}
+            readOnly={true}
+            plugins={[
+              headingsPlugin(),
+              listsPlugin(),
+              quotePlugin(),
+              thematicBreakPlugin(),
+              markdownShortcutPlugin(),
+              linkPlugin()
+            ]}
+            contentEditableClassName="prose prose-sm max-w-none text-gray-700"
+          />
         </div>
       </div>
 
       {/* Footer Actions */}
       <div className="flex h-24 shrink-0 items-center justify-end gap-2 px-4">
         <button
-          onClick={() => alert('수정 기능은 준비중입니다.')}
+          onClick={() => setIsEditing(true)}
           className="flex cursor-pointer items-center gap-1 text-gray-400 transition-colors hover:text-blue-500"
         >
           <Pencil size={16} />

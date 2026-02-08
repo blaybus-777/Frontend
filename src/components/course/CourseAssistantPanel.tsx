@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import NoteList from './note/NoteList';
 import NoteDetail from './note/NoteDetail';
+import NoteEditor from './note/NoteEditor';
 import { useShallow } from 'zustand/react/shallow';
 import { useNoteStore } from '@/store/useNoteStore';
+import { useParams } from 'react-router-dom';
+
 
 // Mock Data for "Study" Tab
 const MOCK_PARTS = [
@@ -100,7 +103,7 @@ export default function CourseAssistantPanel() {
   };
 
   return (
-    <div className="absolute top-0 right-0 bottom-0 z-20 flex w-[320px] flex-col bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
+    <div className="absolute top-0 right-0 bottom-0 flex w-[320px] flex-col bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
       {/* Part List Section - Fixed */}
       <PartListSection selectedPartId={selectedPartId} />
 
@@ -245,11 +248,36 @@ function StudyTabContent() {
 }
 
 function NoteTabContent() {
-  const { selectedNoteId } = useNoteStore(
+  const { id } = useParams<{ id: string }>();
+  // Assuming id from URL is the modelId
+  const modelId = id ? parseInt(id, 10) : 0;
+
+  const { selectedNoteId, isCreating, setIsCreating, createNote } = useNoteStore(
     useShallow((state) => ({
       selectedNoteId: state.selectedNoteId,
+      isCreating: state.isCreating,
+      setIsCreating: state.setIsCreating,
+      createNote: state.createNote,
     }))
   );
+
+  const handleCreateSubmit = async (title: string, content: string) => {
+    if (modelId === 0) {
+      alert('모델 ID를 찾을 수 없습니다.');
+      return;
+    }
+    await createNote(modelId, title, content);
+  };
+
+  if (isCreating) {
+    return (
+      <NoteEditor
+        onSubmit={handleCreateSubmit}
+        onCancel={() => setIsCreating(false)}
+        submitLabel="새 메모 저장"
+      />
+    );
+  }
 
   if (selectedNoteId) {
     return <NoteDetail />;
@@ -266,7 +294,7 @@ function NoteTabContent() {
       <div className="bg-neutral-100 p-4 pt-2">
         <button
           className="w-full rounded-full bg-gray-200 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-300"
-          onClick={() => alert('메모 추가 기능은 준비중입니다.')}
+          onClick={() => setIsCreating(true)}
         >
           메모 추가
         </button>

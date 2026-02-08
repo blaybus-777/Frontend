@@ -1,8 +1,13 @@
 import { create } from 'zustand';
-import { getNoteList, deleteNote } from '@/apis/note';
-import type { NoteItem } from '@/apis/note';
+import {
+  getNoteList,
+  deleteNote as deleteNoteApi,
+  createNote as createNoteApi,
+  updateNote as updateNoteApi,
+  type NoteItem,
+} from '@/apis/note';
 
-interface NoteState {
+export interface NoteState {
   notes: NoteItem[];
   isLoading: boolean;
   error: string | null;
@@ -12,6 +17,11 @@ interface NoteState {
   
   selectedNoteId: number | null;
   setSelectedNoteId: (id: number | null) => void;
+
+  isCreating: boolean;
+  setIsCreating: (isCreating: boolean) => void;
+  createNote: (modelId: number, title: string, content: string) => Promise<void>;
+  updateNote: (noteId: number, title: string, content: string) => Promise<void>;
 }
 
 const MOCK_NOTES: NoteItem[] = [
@@ -41,36 +51,64 @@ const MOCK_NOTES: NoteItem[] = [
   },
 ];
 
-export const useNoteStore = create<NoteState>((set) => ({
+export const useNoteStore = create<NoteState>((set, get) => ({
   notes: [],
+  selectedNoteId: null,
   isLoading: false,
   error: null,
+  isCreating: false,
 
   fetchNotes: async (modelId: number) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true });
     try {
       const data = await getNoteList(modelId);
-      set({ notes: data.items, isLoading: false });
+      set({ notes: data.items });
     } catch (error) {
-      console.error('Failed to fetch notes, using MOCK data:', error);
-      // Fallback to mock data for testing
-      set({ notes: MOCK_NOTES, isLoading: false, error: null });
+      console.error('Failed to fetch notes:', error);
+    } finally {
+      set({ isLoading: false });
     }
   },
 
-  deleteNote: async (noteId: number) => {
+  setSelectedNoteId: (id) => set({ selectedNoteId: id, isCreating: false }),
+
+  setIsCreating: (isCreating) => set({ isCreating, selectedNoteId: null }),
+
+  deleteNote: async (noteId) => {
     try {
-      await deleteNote(noteId);
+      await deleteNoteApi(noteId);
+      set((state) => ({
+        notes: state.notes.filter((note) => note.noteId !== noteId),
+        selectedNoteId: state.selectedNoteId === noteId ? null : state.selectedNoteId,
+      }));
     } catch (error) {
-      console.error('Failed to delete note (API), updating UI anyway:', error);
+      console.error('Failed to delete note:', error);
     }
-    // Always update UI for testing purposes
-    set((state) => ({
-      notes: state.notes.filter((note) => note.noteId !== noteId),
-      selectedNoteId: state.selectedNoteId === noteId ? null : state.selectedNoteId,
-    }));
   },
 
-  selectedNoteId: null,
-  setSelectedNoteId: (id) => set({ selectedNoteId: id }),
+  createNote: async (modelId, title, content) => {
+    try {
+      await createNoteApi(modelId, title, content);
+      await get().fetchNotes(modelId);
+      set({ isCreating: false });
+    } catch (error) {
+      console.error('Failed to create note:', error);
+      throw error;
+    }
+  },
+
+  updateNote: async (noteId, title, content) => {
+    try {
+      await updateNoteApi(noteId, title, content);
+      // Update list to reflect title changes if necessary
+      const currentNotes = get().notes;
+      const modelId = currentNotes.find(n => n.noteId === noteId)?.modelId;
+      if (modelId) {
+        await get().fetchNotes(modelId);
+      }
+    } catch (error) {
+      console.error('Failed to update note:', error);
+      throw error;
+    }
+  },
 }));

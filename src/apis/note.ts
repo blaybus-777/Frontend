@@ -34,3 +34,23 @@ export const getNoteDetail = async (noteId: number): Promise<NoteItem> => {
   }
   throw new Error('Note not found');
 };
+
+// POST /v1/note/create
+export const createNote = async (
+  modelId: number,
+  title: string,
+  content: string
+): Promise<void> => {
+  await api.post('/v1/note/create', { modelId, title, content });
+};
+
+// PATCH /v1/note/update/{noteId}
+export const updateNote = async (
+  noteId: number,
+  title: string,
+  content: string
+): Promise<void> => {
+  await api.patch(`/v1/note/update/${noteId}`, { title, content });
+};
+
+
