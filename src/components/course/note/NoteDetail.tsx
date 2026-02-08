@@ -1,4 +1,4 @@
-import { useNoteStore } from '@/store/useNoteStore';
+import { useNoteStore } from '@/stores/useNoteStore';
 import { ChevronLeft, Pencil, Trash2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import DeleteConfirmModal from './DeleteConfirmModal';

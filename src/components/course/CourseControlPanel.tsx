@@ -1,7 +1,7 @@
 import { ControlToggleButton } from './ControlToggleButton';
 import { Slider } from '@/components/ui/slider';
 
-import { useCourseStore } from '@/store/useCourseStore';
+import { useCourseStore } from '@/stores/useCourseStore';
 
 export default function CourseControlPanel() {
   const explosionLevel = useCourseStore((state) => state.explosionLevel);

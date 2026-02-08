@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { useCourseStore } from '@/store/useCourseStore';
+import { useCourseStore } from '@/stores/useCourseStore';
 
 // Icon imports
 import StudyIcon from '@/assets/icons/study.svg';

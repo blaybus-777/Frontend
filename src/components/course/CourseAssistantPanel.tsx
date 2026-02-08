@@ -1,4 +1,4 @@
-import { useCourseStore } from '@/store/useCourseStore';
+import { useCourseStore } from '@/stores/useCourseStore';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
@@ -6,7 +6,7 @@ import NoteList from './note/NoteList';
 import NoteDetail from './note/NoteDetail';
 import NoteEditor from './note/NoteEditor';
 import { useShallow } from 'zustand/react/shallow';
-import { useNoteStore } from '@/store/useNoteStore';
+import { useNoteStore } from '@/stores/useNoteStore';
 import { useParams } from 'react-router-dom';
 
 // Mock Data for "Study" Tab
