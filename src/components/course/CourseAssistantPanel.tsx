@@ -271,11 +271,11 @@ function NoteTabContent() {
 
   if (isCreating) {
     return (
-      <NoteEditor
-        onSubmit={handleCreateSubmit}
-        onCancel={() => setIsCreating(false)}
-        submitLabel="새 메모 저장"
-      />
+        <NoteEditor
+          onSubmit={handleCreateSubmit}
+          onCancel={() => setIsCreating(false)}
+          submitLabel="새 메모 저장"
+        />
     );
   }
 

@@ -124,3 +124,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* MDXEditor Custom Styles for NoteEditor */
+.note-editor-root [class*="_placeholder_"] {
+  white-space: normal !important;
+  text-overflow: unset !important;
+  overflow: visible !important;
+  width: 100% !important;
+  position: absolute !important;
+  height: auto !important;
+  word-break: keep-all;
+}
+
+.mdxeditor-root-contenteditable {
+  height: 100%;
+}
+

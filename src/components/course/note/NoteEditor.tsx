@@ -98,8 +98,8 @@ export default function NoteEditor({
                 <MDXEditor
                   markdown={value || ''}
                   onChange={onChange}
-                  className="h-full flex flex-col"
-                  contentEditableClassName="prose prose-sm max-w-none px-6 py-4 focus:outline-none h-full overflow-y-auto custom-scrollbar"
+                  className="h-full flex flex-col note-editor-root"
+                  contentEditableClassName="mdxeditor-root-contenteditable prose prose-sm max-w-none px-6 py-4 focus:outline-none h-full overflow-y-auto custom-scrollbar"
                   placeholder="마크다운을 이용해서 편리하게 글을 작성할 수 있어요."
                   autoFocus={false}
                   plugins={[

@@ -26,27 +26,26 @@ export default function NoteDetail() {
     }))
   );
 
-  const { note, isLoading, error } = useNoteDetail(selectedNoteId);
+  const { note, isLoading, error, refetch } = useNoteDetail(selectedNoteId);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   // If editing, render the editor instead of the detail view
   if (isEditing && note) {
     return (
-      <div className="flex h-full flex-col items-center justify-center p-4 text-gray-500">
         <NoteEditor
           initialTitle={note.title}
           initialContent={note.content}
           onSubmit={async (title, content) => {
             if (selectedNoteId) {
               await updateNote(selectedNoteId, title, content);
+              await refetch();
               setIsEditing(false);
             }
           }}
           onCancel={() => setIsEditing(false)}
           submitLabel="수정 완료"
         />
-      </div>
     );
   }
 
