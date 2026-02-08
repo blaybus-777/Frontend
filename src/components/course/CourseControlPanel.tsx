@@ -16,6 +16,11 @@ export default function CourseControlPanel() {
   const explodeSpace = useCourseStore((state) => state.explodeSpace);
   const setExplodeSpace = useCourseStore((state) => state.setExplodeSpace);
 
+  const transformMode = useCourseStore((state) => state.transformMode);
+  const setTransformMode = useCourseStore((state) => state.setTransformMode);
+  const selectedPartTransform = useCourseStore(
+    (state) => state.selectedPartTransform
+  );
   return (
     <div className="flex w-full flex-col">
       {/* Assembly Mode Section */}
@@ -68,20 +73,36 @@ export default function CourseControlPanel() {
               {explosionLevel[0]}%
             </span>
           </div>
-          <div className="flex gap-2 pt-2">
-            <ControlToggleButton
-              label="로컬 좌표"
-              isActive={explodeSpace === 'local'}
-              onClick={() => setExplodeSpace('local')}
-            />
-            <ControlToggleButton
-              label="월드 좌표"
-              isActive={explodeSpace === 'world'}
-              onClick={() => setExplodeSpace('world')}
-            />
-          </div>
         </div>
       )}
+
+      <div className="flex flex-col gap-3 border-t border-gray-200 p-4">
+        <h2 className="text-base font-bold">부품 조작</h2>
+        <div className="flex gap-2">
+          <ControlToggleButton
+            label="이동"
+            isActive={transformMode === 'translate'}
+            onClick={() => setTransformMode('translate')}
+          />
+          <ControlToggleButton
+            label="회전"
+            isActive={transformMode === 'rotate'}
+            onClick={() => setTransformMode('rotate')}
+          />
+        </div>
+        <div className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700">
+          <div className="font-semibold text-gray-600">좌표</div>
+          {selectedPartTransform ? (
+            <div className="mt-1 grid grid-cols-3 gap-2 text-[11px]">
+              <div>X {selectedPartTransform.x.toFixed(2)}</div>
+              <div>Y {selectedPartTransform.y.toFixed(2)}</div>
+              <div>Z {selectedPartTransform.z.toFixed(2)}</div>
+            </div>
+          ) : (
+            <div className="mt-1 text-gray-500">선택된 부품 없음</div>
+          )}
+        </div>
+      </div>
       <div className=""></div>
     </div>
   );

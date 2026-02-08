@@ -1,11 +1,14 @@
-import { useGLTF } from "@react-three/drei";
+import { TransformControls, useGLTF } from "@react-three/drei";
 import { Html } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import type { PartInfoMap, SelectedPart } from "./types";
 import { DRONE_PART_ID_TO_FILE } from "@/data/partMapping";
 import { FINAL_ASSET_URLS } from "@/constants/assets";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { useCourseStore } from "@/store/useCourseStore";
+import { useShallow } from "zustand/react/shallow";
 
 interface ModelSceneProps {
   urls: string[];
@@ -18,6 +21,8 @@ interface ModelSceneProps {
   viewMode?: "general" | "wireframe";
   assemblyMode?: "single" | "assembly";
   assetKey?: string;
+  htmlPortal?: RefObject<HTMLDivElement | null>;
+  orbitRef?: RefObject<OrbitControlsImpl | null>;
 }
 
 interface MeshExplodeData {
@@ -53,6 +58,7 @@ function cloneMaterial(material: THREE.Material) {
 function prepareMaterials(object: THREE.Object3D) {
   object.traverse((child) => {
     if (child instanceof THREE.Mesh) {
+      child.userData.__selectable = true;
       if (Array.isArray(child.material)) {
         child.material = child.material.map((material) => cloneMaterial(material));
       } else if (child.material) {
@@ -193,16 +199,32 @@ export default function ModelScene({
   viewMode = "general",
   assemblyMode = "assembly",
   assetKey,
+  htmlPortal,
+  orbitRef,
 }: ModelSceneProps) {
   const groupRef = useRef<THREE.Group>(null);
   const explodeDataRef = useRef<MeshExplodeData[]>([]);
-  const hoveredRef = useRef<THREE.Mesh | null>(null);
   const selectedRef = useRef<THREE.Mesh | null>(null);
   const labelAnchorRef = useRef<THREE.Object3D | null>(null);
   const labelGroupRef = useRef<THREE.Group | null>(null);
-  const { camera } = useThree();
+  const hoveredRef = useRef<THREE.Mesh | null>(null);
+  const { camera, controls } = useThree();
+  const orbitControls =
+    orbitRef?.current ?? (controls as OrbitControlsImpl | undefined);
   const [selectedLabel, setSelectedLabel] = useState<SelectedPart | null>(null);
+  const [hoveredLabel, setHoveredLabel] = useState<SelectedPart | null>(null);
   const [labelDistanceFactor, setLabelDistanceFactor] = useState(6);
+  const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(
+    null
+  );
+  const { transformMode } = useCourseStore(
+    useShallow((state) => ({
+      transformMode: state.transformMode,
+    }))
+  );
+  const setSelectedPartTransform = useCourseStore(
+    (state) => state.setSelectedPartTransform
+  );
 
   const resolvedUrls = useMemo(() => {
     if (assemblyMode === "single") {
@@ -224,6 +246,9 @@ export default function ModelScene({
       }
       selectedRef.current = null;
       setSelectedLabel(null);
+      setHoveredLabel(null);
+      setSelectedObject(null);
+      setSelectedPartTransform(null);
       if (onSelect) onSelect(null);
     });
   }, [onRegisterClearSelection, onSelect]);
@@ -232,15 +257,20 @@ export default function ModelScene({
     if (!groupRef.current) return;
 
     const group = groupRef.current;
+    group.position.set(0, 0, 0);
     const box = new THREE.Box3().setFromObject(group);
     const size = box.getSize(new THREE.Vector3()).length();
     const center = box.getCenter(new THREE.Vector3());
 
     group.position.sub(center);
 
-    const distance = size * 0.6 || 2;
-    camera.position.set(distance, distance, distance);
+    const distance = Math.max(size * 0.8, 2);
+    camera.position.set(distance, distance * 0.75, distance);
     camera.lookAt(0, 0, 0);
+    if (orbitControls) {
+      orbitControls.target.set(0, 0, 0);
+      orbitControls.update();
+    }
 
     const factor = Math.min(6, Math.max(2.5, size * 0.3));
     setLabelDistanceFactor(factor);
@@ -270,7 +300,7 @@ export default function ModelScene({
       });
     });
     explodeDataRef.current = meshes;
-  }, [camera, watchKey]);
+  }, [camera, watchKey, orbitControls]);
 
   useEffect(() => {
     if (!groupRef.current) return;
@@ -287,6 +317,7 @@ export default function ModelScene({
     });
   }, [explodeDistance, explodeSpace]);
 
+
   useFrame(() => {
     if (!labelAnchorRef.current || !labelGroupRef.current) return;
     const anchor = labelAnchorRef.current;
@@ -295,13 +326,27 @@ export default function ModelScene({
     labelGroupRef.current.quaternion.copy(camera.quaternion);
   });
 
+  useFrame(() => {
+    if (!selectedRef.current) return;
+    const { x, y, z } = selectedRef.current.position;
+    setSelectedPartTransform({ x, y, z });
+  });
+
   return (
     <group
       ref={groupRef}
       onPointerMove={(event) => {
         event.stopPropagation();
-        const target = event.object;
-        if (!(target instanceof THREE.Mesh)) return;
+        const selectableHit = event.intersections.find(
+          (hit) =>
+            hit.object instanceof THREE.Mesh &&
+            (hit.object as THREE.Mesh).userData.__selectable
+        );
+        const target =
+          selectableHit?.object instanceof THREE.Mesh
+            ? selectableHit.object
+            : null;
+        if (!target) return;
         if (hoveredRef.current && hoveredRef.current !== target) {
           if (hoveredRef.current !== selectedRef.current) {
             setHighlight(hoveredRef.current, "none");
@@ -310,6 +355,10 @@ export default function ModelScene({
         hoveredRef.current = target;
         if (target !== selectedRef.current) {
           setHighlight(target, "hover");
+          if (!selectedRef.current) {
+            setHoveredLabel(buildSelectedPart(target, partInfo));
+            labelAnchorRef.current = target;
+          }
         }
       }}
       onPointerOut={() => {
@@ -317,17 +366,42 @@ export default function ModelScene({
           setHighlight(hoveredRef.current, "none");
         }
         hoveredRef.current = null;
+        if (!selectedRef.current) {
+          setHoveredLabel(null);
+          labelAnchorRef.current = null;
+        }
+      }}
+      onPointerMissed={() => {
+        if (hoveredRef.current && hoveredRef.current !== selectedRef.current) {
+          setHighlight(hoveredRef.current, "none");
+        }
+        hoveredRef.current = null;
+        if (!selectedRef.current) {
+          setHoveredLabel(null);
+          labelAnchorRef.current = null;
+        }
       }}
       onPointerDown={(event) => {
         event.stopPropagation();
-        const target = event.object;
-        if (!(target instanceof THREE.Mesh)) return;
+        const selectableHit = event.intersections.find(
+          (hit) =>
+            hit.object instanceof THREE.Mesh &&
+            (hit.object as THREE.Mesh).userData.__selectable
+        );
+        const target =
+          selectableHit?.object instanceof THREE.Mesh
+            ? selectableHit.object
+            : null;
+        if (!target) return;
 
         if (selectedRef.current === target) {
           setHighlight(target, "none");
           selectedRef.current = null;
           setSelectedLabel(null);
+          setHoveredLabel(null);
           labelAnchorRef.current = null;
+          setSelectedObject(null);
+          setSelectedPartTransform(null);
           if (onSelect) onSelect(null);
           return;
         }
@@ -340,26 +414,48 @@ export default function ModelScene({
         setHighlight(target, "select");
         const selected = buildSelectedPart(target, partInfo);
         setSelectedLabel(selected);
+        setHoveredLabel(null);
         labelAnchorRef.current = target;
+        setSelectedObject(target);
+        setSelectedPartTransform({
+          x: target.position.x,
+          y: target.position.y,
+          z: target.position.z,
+        });
         if (onSelect) onSelect(selected);
       }}
     >
       {resolvedUrls.map((url) => (
         <ModelPart key={url} url={url} viewMode={viewMode} />
       ))}
-      {selectedLabel ? (
+      {selectedObject ? (
+        <TransformControls
+          object={selectedObject}
+          mode={transformMode}
+          space="local"
+          onMouseDown={() => {
+            if (orbitControls) orbitControls.enabled = false;
+          }}
+          onMouseUp={() => {
+            if (orbitControls) orbitControls.enabled = true;
+          }}
+        />
+      ) : null}
+      {(selectedLabel ?? hoveredLabel) ? (
         <group ref={labelGroupRef}>
           <Html
-            position={[0, 0.08, 0]}
+            position={[0, 0.25, 0]}
             center
             transform
             distanceFactor={labelDistanceFactor}
             style={{ pointerEvents: "none" }}
+            portal={htmlPortal?.current ?? undefined}
           >
-            <div className="bg-white/90 border border-gray-300 text-[5px] text-gray-800 rounded-full px-1.5 py-0.5 shadow-sm whitespace-nowrap">
-              <span className="font-semibold text-[5px]">{selectedLabel.name}</span>
-              {selectedLabel.materialName ? (
-                <span className="ml-1 text-gray-500 text-[5px]">{selectedLabel.materialName}</span>
+            <div className="bg-white/90 border border-gray-300 text-[4px] text-gray-800 rounded-full px-1.5 py-0.5 shadow-sm whitespace-nowrap">
+              {(selectedLabel ?? hoveredLabel)?.materialName ? (
+                <span className="text-gray-500 text-[5px]">
+                  {(selectedLabel ?? hoveredLabel)?.materialName}
+                </span>
               ) : null}
             </div>
           </Html>

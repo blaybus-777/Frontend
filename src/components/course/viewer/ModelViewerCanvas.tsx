@@ -1,9 +1,10 @@
 import { Canvas } from "@react-three/fiber";
 import { Environment, OrbitControls } from "@react-three/drei";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import * as THREE from "three";
 import ModelScene from "./ModelScene";
 import type { PartInfoMap, SelectedPart } from "./types";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 interface ModelViewerCanvasProps {
   urls: string[];
@@ -29,9 +30,19 @@ export default function ModelViewerCanvas({
   assetKey,
 }: ModelViewerCanvasProps) {
   const showWorldAxes = true;
+  const htmlPortalRef = useRef<HTMLDivElement | null>(null);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
   return (
-    <div className="w-full h-full" onContextMenu={(event) => event.preventDefault()}>
+    <div
+      className="relative h-full w-full overflow-hidden"
+      onContextMenu={(event) => event.preventDefault()}
+    >
+      <div
+        ref={htmlPortalRef}
+        className="pointer-events-none absolute inset-0 z-10 overflow-hidden"
+      />
       <Canvas
+        className="relative z-0"
         camera={{ fov: 45 }}
         onCreated={({ gl }) => {
           gl.setClearColor("#0a0e18");
@@ -54,10 +65,14 @@ export default function ModelViewerCanvas({
             viewMode={viewMode}
             assemblyMode={assemblyMode}
             assetKey={assetKey}
+            htmlPortal={htmlPortalRef}
+            orbitRef={controlsRef}
           />
         </Suspense>
 
         <OrbitControls
+          ref={controlsRef}
+          makeDefault
           enableDamping
           enableZoom
           enablePan
