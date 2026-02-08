@@ -3,4 +3,4 @@ node_modules
 public
 package-lock.json
 .git
-.agent/skills
+.agents/skills
