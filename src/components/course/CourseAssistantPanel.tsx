@@ -2,6 +2,7 @@ import { useCourseStore } from '@/store/useCourseStore';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
+import NoteList from './note/NoteList';
 
 // Mock Data for "Study" Tab
 const MOCK_PARTS = [
@@ -87,7 +88,7 @@ export default function CourseAssistantPanel() {
       case 'study':
         return <StudyTabContent />;
       case 'memo':
-        return <MemoTabContent />;
+        return <NoteTabContent />;
       case 'ai-tutor':
         return <AiTutorTabContent />;
       default:
@@ -102,7 +103,7 @@ export default function CourseAssistantPanel() {
 
       {/* Content Area - Scrollable */}
       <div className="custom-scrollbar flex-1 overflow-y-auto">
-        <div className="">{renderContent()}</div>
+        {renderContent()}
       </div>
     </div>
   );
@@ -240,10 +241,23 @@ function StudyTabContent() {
   );
 }
 
-function MemoTabContent() {
+function NoteTabContent() {
   return (
-    <div className="flex h-full flex-col items-center justify-center p-4 text-gray-400">
-      <p>메모 기능 준비중...</p>
+    <div className="flex h-full flex-col">
+      <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
+        메모
+      </h3>
+      <div className="flex-1 overflow-y-auto bg-neutral-100">
+        <NoteList />
+      </div>
+      <div className="bg-neutral-100 p-4 pt-2">
+        <button
+          className="w-full rounded-full bg-gray-200 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-300"
+          onClick={() => alert('메모 추가 기능은 준비중입니다.')}
+        >
+          메모 추가
+        </button>
+      </div>
     </div>
   );
 }
