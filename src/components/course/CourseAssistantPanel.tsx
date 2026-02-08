@@ -290,9 +290,9 @@ function NoteTabContent() {
       <div className="flex-1 overflow-y-auto bg-neutral-100">
         <NoteList />
       </div>
-      <div className="bg-neutral-100 p-4 pt-2">
+      <div className="flex justify-center bg-neutral-100 p-4 pt-2">
         <button
-          className="w-full rounded-full bg-gray-200 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-300"
+          className="w-40 rounded-full bg-gray-200 py-3 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-300"
           onClick={() => setIsCreating(true)}
         >
           메모 추가
