@@ -109,7 +109,7 @@ export default function NoteDetail() {
           className="custom-scrollbar h-full overflow-y-auto rounded-lg bg-white p-5 shadow-sm"
           style={{
             WebkitOverflowScrolling: 'touch',
-            touchAction: 'pan-y'
+            touchAction: 'pan-y',
           }}
         >
           <MDXEditor

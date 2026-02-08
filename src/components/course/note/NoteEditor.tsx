@@ -98,7 +98,7 @@ export default function NoteEditor({
             className="custom-scrollbar flex min-h-0 flex-1 cursor-text flex-col overflow-y-auto"
             style={{
               WebkitOverflowScrolling: 'touch',
-              touchAction: 'pan-y'
+              touchAction: 'pan-y',
             }}
             onClick={(e) => {
               const target = e.target as HTMLElement;

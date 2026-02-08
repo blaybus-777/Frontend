@@ -134,10 +134,10 @@ function PartListSection({
               'custom-scrollbar overflow-y-auto transition-all duration-300 ease-in-out',
               isExpanded ? 'max-h-[170px]' : 'max-h-[80px]'
             )}
-            style={{ 
+            style={{
               height: 'auto',
               WebkitOverflowScrolling: 'touch',
-              touchAction: 'pan-y'
+              touchAction: 'pan-y',
             }}
           >
             <div className="grid grid-cols-4 gap-2 pb-2">
@@ -192,9 +192,9 @@ function StudyTabContent() {
   return (
     <div
       className="custom-scrollbar flex h-full flex-col gap-6 overflow-y-auto"
-      style={{ 
+      style={{
         WebkitOverflowScrolling: 'touch',
-        touchAction: 'pan-y'
+        touchAction: 'pan-y',
       }}
     >
       {/* Learning Point Section */}
@@ -299,9 +299,9 @@ function NoteTabContent() {
       </h3>
       <div
         className="flex-1 overflow-y-auto bg-neutral-100"
-        style={{ 
+        style={{
           WebkitOverflowScrolling: 'touch',
-          touchAction: 'pan-y'
+          touchAction: 'pan-y',
         }}
       >
         <NoteList />
