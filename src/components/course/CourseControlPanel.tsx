@@ -1,23 +1,18 @@
 import { ControlToggleButton } from "./ControlToggleButton";
 import { Slider } from "@/components/ui/slider";
 
-interface CourseControlPanelProps {
-  viewMode: "general" | "wireframe";
-  onViewModeChange: (mode: "general" | "wireframe") => void;
-  assemblyMode: "single" | "assembly";
-  onAssemblyModeChange: (mode: "single" | "assembly") => void;
-  explosionLevel: number[];
-  onExplosionLevelChange: (value: number[]) => void;
-}
+import { useCourseStore } from "@/store/useCourseStore";
 
-export default function CourseControlPanel({
-  viewMode,
-  onViewModeChange,
-  assemblyMode,
-  onAssemblyModeChange,
-  explosionLevel,
-  onExplosionLevelChange,
-}: CourseControlPanelProps) {
+export default function CourseControlPanel() {
+  const explosionLevel = useCourseStore((state) => state.explosionLevel);
+  const setExplosionLevel = useCourseStore((state) => state.setExplosionLevel);
+  
+  const viewMode = useCourseStore((state) => state.viewMode);
+  const setViewMode = useCourseStore((state) => state.setViewMode);
+  
+  const assemblyMode = useCourseStore((state) => state.assemblyMode);
+  const setAssemblyMode = useCourseStore((state) => state.setAssemblyMode);
+
   return (
     <div className="w-full flex flex-col">
       {/* Assembly Mode Section */}
@@ -27,12 +22,12 @@ export default function CourseControlPanel({
           <ControlToggleButton
             label="단일 부품"
             isActive={assemblyMode === "single"}
-            onClick={() => onAssemblyModeChange("single")}
+            onClick={() => setAssemblyMode("single")}
           />
           <ControlToggleButton
             label="조립도"
             isActive={assemblyMode === "assembly"}
-            onClick={() => onAssemblyModeChange("assembly")}
+            onClick={() => setAssemblyMode("assembly")}
           />
         </div>
       </div>
@@ -44,12 +39,12 @@ export default function CourseControlPanel({
           <ControlToggleButton
             label="General"
             isActive={viewMode === "general"}
-            onClick={() => onViewModeChange("general")}
+            onClick={() => setViewMode("general")}
           />
           <ControlToggleButton
             label="Wireframe"
             isActive={viewMode === "wireframe"}
-            onClick={() => onViewModeChange("wireframe")}
+            onClick={() => setViewMode("wireframe")}
           />
         </div>
       </div>
@@ -61,7 +56,7 @@ export default function CourseControlPanel({
           <div className="flex items-center gap-4">
             <Slider
               value={explosionLevel}
-              onValueChange={onExplosionLevelChange}
+              onValueChange={setExplosionLevel}
               max={100}
               step={1}
               className="flex-1 **:data-[slot=slider-range]:bg-[#3469FF] **:data-[slot=slider-thumb]:bg-[#3469FF] **:data-[slot=slider-thumb]:border-0"

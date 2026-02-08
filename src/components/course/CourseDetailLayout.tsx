@@ -4,25 +4,13 @@ import CourseRightSidebar from '@/components/course/CourseRightSidebar';
 import CourseAssistantPanel from '@/components/course/CourseAssistantPanel';
 
 interface CourseDetailLayoutProps {
-  viewMode: 'general' | 'wireframe';
-  assemblyMode: 'single' | 'assembly';
   selectedPartId: string | null;
-  onViewModeChange: (mode: 'general' | 'wireframe') => void;
-  onAssemblyModeChange: (mode: 'single' | 'assembly') => void;
   onSelectPart: (id: string | null) => void;
-  explosionLevel: number[];
-  onExplosionLevelChange: (value: number[]) => void;
 }
 
 export default function CourseDetailLayout({
-  viewMode,
-  assemblyMode,
   selectedPartId,
-  onViewModeChange,
-  onAssemblyModeChange,
   onSelectPart,
-  explosionLevel,
-  onExplosionLevelChange,
 }: CourseDetailLayoutProps) {
   return (
     <div className="max-w-[1440px] w-full mx-auto px-4 md:px-6">
@@ -31,14 +19,7 @@ export default function CourseDetailLayout({
         <div className="shrink-0 p-3 w-3xs mr-4">
           <div className="text-black flex flex-col h-full">
             <div className="bg-white border border-gray-200 rounded-md shrink-0 mb-3 shadow-sm">
-              <CourseControlPanel 
-                viewMode={viewMode}
-                onViewModeChange={onViewModeChange}
-                assemblyMode={assemblyMode}
-                onAssemblyModeChange={onAssemblyModeChange}
-                explosionLevel={explosionLevel}
-                onExplosionLevelChange={onExplosionLevelChange}
-              />
+              <CourseControlPanel />
             </div>
             <div className="bg-gray-50 flex-1 overflow-hidden">
                <CourseHierarchyTree 
