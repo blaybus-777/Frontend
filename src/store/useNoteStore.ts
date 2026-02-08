@@ -9,6 +9,9 @@ interface NoteState {
 
   fetchNotes: (modelId: number) => Promise<void>;
   deleteNote: (noteId: number) => Promise<void>;
+  
+  selectedNoteId: number | null;
+  setSelectedNoteId: (id: number | null) => void;
 }
 
 const MOCK_NOTES: NoteItem[] = [
@@ -64,6 +67,10 @@ export const useNoteStore = create<NoteState>((set) => ({
     // Always update UI for testing purposes
     set((state) => ({
       notes: state.notes.filter((note) => note.noteId !== noteId),
+      selectedNoteId: state.selectedNoteId === noteId ? null : state.selectedNoteId,
     }));
   },
+
+  selectedNoteId: null,
+  setSelectedNoteId: (id) => set({ selectedNoteId: id }),
 }));

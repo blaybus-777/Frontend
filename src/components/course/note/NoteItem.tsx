@@ -4,9 +4,10 @@ import type { NoteItem } from '@/apis/note';
 interface NoteItemProps {
   note: NoteItem;
   onDelete: (noteId: number) => void;
+  onClick: () => void;
 }
 
-export default function NoteItem({ note, onDelete }: NoteItemProps) {
+export default function NoteItem({ note, onDelete, onClick }: NoteItemProps) {
   // Format date: "2026.02.02"
   const dateObj = new Date(note.date);
   const formattedDate = `${dateObj.getFullYear()}.${String(
@@ -14,7 +15,10 @@ export default function NoteItem({ note, onDelete }: NoteItemProps) {
   ).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')}`;
 
   return (
-    <div className="group flex items-center justify-between rounded-lg px-4 py-3 transition-colors hover:bg-[#3469ff]">
+    <div
+      onClick={onClick}
+      className="group flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 transition-colors hover:bg-[#3469ff]"
+    >
       <h4 className="line-clamp-1 flex-1 text-base font-bold text-gray-900 group-hover:text-white">
         {note.title}
       </h4>

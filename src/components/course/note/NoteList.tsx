@@ -10,12 +10,13 @@ export default function NoteList() {
   // Assuming id from URL is the modelId
   const modelId = id ? parseInt(id, 10) : 0; 
 
-  const { notes, isLoading, fetchNotes, deleteNote } = useNoteStore(
+  const { notes, isLoading, fetchNotes, deleteNote, setSelectedNoteId } = useNoteStore(
     useShallow((state) => ({
       notes: state.notes,
       isLoading: state.isLoading,
       fetchNotes: state.fetchNotes,
       deleteNote: state.deleteNote,
+      setSelectedNoteId: state.setSelectedNoteId,
     }))
   );
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -53,6 +54,7 @@ export default function NoteList() {
             key={note.noteId}
             note={note}
             onDelete={handleDeleteClick}
+            onClick={() => setSelectedNoteId(note.noteId)}
           />
         ))
       )}

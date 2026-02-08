@@ -3,6 +3,9 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import NoteList from './note/NoteList';
+import NoteDetail from './note/NoteDetail';
+import { useShallow } from 'zustand/react/shallow';
+import { useNoteStore } from '@/store/useNoteStore';
 
 // Mock Data for "Study" Tab
 const MOCK_PARTS = [
@@ -242,6 +245,16 @@ function StudyTabContent() {
 }
 
 function NoteTabContent() {
+  const { selectedNoteId } = useNoteStore(
+    useShallow((state) => ({
+      selectedNoteId: state.selectedNoteId,
+    }))
+  );
+
+  if (selectedNoteId) {
+    return <NoteDetail />;
+  }
+
   return (
     <div className="flex h-full flex-col">
       <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
