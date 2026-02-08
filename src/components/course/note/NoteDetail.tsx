@@ -44,7 +44,6 @@ export default function NoteDetail() {
             }
           }}
           onCancel={() => setIsEditing(false)}
-          submitLabel="수정 완료"
         />
     );
   }

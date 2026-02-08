@@ -108,7 +108,7 @@ export default function CourseAssistantPanel() {
       <PartListSection selectedPartId={selectedPartId} />
 
       {/* Content Area - Scrollable */}
-      <div className="custom-scrollbar flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {renderContent()}
       </div>
     </div>
@@ -187,7 +187,7 @@ function PartListSection({
 
 function StudyTabContent() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar">
       {/* Learning Point Section */}
       <section>
         <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
@@ -274,7 +274,6 @@ function NoteTabContent() {
         <NoteEditor
           onSubmit={handleCreateSubmit}
           onCancel={() => setIsCreating(false)}
-          submitLabel="새 메모 저장"
         />
     );
   }
