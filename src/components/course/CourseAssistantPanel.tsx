@@ -134,7 +134,11 @@ function PartListSection({
               'custom-scrollbar overflow-y-auto transition-all duration-300 ease-in-out',
               isExpanded ? 'max-h-[170px]' : 'max-h-[80px]'
             )}
-            style={{ height: 'auto' }}
+            style={{ 
+              height: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y'
+            }}
           >
             <div className="grid grid-cols-4 gap-2 pb-2">
               {MOCK_PARTS.map((part) => (
@@ -186,7 +190,13 @@ function PartListSection({
 
 function StudyTabContent() {
   return (
-    <div className="custom-scrollbar flex h-full flex-col gap-6 overflow-y-auto">
+    <div
+      className="custom-scrollbar flex h-full flex-col gap-6 overflow-y-auto"
+      style={{ 
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-y'
+      }}
+    >
       {/* Learning Point Section */}
       <section>
         <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
@@ -287,7 +297,13 @@ function NoteTabContent() {
       <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
         메모
       </h3>
-      <div className="flex-1 overflow-y-auto bg-neutral-100">
+      <div
+        className="flex-1 overflow-y-auto bg-neutral-100"
+        style={{ 
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y'
+        }}
+      >
         <NoteList />
       </div>
       <div className="flex justify-center bg-neutral-100 p-4 pt-2">

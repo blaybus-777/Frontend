@@ -105,7 +105,13 @@ export default function NoteDetail() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden p-4">
-        <div className="custom-scrollbar h-full overflow-y-auto rounded-lg bg-white p-5 shadow-sm">
+        <div
+          className="custom-scrollbar h-full overflow-y-auto rounded-lg bg-white p-5 shadow-sm"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y'
+          }}
+        >
           <MDXEditor
             markdown={note.content}
             readOnly={true}

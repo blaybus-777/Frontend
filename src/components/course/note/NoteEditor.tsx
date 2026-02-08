@@ -96,6 +96,10 @@ export default function NoteEditor({
           {/* Editor Area */}
           <div
             className="custom-scrollbar flex min-h-0 flex-1 cursor-text flex-col overflow-y-auto"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y'
+            }}
             onClick={(e) => {
               const target = e.target as HTMLElement;
               // 버튼, 입력창, 링크, 다이얼로그 내부 클릭 시에는 포커스 강제 이동 방지
