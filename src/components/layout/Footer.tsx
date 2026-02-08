@@ -9,7 +9,7 @@ function Footer() {
       <div className="relative mx-auto flex h-80 w-full max-w-[1200px] items-start justify-between gap-36">
         <div className="flex w-60 flex-col gap-8">
           <div className="to-foundation-blue-9 font-pretendard bg-linear-to-r from-[#42C2FF] bg-clip-text text-3xl font-extrabold text-transparent">
-            simvex
+            SIMVEX
           </div>
           <p className="text-foundation-black-text text-xl font-semibold">
             공대생을 위한
