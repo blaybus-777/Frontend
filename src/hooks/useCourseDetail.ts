@@ -1,22 +1,29 @@
-
-import { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useCourseStore } from '@/store/useCourseStore';
 
 export const useCourseDetail = () => {
-  // 3D Control States
-  // 'general' means standard rendering, 'wireframe' shows the mesh structure
-  const [viewMode, setViewMode] = useState<'general' | 'wireframe'>('general');
-  
-  // 'single' focuses on one part, 'assembly' shows the whole model
-  const [assemblyMode, setAssemblyMode] = useState<'single' | 'assembly'>('assembly');
-
   // Store State Integration
-  const { 
-    selectedPartId, 
-    setSelectedPartId, 
+  const {
+    selectedPartId,
+    setSelectedPartId,
     activeTab,
-    isPanelOpen
-  } = useCourseStore();
+    isPanelOpen,
+    viewMode,
+    setViewMode,
+    assemblyMode,
+    setAssemblyMode,
+  } = useCourseStore(
+    useShallow((state) => ({
+      selectedPartId: state.selectedPartId,
+      setSelectedPartId: state.setSelectedPartId,
+      activeTab: state.activeTab,
+      isPanelOpen: state.isPanelOpen,
+      viewMode: state.viewMode,
+      setViewMode: state.setViewMode,
+      assemblyMode: state.assemblyMode,
+      setAssemblyMode: state.setAssemblyMode,
+    }))
+  );
 
   return {
     // State

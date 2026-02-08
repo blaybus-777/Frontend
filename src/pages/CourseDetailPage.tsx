@@ -2,22 +2,11 @@ import { useCourseDetail } from '@/hooks/useCourseDetail';
 import CourseDetailLayout from '@/components/course/CourseDetailLayout';
 
 function CourseDetailPage() {
-  const {
-    viewMode,
-    assemblyMode,
-    selectedPartId,
-    setViewMode,
-    setAssemblyMode,
-    setSelectedPartId
-  } = useCourseDetail();
+  const { selectedPartId, setSelectedPartId } = useCourseDetail();
 
   return (
-    <CourseDetailLayout 
-      viewMode={viewMode}
-      assemblyMode={assemblyMode}
+    <CourseDetailLayout
       selectedPartId={selectedPartId}
-      onViewModeChange={setViewMode}
-      onAssemblyModeChange={setAssemblyMode}
       onSelectPart={setSelectedPartId}
     />
   );

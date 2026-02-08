@@ -1,26 +1,28 @@
-import { cn } from "@/lib/utils";
-import { useCourseStore } from "@/store/useCourseStore";
+import { cn } from '@/lib/utils';
+import { useCourseStore } from '@/store/useCourseStore';
 
 // Icon imports
-import StudyIcon from "@/assets/icons/study.svg";
-import MemoIcon from "@/assets/icons/memo.svg";
-import AiTutorIcon from "@/assets/icons/ai-tutor.svg";
+import StudyIcon from '@/assets/icons/study.svg';
+import MemoIcon from '@/assets/icons/memo.svg';
+import AiTutorIcon from '@/assets/icons/ai-tutor.svg';
 
 interface CourseRightSidebarProps {
   className?: string;
 }
 
-export default function CourseRightSidebar({ className }: CourseRightSidebarProps) {
+export default function CourseRightSidebar({
+  className,
+}: CourseRightSidebarProps) {
   const { activeTab, setActiveTab } = useCourseStore();
 
   return (
     <aside
       className={cn(
-        "w-[68px] flex flex-col items-center bg-white border-l border-gray-200 h-full",
+        'flex h-full w-[68px] flex-col items-center border-l border-gray-200 bg-white',
         className
       )}
     >
-      <div className="flex flex-col w-full items-center">
+      <div className="flex w-full flex-col items-center">
         {/* Study Button */}
         <SidebarItem
           icon={StudyIcon}
@@ -28,7 +30,7 @@ export default function CourseRightSidebar({ className }: CourseRightSidebarProp
           isActive={activeTab === 'study'}
           onClick={() => setActiveTab('study')}
         />
-        
+
         {/* Memo Button */}
         <SidebarItem
           icon={MemoIcon}
@@ -61,26 +63,29 @@ function SidebarItem({ icon, label, onClick, isActive }: SidebarItemProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 px-2 py-5 transition-colors w-full group",
-        isActive ? "text-blue-600" : "text-gray-900 hover:bg-gray-50"
+        'group flex w-full flex-col items-center justify-center gap-1 px-2 py-5 transition-colors',
+        isActive ? 'text-blue-600' : 'text-gray-900 hover:bg-gray-50'
       )}
     >
-      <div className="size-6 flex items-center justify-center">
-        <img 
-            src={icon}
-            alt={label}
-            className={cn(
-                "w-full h-full object-contain transition-all",
-                isActive && "filter-active-blue"
-            )}
-            style={isActive ? {
-                filter: "invert(36%) sepia(74%) saturate(4649%) hue-rotate(209deg) brightness(100%) contrast(91%)" // Blue-600 approximation
-            } : undefined}
+      <div className="flex size-6 items-center justify-center">
+        <img
+          src={icon}
+          alt={label}
+          className={cn(
+            'h-full w-full object-contain transition-all',
+            isActive && 'filter-active-blue'
+          )}
+          style={
+            isActive
+              ? {
+                  filter:
+                    'invert(36%) sepia(74%) saturate(4649%) hue-rotate(209deg) brightness(100%) contrast(91%)', // Blue-600 approximation
+                }
+              : undefined
+          }
         />
       </div>
-      <span className="text-[0.75rem] font-medium">
-        {label}
-      </span>
+      <span className="text-[0.75rem] font-medium">{label}</span>
     </button>
   );
 }

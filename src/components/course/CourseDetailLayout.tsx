@@ -4,41 +4,28 @@ import CourseRightSidebar from '@/components/course/CourseRightSidebar';
 import CourseAssistantPanel from '@/components/course/CourseAssistantPanel';
 
 interface CourseDetailLayoutProps {
-  viewMode: 'general' | 'wireframe';
-  assemblyMode: 'single' | 'assembly';
   selectedPartId: string | null;
-  onViewModeChange: (mode: 'general' | 'wireframe') => void;
-  onAssemblyModeChange: (mode: 'single' | 'assembly') => void;
   onSelectPart: (id: string | null) => void;
 }
 
 export default function CourseDetailLayout({
-  viewMode,
-  assemblyMode,
   selectedPartId,
-  onViewModeChange,
-  onAssemblyModeChange,
   onSelectPart,
 }: CourseDetailLayoutProps) {
   return (
-    <div className="max-w-[1440px] w-full mx-auto px-4 md:px-6">
-      <div className="flex flex-col lg:flex-row h-[calc(100dvh-81px)]">
+    <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6">
+      <div className="flex h-[calc(100dvh-81px)] flex-col lg:flex-row">
         {/* Left Side: Control Panel */}
-        <div className="shrink-0 p-3 w-3xs mr-4">
-          <div className="text-black flex flex-col h-full">
-            <div className="bg-white border border-gray-200 rounded-md shrink-0 mb-3 shadow-sm">
-              <CourseControlPanel 
-                viewMode={viewMode}
-                onViewModeChange={onViewModeChange}
-                assemblyMode={assemblyMode}
-                onAssemblyModeChange={onAssemblyModeChange}
-              />
+        <div className="mr-4 w-3xs shrink-0 p-3">
+          <div className="flex h-full flex-col text-black">
+            <div className="mb-3 shrink-0 rounded-md border border-gray-200 bg-white shadow-sm">
+              <CourseControlPanel />
             </div>
-            <div className="bg-gray-50 flex-1 overflow-hidden">
-               <CourseHierarchyTree 
-                  selectedPartId={selectedPartId}
-                  onSelectPart={onSelectPart}
-               />
+            <div className="flex-1 overflow-hidden bg-gray-50">
+              <CourseHierarchyTree
+                selectedPartId={selectedPartId}
+                onSelectPart={onSelectPart}
+              />
             </div>
           </div>
         </div>
@@ -46,18 +33,20 @@ export default function CourseDetailLayout({
         {/* Right Side Wrapper: Viewer + Sidebar */}
         <div className="flex flex-1 overflow-hidden">
           {/* Center: 3D Viewer Placeholder */}
-          <div className="flex-1 bg-gray-100 flex items-center justify-center relative overflow-hidden">
-              <div className="text-center">
-                  <h2 className="text-xl font-bold text-gray-400 mb-4">3D Viewer Area</h2>
-              </div>
+          <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gray-100">
+            <div className="text-center">
+              <h2 className="mb-4 text-xl font-bold text-gray-400">
+                3D Viewer Area
+              </h2>
+            </div>
 
-              {/* Assistant Panel Overlay */}
-              <CourseAssistantPanel />
+            {/* Assistant Panel Overlay */}
+            <CourseAssistantPanel />
           </div>
 
           {/* Right Side: Sidebar */}
-          <div className="shrink-0 h-full bg-white">
-              <CourseRightSidebar />
+          <div className="h-full shrink-0 bg-white">
+            <CourseRightSidebar />
           </div>
         </div>
       </div>

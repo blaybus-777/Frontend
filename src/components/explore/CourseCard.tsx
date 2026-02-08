@@ -1,7 +1,7 @@
-import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import ModelPreview from "./ModelPreview";
+import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import ModelPreview from './ModelPreview';
 
 interface CourseCardProps {
   id: string;
@@ -26,13 +26,13 @@ export default function CourseCard({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div 
+    <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group cursor-pointer flex flex-col h-full bg-foundation-white-bg border border-foundation-gray-4 rounded-sm p-3 gap-4 hover:shadow-card-hover transition-shadow duration-300"
+      className="group bg-foundation-white-bg border-foundation-gray-4 hover:shadow-card-hover flex h-full cursor-pointer flex-col gap-4 rounded-sm border p-3 transition-shadow duration-300"
     >
       {/* Thumbnail */}
-      <div className="aspect-3/2 w-full overflow-hidden rounded-sm bg-foundation-gray-1 border border-foundation-gray-4 relative">
+      <div className="bg-foundation-gray-1 border-foundation-gray-4 relative aspect-3/2 w-full overflow-hidden rounded-sm border">
         {isHovered && modelUrls && modelUrls.length > 0 ? (
           <div className="absolute inset-0 z-10">
             <ModelPreview urls={modelUrls} />
@@ -47,23 +47,32 @@ export default function CourseCard({
       </div>
 
       {/* Content */}
-      <div 
+      <div
         onClick={() => navigate(`/course/${id}`)}
-        className="flex flex-col gap-3 flex-1"
+        className="flex flex-1 flex-col gap-3"
       >
-        <h3 className="text-lg font-bold text-foundation-black-text line-clamp-1" title={title}>
+        <h3
+          className="text-foundation-black-text line-clamp-1 text-lg font-bold"
+          title={title}
+        >
           {title}
         </h3>
-        
+
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mt-auto h-[50px] overflow-hidden content-start">
+        <div className="mt-auto flex h-[50px] flex-wrap content-start gap-2 overflow-hidden">
           {/* Level Badge */}
-          <Badge variant="secondary" className="bg-neutral-100 text-foundation-black-text rounded-sm px-1 text-sm leading-none font-medium border-none shadow-none shrink h-fit">
+          <Badge
+            variant="secondary"
+            className="text-foundation-black-text h-fit shrink rounded-sm border-none bg-neutral-100 px-1 text-sm leading-none font-medium shadow-none"
+          >
             {level}
           </Badge>
-          
+
           {/* Category Badge */}
-          <Badge variant="secondary" className="bg-neutral-100 text-foundation-black-text rounded-sm px-1 text-sm leading-none font-medium border-none shadow-none shrink h-fit">
+          <Badge
+            variant="secondary"
+            className="text-foundation-black-text h-fit shrink rounded-sm border-none bg-neutral-100 px-1 text-sm leading-none font-medium shadow-none"
+          >
             {category}
           </Badge>
 
@@ -72,7 +81,7 @@ export default function CourseCard({
             <Badge
               key={tag}
               variant="secondary"
-              className="bg-neutral-100 text-foundation-black-text rounded-sm px-1 text-sm leading-none font-medium border-none shadow-none shrink h-fit"
+              className="text-foundation-black-text h-fit shrink rounded-sm border-none bg-neutral-100 px-1 text-sm leading-none font-medium shadow-none"
             >
               {tag}
             </Badge>
