@@ -1,4 +1,4 @@
-import { useNoteStore } from '@/store/useNoteStore';
+import { useNoteStore } from '@/stores/useNoteStore';
 import NoteItem from './NoteItem';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import { useState, useEffect } from 'react';
