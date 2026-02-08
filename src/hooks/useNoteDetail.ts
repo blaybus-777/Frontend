@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { getNoteDetail, type NoteItem } from '@/apis/note';
 

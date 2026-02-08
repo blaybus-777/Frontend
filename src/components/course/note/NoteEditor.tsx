@@ -18,7 +18,7 @@ import {
   InsertCodeBlock,
   BlockTypeSelect,
   CodeToggle,
-  type MDXEditorMethods
+  type MDXEditorMethods,
 } from '@mdxeditor/editor';
 import { useRef } from 'react';
 import '@mdxeditor/editor/style.css';
@@ -74,12 +74,12 @@ export default function NoteEditor({
   return (
     <form
       onSubmit={handleSubmit(onFormSubmit)}
-      className="flex h-full min-h-0 flex-col bg-neutral-100 overflow-hidden"
+      className="flex h-full min-h-0 flex-col overflow-hidden bg-neutral-100"
     >
-      <div className="flex-1 flex flex-col p-4 overflow-hidden min-h-0">
-        <div className="flex h-full flex-col rounded-lg bg-white shadow-sm overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
+        <div className="flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-sm">
           {/* Header (Title Input) */}
-          <div className="border-b border-gray-100 p-4 shrink-0">
+          <div className="shrink-0 border-b border-gray-100 p-4">
             <input
               {...register('title')}
               placeholder="제목을 입력하세요"
@@ -87,20 +87,25 @@ export default function NoteEditor({
               autoFocus={!initialTitle}
             />
             {errors.title && (
-              <p className="mt-1 text-xs text-red-500">{errors.title.message}</p>
+              <p className="mt-1 text-xs text-red-500">
+                {errors.title.message}
+              </p>
             )}
           </div>
 
           {/* Editor Area */}
-          <div 
-            className="flex-1 flex flex-col cursor-text overflow-y-auto min-h-0 custom-scrollbar" 
+          <div
+            className="custom-scrollbar flex min-h-0 flex-1 cursor-text flex-col overflow-y-auto"
             onClick={(e) => {
               const target = e.target as HTMLElement;
               // 버튼, 입력창, 링크, 다이얼로그 내부 클릭 시에는 포커스 강제 이동 방지
               if (
-                target.tagName === 'BUTTON' || target.closest('button') ||
-                target.tagName === 'INPUT' || target.closest('input') ||
-                target.tagName === 'A' || target.closest('a') ||
+                target.tagName === 'BUTTON' ||
+                target.closest('button') ||
+                target.tagName === 'INPUT' ||
+                target.closest('input') ||
+                target.tagName === 'A' ||
+                target.closest('a') ||
                 target.closest('[role="dialog"]') ||
                 target.closest('.mdxeditor-toolbar')
               ) {
@@ -134,7 +139,7 @@ export default function NoteEditor({
                       toolbarContents: () => (
                         <>
                           {' '}
-                          <div className="mdxeditor-toolbar flex items-center gap-1 border-b border-gray-100 px-2 py-1 shrink-0">
+                          <div className="mdxeditor-toolbar flex shrink-0 items-center gap-1 border-b border-gray-100 px-2 py-1">
                             <BoldItalicUnderlineToggles />
                             <div className="mx-1 h-4 w-px bg-gray-200" />
                             <CreateLink />
@@ -145,14 +150,14 @@ export default function NoteEditor({
                             <InsertCodeBlock />
                           </div>
                         </>
-                      )
-                    })
+                      ),
+                    }),
                   ]}
                 />
               )}
             />
             {errors.content && (
-              <p className="px-6 py-2 text-xs text-red-500 bg-red-50 border-t border-red-100 shrink-0">
+              <p className="shrink-0 border-t border-red-100 bg-red-50 px-6 py-2 text-xs text-red-500">
                 {errors.content.message}
               </p>
             )}
@@ -161,23 +166,25 @@ export default function NoteEditor({
       </div>
 
       {/* Footer Actions */}
-      <div className="flex items-center justify-end gap-2 px-4 py-3 shrink-0">
+      <div className="flex shrink-0 items-center justify-end gap-2 px-4 py-3">
         <button
           type="button"
           onClick={onCancel}
-          className="flex items-center gap-1.5 rounded-lg text-gray-500 hover:text-gray-700 font-medium px-3 py-2 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-2 font-medium text-gray-500 transition-colors hover:text-gray-700"
           disabled={isSubmitting}
         >
-          <X size={16}  />
+          <X size={16} />
           <span className="text-sm">취소</span>
         </button>
         <button
           type="submit"
-          className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 font-medium px-3 py-2 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-2 font-medium text-gray-500 transition-colors hover:text-gray-700 disabled:opacity-50"
           disabled={isSubmitting}
         >
           <SquareCheckBig size={16} />
-          <span className="text-sm">{isSubmitting ? '저장 중...' : '저장'}</span>
+          <span className="text-sm">
+            {isSubmitting ? '저장 중...' : '저장'}
+          </span>
         </button>
       </div>
     </form>

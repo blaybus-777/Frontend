@@ -14,7 +14,9 @@ export interface NoteListResponse {
 }
 
 // GET /v1/note/list/{modelId}
-export const getNoteList = async (modelId: number): Promise<NoteListResponse> => {
+export const getNoteList = async (
+  modelId: number
+): Promise<NoteListResponse> => {
   const response = await api.get(`/v1/note/list/${modelId}`);
   return response.data.data;
 };
@@ -52,5 +54,3 @@ export const updateNote = async (
 ): Promise<void> => {
   await api.patch(`/v1/note/update/${noteId}`, { title, content });
 };
-
-

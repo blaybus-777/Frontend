@@ -8,18 +8,19 @@ import { useShallow } from 'zustand/react/shallow';
 export default function NoteList() {
   const { id } = useParams<{ id: string }>();
   // Assuming id from URL is the modelId
-  const modelId = id ? parseInt(id, 10) : 0; 
+  const modelId = id ? parseInt(id, 10) : 0;
 
-  const { notes, isLoading, fetchNotes, deleteNote, setSelectedNoteId } = useNoteStore(
-    useShallow((state) => ({
-      notes: state.notes,
-      isLoading: state.isLoading,
-      fetchNotes: state.fetchNotes,
-      deleteNote: state.deleteNote,
-      setSelectedNoteId: state.setSelectedNoteId,
-    }))
-  );
-  
+  const { notes, isLoading, fetchNotes, deleteNote, setSelectedNoteId } =
+    useNoteStore(
+      useShallow((state) => ({
+        notes: state.notes,
+        isLoading: state.isLoading,
+        fetchNotes: state.fetchNotes,
+        deleteNote: state.deleteNote,
+        setSelectedNoteId: state.setSelectedNoteId,
+      }))
+    );
+
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function NoteList() {
   return (
     <div className="flex flex-col gap-2 p-4">
       {notes.length === 0 ? (
-        <div className="py-10 text-center text-gray-400 text-sm">
+        <div className="py-10 text-center text-sm text-gray-400">
           작성된 메모가 없습니다.
         </div>
       ) : (

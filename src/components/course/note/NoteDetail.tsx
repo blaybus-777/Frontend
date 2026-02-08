@@ -11,20 +11,21 @@ import {
   quotePlugin,
   thematicBreakPlugin,
   markdownShortcutPlugin,
-  linkPlugin
+  linkPlugin,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import NoteEditor from './NoteEditor';
 
 export default function NoteDetail() {
-  const { selectedNoteId, setSelectedNoteId, deleteNote, updateNote } = useNoteStore(
-    useShallow((state) => ({
-      selectedNoteId: state.selectedNoteId,
-      setSelectedNoteId: state.setSelectedNoteId,
-      deleteNote: state.deleteNote,
-      updateNote: state.updateNote,
-    }))
-  );
+  const { selectedNoteId, setSelectedNoteId, deleteNote, updateNote } =
+    useNoteStore(
+      useShallow((state) => ({
+        selectedNoteId: state.selectedNoteId,
+        setSelectedNoteId: state.setSelectedNoteId,
+        deleteNote: state.deleteNote,
+        updateNote: state.updateNote,
+      }))
+    );
 
   const { note, isLoading, error, refetch } = useNoteDetail(selectedNoteId);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -33,18 +34,18 @@ export default function NoteDetail() {
   // If editing, render the editor instead of the detail view
   if (isEditing && note) {
     return (
-        <NoteEditor
-          initialTitle={note.title}
-          initialContent={note.content}
-          onSubmit={async (title, content) => {
-            if (selectedNoteId) {
-              await updateNote(selectedNoteId, title, content);
-              await refetch();
-              setIsEditing(false);
-            }
-          }}
-          onCancel={() => setIsEditing(false)}
-        />
+      <NoteEditor
+        initialTitle={note.title}
+        initialContent={note.content}
+        onSubmit={async (title, content) => {
+          if (selectedNoteId) {
+            await updateNote(selectedNoteId, title, content);
+            await refetch();
+            setIsEditing(false);
+          }
+        }}
+        onCancel={() => setIsEditing(false)}
+      />
     );
   }
 
@@ -104,7 +105,7 @@ export default function NoteDetail() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden p-4">
-        <div className="h-full overflow-y-auto rounded-lg bg-white p-5 shadow-sm custom-scrollbar">
+        <div className="custom-scrollbar h-full overflow-y-auto rounded-lg bg-white p-5 shadow-sm">
           <MDXEditor
             markdown={note.content}
             readOnly={true}
@@ -114,7 +115,7 @@ export default function NoteDetail() {
               quotePlugin(),
               thematicBreakPlugin(),
               markdownShortcutPlugin(),
-              linkPlugin()
+              linkPlugin(),
             ]}
             contentEditableClassName="prose prose-sm max-w-none text-gray-700"
           />

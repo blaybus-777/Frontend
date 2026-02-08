@@ -126,7 +126,7 @@
 }
 
 /* MDXEditor Custom Styles for NoteEditor */
-.note-editor-root [class*="_placeholder_"] {
+.note-editor-root [class*='_placeholder_'] {
   white-space: normal !important;
   text-overflow: unset !important;
   overflow: visible !important;
@@ -139,4 +139,3 @@
 .mdxeditor-root-contenteditable {
   height: 100%;
 }
-

@@ -14,13 +14,17 @@ export interface NoteState {
 
   fetchNotes: (modelId: number) => Promise<void>;
   deleteNote: (noteId: number) => Promise<void>;
-  
+
   selectedNoteId: number | null;
   setSelectedNoteId: (id: number | null) => void;
 
   isCreating: boolean;
   setIsCreating: (isCreating: boolean) => void;
-  createNote: (modelId: number, title: string, content: string) => Promise<void>;
+  createNote: (
+    modelId: number,
+    title: string,
+    content: string
+  ) => Promise<void>;
   updateNote: (noteId: number, title: string, content: string) => Promise<void>;
 }
 
@@ -52,7 +56,8 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       await deleteNoteApi(noteId);
       set((state) => ({
         notes: state.notes.filter((note) => note.noteId !== noteId),
-        selectedNoteId: state.selectedNoteId === noteId ? null : state.selectedNoteId,
+        selectedNoteId:
+          state.selectedNoteId === noteId ? null : state.selectedNoteId,
       }));
     } catch (error) {
       console.error('Failed to delete note:', error);
@@ -75,7 +80,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       await updateNoteApi(noteId, title, content);
       // Update list to reflect title changes if necessary
       const currentNotes = get().notes;
-      const modelId = currentNotes.find(n => n.noteId === noteId)?.modelId;
+      const modelId = currentNotes.find((n) => n.noteId === noteId)?.modelId;
       if (modelId) {
         await get().fetchNotes(modelId);
       }

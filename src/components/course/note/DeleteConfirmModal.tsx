@@ -40,11 +40,11 @@ export default function DeleteConfirmModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div
         ref={modalRef}
-        className="relative w-[300px] rounded-lg bg-white p-6 shadow-lg animate-in fade-in zoom-in duration-200"
+        className="animate-in fade-in zoom-in relative w-[300px] rounded-lg bg-white p-6 shadow-lg duration-200"
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
         >
           <X size={20} />
         </button>

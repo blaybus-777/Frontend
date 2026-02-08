@@ -9,7 +9,6 @@ import { useShallow } from 'zustand/react/shallow';
 import { useNoteStore } from '@/store/useNoteStore';
 import { useParams } from 'react-router-dom';
 
-
 // Mock Data for "Study" Tab
 const MOCK_PARTS = [
   {
@@ -108,7 +107,7 @@ export default function CourseAssistantPanel() {
       <PartListSection selectedPartId={selectedPartId} />
 
       {/* Content Area - Scrollable */}
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {renderContent()}
       </div>
     </div>
@@ -187,7 +186,7 @@ function PartListSection({
 
 function StudyTabContent() {
   return (
-    <div className="flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar">
+    <div className="custom-scrollbar flex h-full flex-col gap-6 overflow-y-auto">
       {/* Learning Point Section */}
       <section>
         <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
@@ -252,14 +251,15 @@ function NoteTabContent() {
   // Assuming id from URL is the modelId
   const modelId = id ? parseInt(id, 10) : 0;
 
-  const { selectedNoteId, isCreating, setIsCreating, createNote } = useNoteStore(
-    useShallow((state) => ({
-      selectedNoteId: state.selectedNoteId,
-      isCreating: state.isCreating,
-      setIsCreating: state.setIsCreating,
-      createNote: state.createNote,
-    }))
-  );
+  const { selectedNoteId, isCreating, setIsCreating, createNote } =
+    useNoteStore(
+      useShallow((state) => ({
+        selectedNoteId: state.selectedNoteId,
+        isCreating: state.isCreating,
+        setIsCreating: state.setIsCreating,
+        createNote: state.createNote,
+      }))
+    );
 
   const handleCreateSubmit = async (title: string, content: string) => {
     if (modelId === 0) {
@@ -271,10 +271,10 @@ function NoteTabContent() {
 
   if (isCreating) {
     return (
-        <NoteEditor
-          onSubmit={handleCreateSubmit}
-          onCancel={() => setIsCreating(false)}
-        />
+      <NoteEditor
+        onSubmit={handleCreateSubmit}
+        onCancel={() => setIsCreating(false)}
+      />
     );
   }
 
