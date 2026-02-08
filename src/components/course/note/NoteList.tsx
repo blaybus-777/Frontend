@@ -19,6 +19,7 @@ export default function NoteList() {
       setSelectedNoteId: state.setSelectedNoteId,
     }))
   );
+  
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {

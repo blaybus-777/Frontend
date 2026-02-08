@@ -21,7 +21,7 @@ export const getNoteList = async (modelId: number): Promise<NoteListResponse> =>
 
 // DELETE /v1/note/delete/{noteId}
 export const deleteNote = async (noteId: number): Promise<void> => {
-  await api.delete(`/v1/note/delete/${noteId}`);
+  await api.get(`/v1/note/delete/${noteId}`);
 };
 
 // GET /v1/note/{noteId}
