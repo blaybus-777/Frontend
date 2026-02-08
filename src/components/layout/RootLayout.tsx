@@ -4,7 +4,7 @@ import Header from './Header';
 function RootLayout() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header/>
+      <Header />
       <main>
         <div className="mx-auto">
           <Outlet />

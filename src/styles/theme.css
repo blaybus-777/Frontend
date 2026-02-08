@@ -31,6 +31,6 @@
   --text-xl: 1.75rem;
   --text-2xl: 2rem;
   --text-3xl: 2.25rem;
-  --shadow-card-hover: 0px 3px 15px 0px rgba(0,0,0,0.15);
+  --shadow-card-hover: 0px 3px 15px 0px rgba(0, 0, 0, 0.15);
   --color-active: #2831ff;
 }

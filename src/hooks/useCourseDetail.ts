@@ -1,18 +1,17 @@
-
 import { useShallow } from 'zustand/react/shallow';
 import { useCourseStore } from '@/store/useCourseStore';
 
 export const useCourseDetail = () => {
   // Store State Integration
-  const { 
-    selectedPartId, 
-    setSelectedPartId, 
+  const {
+    selectedPartId,
+    setSelectedPartId,
     activeTab,
     isPanelOpen,
     viewMode,
     setViewMode,
     assemblyMode,
-    setAssemblyMode
+    setAssemblyMode,
   } = useCourseStore(
     useShallow((state) => ({
       selectedPartId: state.selectedPartId,

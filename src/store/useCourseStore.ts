@@ -11,14 +11,14 @@ interface CourseState {
   togglePanel: () => void;
   setPanelOpen: (isOpen: boolean) => void;
   setSelectedPartId: (id: string | null) => void;
-  
+
   // 3D Control
   explosionLevel: number[];
   setExplosionLevel: (level: number[]) => void;
-  
+
   viewMode: 'general' | 'wireframe';
   setViewMode: (mode: 'general' | 'wireframe') => void;
-  
+
   assemblyMode: 'single' | 'assembly';
   setAssemblyMode: (mode: 'single' | 'assembly') => void;
 }
@@ -41,9 +41,9 @@ export const useCourseStore = create<CourseState>((set) => ({
     }),
 
   togglePanel: () => set((state) => ({ isPanelOpen: !state.isPanelOpen })),
-  
+
   setPanelOpen: (isOpen) => set({ isPanelOpen: isOpen }),
-  
+
   setSelectedPartId: (id) => set({ selectedPartId: id }),
 
   // 3D Control

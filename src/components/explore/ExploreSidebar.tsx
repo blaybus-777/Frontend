@@ -8,20 +8,22 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-} from "@/components/ui/sidebar";
-import { CATEGORIES } from "@/constants/explore";
+} from '@/components/ui/sidebar';
+import { CATEGORIES } from '@/constants/explore';
 
 export default function ExploreSidebar() {
-  const selectedCategory = "전체"; // Default selected for now
+  const selectedCategory = '전체'; // Default selected for now
 
   return (
-    <SidebarProvider className="min-h-0 h-full">
+    <SidebarProvider className="h-full min-h-0">
       <Sidebar
         collapsible="none"
-        className="w-40 border-none bg-transparent sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto"
+        className="sticky top-28 max-h-[calc(100vh-8rem)] w-40 overflow-y-auto border-none bg-transparent"
       >
         <SidebarHeader className="pb-4 pl-2">
-          <h2 className="text-foundation-gray-8 text-lg font-extrabold">학습 카테고리</h2>
+          <h2 className="text-foundation-gray-8 text-lg font-extrabold">
+            학습 카테고리
+          </h2>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="p-0">
@@ -32,7 +34,7 @@ export default function ExploreSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={category === selectedCategory}
-                      className="h-10 px-4 py-3 text-foundation-black-text text-base font-bold transition-colors hover:bg-foundation-blue-1 hover:text-foundation-blue-6 data-[active=true]:bg-foundation-blue-1 data-[active=true]:text-foundation-blue-6 data-[active=true]:text-lg data-[active=true]:font-bold"
+                      className="text-foundation-black-text hover:bg-foundation-blue-1 hover:text-foundation-blue-6 data-[active=true]:bg-foundation-blue-1 data-[active=true]:text-foundation-blue-6 h-10 px-4 py-3 text-base font-bold transition-colors data-[active=true]:text-lg data-[active=true]:font-bold"
                     >
                       <button>
                         <span>{category}</span>

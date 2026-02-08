@@ -1,13 +1,19 @@
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
-import { type PropsWithChildren, useEffect, useRef } from "react";
-import * as THREE from "three";
+import { Canvas, useThree } from '@react-three/fiber';
+import { OrbitControls, useGLTF, Environment } from '@react-three/drei';
+import { type PropsWithChildren, useEffect, useRef } from 'react';
+import * as THREE from 'three';
 
 interface Props {
   urls: string[];
 }
 
-function Model({ url, position }: { url: string; position: [number, number, number] }) {
+function Model({
+  url,
+  position,
+}: {
+  url: string;
+  position: [number, number, number];
+}) {
   const { scene } = useGLTF(url);
   return <primitive object={scene} position={position} />;
 }
@@ -34,7 +40,7 @@ function FitCamera({ children }: PropsWithChildren<unknown>) {
 }
 
 export default function ModelPreview({ urls }: Props) {
-  const radius = 0.3; 
+  const radius = 0.3;
 
   return (
     <Canvas camera={{ fov: 45 }}>
@@ -48,13 +54,7 @@ export default function ModelPreview({ urls }: Props) {
           const x = Math.cos(angle) * radius;
           const z = Math.sin(angle) * radius;
 
-          return (
-            <Model
-              key={url}
-              url={url}
-              position={[x, 0, z]}
-            />
-          );
+          return <Model key={url} url={url} position={[x, 0, z]} />;
         })}
       </FitCamera>
 

@@ -20,15 +20,23 @@ export const useEnums = () => {
     refetchOnWindowFocus: false,
   });
 
-  const tagMap = tagData?.items.reduce((acc, item) => {
-    acc[item.name] = item.code;
-    return acc;
-  }, {} as Record<string, string>) || {};
+  const tagMap =
+    tagData?.items.reduce(
+      (acc, item) => {
+        acc[item.name] = item.code;
+        return acc;
+      },
+      {} as Record<string, string>
+    ) || {};
 
-  const modelMap = modelData?.items.reduce((acc, item) => {
-    acc[item.name] = item.code;
-    return acc;
-  }, {} as Record<string, string>) || {};
+  const modelMap =
+    modelData?.items.reduce(
+      (acc, item) => {
+        acc[item.name] = item.code;
+        return acc;
+      },
+      {} as Record<string, string>
+    ) || {};
 
   return {
     tagMap,
