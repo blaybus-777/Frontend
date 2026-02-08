@@ -1,5 +1,5 @@
 import { useShallow } from 'zustand/react/shallow';
-import { useCourseStore } from '@/store/useCourseStore';
+import { useCourseStore } from '@/stores/useCourseStore';
 
 export const useCourseDetail = () => {
   // Store State Integration
