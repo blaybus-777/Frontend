@@ -4,9 +4,14 @@ function Header() {
   const location = useLocation();
 
   const getLinkColor = (path: string) => {
-    return location.pathname == path
-      ? 'text-foundation-blue-9'
-      : 'text-foundation-black-text';
+    if (location.pathname === path) {
+      return 'text-foundation-blue-9';
+    }
+    // /course/:id 경로일 때 Study 메뉴 활성화
+    if (path === 'study' && location.pathname.startsWith('/course/')) {
+      return 'text-foundation-blue-9';
+    }
+    return 'text-foundation-black-text';
   };
 
   return (
@@ -16,12 +21,12 @@ function Header() {
           SIMVEX
         </div>
         <div className="absolute left-1/2 flex -translate-x-1/2 gap-10">
-          <Link to="/" className={`font-bold ${getLinkColor('/')}`}>
+        <Link to="/topic" className={`font-bold ${getLinkColor('/topic')}`}>
             Explore
           </Link>
-          <Link to="/topic" className={`font-bold ${getLinkColor('/topic')}`}>
+          <div className={`cursor-default font-bold ${getLinkColor('study')}`}>
             Study
-          </Link>
+          </div>
           <Link to="#" className={`font-bold ${getLinkColor('#')}`}>
             CAD
           </Link>
