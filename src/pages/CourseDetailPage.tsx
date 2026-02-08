@@ -8,7 +8,9 @@ function CourseDetailPage() {
     selectedPartId,
     setViewMode,
     setAssemblyMode,
-    setSelectedPartId
+    setSelectedPartId,
+    explosionLevel,
+    setExplosionLevel,
   } = useCourseDetail();
 
   return (
@@ -19,6 +21,8 @@ function CourseDetailPage() {
       onViewModeChange={setViewMode}
       onAssemblyModeChange={setAssemblyMode}
       onSelectPart={setSelectedPartId}
+      explosionLevel={explosionLevel}
+      onExplosionLevelChange={setExplosionLevel}
     />
   );
 }

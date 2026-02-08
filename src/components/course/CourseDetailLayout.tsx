@@ -10,6 +10,8 @@ interface CourseDetailLayoutProps {
   onViewModeChange: (mode: 'general' | 'wireframe') => void;
   onAssemblyModeChange: (mode: 'single' | 'assembly') => void;
   onSelectPart: (id: string | null) => void;
+  explosionLevel: number[];
+  onExplosionLevelChange: (value: number[]) => void;
 }
 
 export default function CourseDetailLayout({
@@ -19,6 +21,8 @@ export default function CourseDetailLayout({
   onViewModeChange,
   onAssemblyModeChange,
   onSelectPart,
+  explosionLevel,
+  onExplosionLevelChange,
 }: CourseDetailLayoutProps) {
   return (
     <div className="max-w-[1440px] w-full mx-auto px-4 md:px-6">
@@ -32,6 +36,8 @@ export default function CourseDetailLayout({
                 onViewModeChange={onViewModeChange}
                 assemblyMode={assemblyMode}
                 onAssemblyModeChange={onAssemblyModeChange}
+                explosionLevel={explosionLevel}
+                onExplosionLevelChange={onExplosionLevelChange}
               />
             </div>
             <div className="bg-gray-50 flex-1 overflow-hidden">

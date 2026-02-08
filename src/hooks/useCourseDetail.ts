@@ -10,6 +10,9 @@ export const useCourseDetail = () => {
   // 'single' focuses on one part, 'assembly' shows the whole model
   const [assemblyMode, setAssemblyMode] = useState<'single' | 'assembly'>('assembly');
 
+  // Explosion Level State (0-100)
+  const [explosionLevel, setExplosionLevel] = useState<number[]>([0]);
+
   // Store State Integration
   const { 
     selectedPartId, 
@@ -25,10 +28,12 @@ export const useCourseDetail = () => {
     selectedPartId,
     activeTab,
     isPanelOpen,
+    explosionLevel, // [NEW]
 
     // Actions
     setViewMode,
     setAssemblyMode,
     setSelectedPartId,
+    setExplosionLevel, // [NEW]
   };
 };

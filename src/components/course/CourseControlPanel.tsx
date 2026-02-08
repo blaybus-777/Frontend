@@ -1,10 +1,13 @@
 import { ControlToggleButton } from "./ControlToggleButton";
+import { Slider } from "@/components/ui/slider";
 
 interface CourseControlPanelProps {
   viewMode: "general" | "wireframe";
   onViewModeChange: (mode: "general" | "wireframe") => void;
   assemblyMode: "single" | "assembly";
   onAssemblyModeChange: (mode: "single" | "assembly") => void;
+  explosionLevel: number[];
+  onExplosionLevelChange: (value: number[]) => void;
 }
 
 export default function CourseControlPanel({
@@ -12,6 +15,8 @@ export default function CourseControlPanel({
   onViewModeChange,
   assemblyMode,
   onAssemblyModeChange,
+  explosionLevel,
+  onExplosionLevelChange,
 }: CourseControlPanelProps) {
   return (
     <div className="w-full flex flex-col">
@@ -48,6 +53,26 @@ export default function CourseControlPanel({
           />
         </div>
       </div>
+
+      {/* 분해 슬라이더 섹션 */}
+      {assemblyMode === "assembly" && (
+        <div className="flex flex-col gap-3 p-4 border-t border-gray-200">
+          <h2 className="text-base font-bold">분해 슬라이더</h2>
+          <div className="flex items-center gap-4">
+            <Slider
+              value={explosionLevel}
+              onValueChange={onExplosionLevelChange}
+              max={100}
+              step={1}
+              className="flex-1 **:data-[slot=slider-range]:bg-[#3469FF] **:data-[slot=slider-thumb]:bg-[#3469FF] **:data-[slot=slider-thumb]:border-0"
+            />
+            <span className="text-sm font-medium w-10 text-right">
+              {explosionLevel[0]}%
+            </span>
+          </div>
+        </div>
+      )}
+      <div className=""></div>
     </div>
   );
 }
