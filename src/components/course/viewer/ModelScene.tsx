@@ -271,7 +271,7 @@ export default function ModelScene({
       setSelectedPartTransform(null);
       if (onSelect) onSelect(null);
     });
-  }, [onRegisterClearSelection, onSelect]);
+  }, [onRegisterClearSelection, onSelect, setSelectedPartTransform]);
 
   useEffect(() => {
     if (!groupRef.current) return;

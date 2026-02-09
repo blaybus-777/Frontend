@@ -13,9 +13,6 @@ export default function CourseControlPanel() {
   const assemblyMode = useCourseStore((state) => state.assemblyMode);
   const setAssemblyMode = useCourseStore((state) => state.setAssemblyMode);
 
-  const explodeSpace = useCourseStore((state) => state.explodeSpace);
-  const setExplodeSpace = useCourseStore((state) => state.setExplodeSpace);
-
   const transformMode = useCourseStore((state) => state.transformMode);
   const setTransformMode = useCourseStore((state) => state.setTransformMode);
   const selectedPartTransform = useCourseStore(
