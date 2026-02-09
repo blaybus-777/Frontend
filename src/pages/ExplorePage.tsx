@@ -4,6 +4,7 @@ import CourseCard from '@/components/course/CourseCard';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { TAGS } from '@/constants/explore';
+import { FINAL_PREVIEW_URLS } from '@/constants/assets';
 import { useModelList } from '@/hooks/useModelList';
 import type { ExtendedModel } from '@/hooks/useModelList';
 
@@ -60,16 +61,23 @@ function ExplorePage() {
             ) : isError ? (
               <div>Error loading courses</div>
             ) : (
-              modelList?.map((course: ExtendedModel) => (
-                <CourseCard
-                  key={course.modelId}
-                  id={String(course.modelId)}
-                  title={course.title}
-                  image={course.image}
-                  tags={course.tag}
-                  modelUrls={course.modelUrls}
-                />
-              ))
+              modelList?.map((course: ExtendedModel) => {
+                const previewUrl = course.assetKey
+                  ? FINAL_PREVIEW_URLS[
+                      course.assetKey as keyof typeof FINAL_PREVIEW_URLS
+                    ]
+                  : undefined;
+                return (
+                  <CourseCard
+                    key={course.modelId}
+                    id={String(course.modelId)}
+                    title={course.title}
+                    image={course.image}
+                    tags={course.tag}
+                    modelUrls={previewUrl ? [previewUrl] : course.modelUrls}
+                  />
+                );
+              })
             )}
           </div>
         </div>

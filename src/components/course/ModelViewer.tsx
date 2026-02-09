@@ -10,6 +10,7 @@ interface ModelViewerProps {
   explodeDistance: number;
   explodeSpace: 'local' | 'world';
   assetKey?: string;
+  storageKey?: string;
 }
 
 export default function ModelViewer({
@@ -21,6 +22,7 @@ export default function ModelViewer({
   explodeDistance,
   explodeSpace,
   assetKey,
+  storageKey,
 }: ModelViewerProps) {
   return (
     <div className="h-full w-full">
@@ -33,6 +35,7 @@ export default function ModelViewer({
         selectedPartId={selectedPartId}
         viewMode={viewMode}
         assetKey={assetKey}
+        storageKey={storageKey}
       />
     </div>
   );

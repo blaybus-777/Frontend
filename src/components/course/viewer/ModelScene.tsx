@@ -1,7 +1,14 @@
 import { TransformControls, useGLTF } from '@react-three/drei';
 import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+  type MutableRefObject,
+} from 'react';
 import * as THREE from 'three';
 import type { PartInfoMap, SelectedPart } from './types';
 import { DRONE_PART_ID_TO_FILE, PART_NAME_MAPPING } from '@/data/partMapping';
@@ -22,6 +29,11 @@ interface ModelSceneProps {
   assetKey?: string;
   htmlPortal?: RefObject<HTMLElement>;
   orbitRef?: RefObject<OrbitControlsImpl | null>;
+  canSetDefaultView?: boolean;
+  resetToken?: number;
+  storageKey?: string;
+  onRequestRestore?: () => void;
+  hasStoredView?: boolean;
 }
 
 interface MeshExplodeData {
@@ -171,6 +183,70 @@ function applyViewerMaterialTuning(
   });
 }
 
+function saveSceneTransforms(
+  root: THREE.Object3D,
+  storageKey: string | null,
+  lastSavedRef: MutableRefObject<number>
+) {
+  if (!storageKey) return;
+  const now = Date.now();
+  if (now - lastSavedRef.current < 150) return;
+  lastSavedRef.current = now;
+  const payload: Record<
+    string,
+    { position: number[]; quaternion: number[]; scale: number[] }
+  > = {};
+  root.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    if (!child.userData.__selectable || !child.name) return;
+    payload[child.name] = {
+      position: child.position.toArray(),
+      quaternion: child.quaternion.toArray(),
+      scale: child.scale.toArray(),
+    };
+  });
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+  } catch {
+    // ignore
+  }
+}
+
+function restoreSceneTransforms(
+  root: THREE.Object3D,
+  storageKey: string | null
+) {
+  if (!storageKey) return;
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Record<
+      string,
+      { position?: number[]; quaternion?: number[]; scale?: number[] }
+    >;
+    root.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      if (!child.userData.__selectable || !child.name) return;
+      const data = parsed[child.name];
+      if (!data) return;
+      if (data.position?.length === 3) {
+        child.position.fromArray(data.position);
+      }
+      if (data.quaternion?.length === 4) {
+        child.quaternion.fromArray(
+          data.quaternion as [number, number, number, number]
+        );
+      }
+      if (data.scale?.length === 3) {
+        child.scale.fromArray(data.scale);
+      }
+      child.updateMatrixWorld();
+    });
+  } catch {
+    // ignore
+  }
+}
+
 function ModelPart({
   url,
   viewMode,
@@ -209,6 +285,11 @@ export default function ModelScene({
   assetKey,
   htmlPortal,
   orbitRef,
+  canSetDefaultView = true,
+  resetToken = 0,
+  storageKey,
+  onRequestRestore,
+  hasStoredView = false,
 }: ModelSceneProps) {
   const groupRef = useRef<THREE.Group>(null);
   const explodeDataRef = useRef<MeshExplodeData[]>([]);
@@ -225,6 +306,8 @@ export default function ModelScene({
   const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(
     null
   );
+  const transformSavedRef = useRef(0);
+  const transformsKey = storageKey ? `${storageKey}:transforms` : null;
   const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3());
   const targetLookAt = useRef<THREE.Vector3>(new THREE.Vector3());
   const isMovingCamera = useRef(false);
@@ -257,6 +340,8 @@ export default function ModelScene({
         if (match) return [match];
       }
     }
+    // if (assemblyMode === 'assembly') {
+    //   return resolveAssemblyUrls(assetKey, urls, explodeDistance);
 
     // 2. 선택된 부품이 없거나 개별 GLB를 못 찾은 경우, 전체 조립 모델 표시
     if (assetKey) {
@@ -265,7 +350,7 @@ export default function ModelScene({
     }
 
     return urls;
-  }, [urls, assetKey, selectedPartId]);
+  }, [urls, selectedPartId, assetKey, explodeDistance]);
 
   const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
 
@@ -356,17 +441,24 @@ export default function ModelScene({
 
     group.position.sub(center);
 
+    restoreSceneTransforms(group, transformsKey);
+
     // 전체 모델 보기 또는 단일 부품 보기 시의 카메라 거리 조정
     // 단일 부품일 때는 size가 작으므로 distance도 그에 맞춰 작아져야 함
     const distance = Math.max(size * 1.5, 0.2);
+    if (!hasStoredView && (!orbitControls || canSetDefaultView)) {
+      camera.position.set(distance, distance * 0.75, distance);
+      camera.lookAt(0, 0, 0);
+      if (orbitControls) {
+        orbitControls.target.set(0, 0, 0);
+        orbitControls.update();
+        orbitControls.saveState();
+      }
+    }
     targetCameraPos.current.set(distance, distance * 0.75, distance);
     targetLookAt.current.set(0, 0, 0);
     isMovingCamera.current = true;
 
-    if (orbitControls) {
-      orbitControls.target.set(0, 0, 0);
-      orbitControls.update();
-    }
     const factor = Math.min(6, Math.max(2.5, size * 0.3));
     setLabelDistanceFactor(factor);
 
@@ -395,7 +487,63 @@ export default function ModelScene({
       });
     });
     explodeDataRef.current = meshes;
-  }, [camera, watchKey, orbitControls]);
+    if (hasStoredView || !canSetDefaultView) {
+      onRequestRestore?.();
+    }
+  }, [
+    camera,
+    watchKey,
+    orbitControls,
+    canSetDefaultView,
+    transformsKey,
+    onRequestRestore,
+    hasStoredView,
+  ]);
+
+  useEffect(() => {
+    if (!groupRef.current) return;
+    if (resetToken === 0) return;
+
+    if (transformsKey) {
+      try {
+        localStorage.removeItem(transformsKey);
+      } catch {
+        // ignore
+      }
+    }
+
+    if (selectedRef.current) {
+      setHighlight(selectedRef.current, 'none');
+    }
+    selectedRef.current = null;
+    setSelectedLabel(null);
+    setHoveredLabel(null);
+    setSelectedObject(null);
+    setSelectedPartTransform(null);
+    labelAnchorRef.current = null;
+
+    const group = groupRef.current;
+    group.position.set(0, 0, 0);
+    const box = new THREE.Box3().setFromObject(group);
+    const size = box.getSize(new THREE.Vector3()).length();
+    const center = box.getCenter(new THREE.Vector3());
+    group.position.sub(center);
+
+    const distance = Math.max(size * 0.8, 2);
+    camera.position.set(distance, distance * 0.75, distance);
+    camera.lookAt(0, 0, 0);
+    if (orbitControls) {
+      orbitControls.target.set(0, 0, 0);
+      orbitControls.update();
+      orbitControls.saveState();
+    }
+  }, [
+    resetToken,
+    camera,
+    orbitControls,
+    setSelectedPartTransform,
+    transformsKey,
+  ]);
 
   useEffect(() => {
     if (!groupRef.current) return;
@@ -546,12 +694,22 @@ export default function ModelScene({
         <TransformControls
           object={selectedObject}
           mode={transformMode}
-          space="local"
+          space="world"
           onMouseDown={() => {
             if (orbitControls) orbitControls.enabled = false;
           }}
           onMouseUp={() => {
             if (orbitControls) orbitControls.enabled = true;
+          }}
+          onObjectChange={() => {
+            if (!selectedRef.current) return;
+            const { x, y, z } = selectedRef.current.position;
+            setSelectedPartTransform({ x, y, z });
+            saveSceneTransforms(
+              groupRef.current ?? selectedRef.current,
+              transformsKey,
+              transformSavedRef
+            );
           }}
         />
       ) : null}
