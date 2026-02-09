@@ -171,25 +171,6 @@ function applyViewerMaterialTuning(
   });
 }
 
-function resolveSinglePartUrls(
-  urls: string[],
-  selectedPartId: string | null | undefined,
-  assetKey: string | undefined
-) {
-  if (!selectedPartId || assetKey !== 'Quadcopter_DRONE')
-    return urls.slice(0, 1);
-  const file = DRONE_PART_ID_TO_FILE[selectedPartId];
-  if (!file) return urls.slice(0, 1);
-  const match = urls.find((url) => url.endsWith(`/${file}`));
-  return match ? [match] : urls.slice(0, 1);
-}
-
-function resolveAssemblyUrls(assetKey: string | undefined, urls: string[]) {
-  if (!assetKey) return urls;
-  const finalUrl = FINAL_ASSET_URLS[assetKey];
-  return finalUrl ? [finalUrl] : urls;
-}
-
 function ModelPart({
   url,
   viewMode,
@@ -261,7 +242,7 @@ export default function ModelScene({
         const match = urls.find((url) => url.endsWith(`/${fileName}`));
         if (match) return [match];
       }
-      
+
       // DRONE_PART_ID_TO_FILE에 없더라도 PART_NAME_MAPPING을 통해 유추 시도
       const meshName = PART_NAME_MAPPING[selectedPartId];
       if (meshName) {
@@ -278,7 +259,7 @@ export default function ModelScene({
       const finalUrl = FINAL_ASSET_URLS[assetKey];
       if (finalUrl) return [finalUrl];
     }
-    
+
     return urls;
   }, [urls, assetKey, selectedPartId]);
 

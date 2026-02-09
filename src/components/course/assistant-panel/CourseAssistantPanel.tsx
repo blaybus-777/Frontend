@@ -46,9 +46,7 @@ export default function CourseAssistantPanel() {
       {/* Content Area - Scrollable */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <TabContentComponent
-          learningContent={
-            courseId ? STUDY_CONTENT_BY_ID[courseId] : undefined
-          }
+          learningContent={courseId ? STUDY_CONTENT_BY_ID[courseId] : undefined}
         />
       </div>
     </div>
