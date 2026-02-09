@@ -6,12 +6,12 @@ export const useCourseDetail = () => {
   const {
     selectedPartId,
     setSelectedPartId,
+    modelId,
+    setModelId,
     activeTab,
     isPanelOpen,
     viewMode,
     setViewMode,
-    assemblyMode,
-    setAssemblyMode,
     explodeSpace,
     setExplodeSpace,
     explosionLevel,
@@ -23,12 +23,12 @@ export const useCourseDetail = () => {
     useShallow((state) => ({
       selectedPartId: state.selectedPartId,
       setSelectedPartId: state.setSelectedPartId,
+      modelId: state.modelId,
+      setModelId: state.setModelId,
       activeTab: state.activeTab,
       isPanelOpen: state.isPanelOpen,
       viewMode: state.viewMode,
       setViewMode: state.setViewMode,
-      assemblyMode: state.assemblyMode,
-      setAssemblyMode: state.setAssemblyMode,
       explodeSpace: state.explodeSpace,
       setExplodeSpace: state.setExplodeSpace,
       explosionLevel: state.explosionLevel,
@@ -42,21 +42,21 @@ export const useCourseDetail = () => {
   return {
     // State
     viewMode,
-    assemblyMode,
     explodeSpace,
     explosionLevel,
     transformMode,
     selectedPartTransform,
     selectedPartId,
+    modelId,
     activeTab,
     isPanelOpen,
 
     // Actions
     setViewMode,
-    setAssemblyMode,
     setExplodeSpace,
     setTransformMode,
     setSelectedPartTransform,
     setSelectedPartId,
+    setModelId,
   };
 };
