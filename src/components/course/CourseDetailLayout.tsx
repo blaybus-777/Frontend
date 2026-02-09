@@ -1,7 +1,7 @@
 import CourseControlPanel from '@/components/course/CourseControlPanel';
 import CourseHierarchyTree from '@/components/course/CourseHierarchyTree';
 import CourseRightSidebar from '@/components/course/CourseRightSidebar';
-import CourseAssistantPanel from '@/components/course/CourseAssistantPanel';
+import CourseAssistantPanel from '@/components/course/assistant-panel';
 import ModelViewer from '@/components/course/ModelViewer';
 import { useCourseDetail } from '@/hooks/useCourseDetail';
 import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
