@@ -1,4 +1,5 @@
 import { useCourseStore } from '@/stores/useCourseStore';
+import { useParams } from 'react-router-dom';
 import type { ComponentType } from 'react';
 import PartListSection from './PartListSection';
 import StudyTabContent from './StudyTabContent';
@@ -27,6 +28,7 @@ const TAB_COMPONENTS: Record<TabType, ComponentType<TabContentProps>> = {
  */
 export default function CourseAssistantPanel() {
   const { isPanelOpen, activeTab, selectedPartId } = useCourseStore();
+  const { id: courseId } = useParams<{ id: string }>();
 
   if (!isPanelOpen) return null;
 
@@ -35,7 +37,7 @@ export default function CourseAssistantPanel() {
   return (
     <div className="absolute top-0 right-0 bottom-0 flex w-[320px] flex-col bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
       {/* Part List Section - Fixed */}
-      <PartListSection selectedPartId={selectedPartId} />
+      <PartListSection selectedPartId={selectedPartId} courseId={courseId} />
 
       {/* Content Area - Scrollable */}
       <div className="flex flex-1 flex-col overflow-hidden">
