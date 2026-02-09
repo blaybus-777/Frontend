@@ -27,9 +27,7 @@ export default function StudyTabContent({
         </h3>
 
         <div className="bg-neutral-100 p-4 text-sm">
-          <h4 className="mb-4 text-base font-bold">
-            {learningContent.title}
-          </h4>
+          <h4 className="mb-4 text-base font-bold">{learningContent.title}</h4>
 
           <div className="space-y-4">
             <ContentList items={learningContent.description} />
@@ -43,17 +41,11 @@ export default function StudyTabContent({
 
             <hr className="border-gray-100" />
 
-            <ContentSection
-              title="핵심 이론"
-              items={learningContent.theory}
-            />
+            <ContentSection title="핵심 이론" items={learningContent.theory} />
 
             <hr className="border-gray-100" />
 
-            <ContentSection
-              title="부품의 역할"
-              items={learningContent.role}
-            />
+            <ContentSection title="부품의 역할" items={learningContent.role} />
           </div>
         </div>
       </section>
