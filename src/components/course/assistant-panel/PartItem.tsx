@@ -12,11 +12,20 @@ interface PartItemProps {
   onSelect?: (partId: string) => void; // Optional: can be used for explicit click handling if needed
 }
 
-export default function PartItem({ part, isSelected }: PartItemProps) {
+export default function PartItem({
+  part,
+  isSelected,
+  onSelect,
+}: PartItemProps) {
   const isGlb = part.image.endsWith('.glb');
 
   return (
-    <button className="group flex w-full shrink-0 flex-col items-center gap-1 focus:outline-none">
+    <button
+      onClick={() => {
+        onSelect?.(part.id);
+      }}
+      className="group flex w-full shrink-0 flex-col items-center gap-1 focus:outline-none"
+    >
       <div
         className={cn(
           'aspect-square w-full overflow-hidden rounded-lg transition-all',
@@ -43,7 +52,7 @@ export default function PartItem({ part, isSelected }: PartItemProps) {
             : 'group-hover:text-active text-gray-500 group-hover:font-medium'
         )}
       >
-        {part.name}
+        {part.englishName}
       </span>
     </button>
   );

@@ -7,10 +7,10 @@ interface ModelViewerProps {
   onSelect?: (part: SelectedPart | null) => void;
   selectedPartId?: string | null;
   viewMode?: 'general' | 'wireframe';
-  assemblyMode?: 'single' | 'assembly';
   explodeDistance: number;
   explodeSpace: 'local' | 'world';
   assetKey?: string;
+  storageKey?: string;
 }
 
 export default function ModelViewer({
@@ -19,26 +19,23 @@ export default function ModelViewer({
   onSelect,
   selectedPartId,
   viewMode = 'general',
-  assemblyMode = 'assembly',
   explodeDistance,
   explodeSpace,
   assetKey,
+  storageKey,
 }: ModelViewerProps) {
-  const resolvedExplodeDistance =
-    assemblyMode === 'assembly' ? explodeDistance : 0;
-
   return (
     <div className="h-full w-full">
       <ModelViewerCanvas
         urls={urls}
-        explodeDistance={resolvedExplodeDistance}
+        explodeDistance={explodeDistance}
         explodeSpace={explodeSpace}
         partInfo={partInfo}
         onSelect={onSelect}
         selectedPartId={selectedPartId}
         viewMode={viewMode}
-        assemblyMode={assemblyMode}
         assetKey={assetKey}
+        storageKey={storageKey}
       />
     </div>
   );

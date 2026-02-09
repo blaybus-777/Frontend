@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ASSETS } from '@/constants/assets';
 import { MOCK_PARTS } from '@/components/course/assistant-panel/mockData';
 import type { Part } from '@/components/course/assistant-panel/types';
+import { PART_ID_MAPPING } from '@/data/partMapping';
 
 // Map course IDs to ASSETS keys
 const COURSE_ID_MAP: Record<string, string> = {
@@ -28,14 +29,19 @@ export function useCourseParts(courseId?: string) {
 
     if (!assetKey || !ASSETS[assetKey]) return MOCK_PARTS;
 
-    return ASSETS[assetKey].modelUrls.map((url): Part => {
+    return Object.values(ASSETS[assetKey].parts).map((url: string): Part => {
       // Extract name from file path: "/models/drone/Arm gear.glb" -> "Arm gear"
       const fileName = url.split('/').pop() || '';
       const name = fileName.replace('.glb', '');
+
+      // 데이터 일관성을 위해 ID 매핑 적용
+      const id = PART_ID_MAPPING[name] || name;
+
       return {
-        id: name, // Use name as ID for now to match selection logic if possible, or url
+        id: id,
         name: name,
-        image: url, // We use the model URL as the 'image' source
+        image: url,
+        englishName: name,
       };
     });
   }, [courseId]);

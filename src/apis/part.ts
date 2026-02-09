@@ -23,9 +23,28 @@ export interface PartListResponse {
   page: number;
 }
 
+export const getPartHierarchy = async (
+  modelId: string
+): Promise<PartListResponse> => {
+  const response = await api.get(`/v1/part/list/${modelId}`, {
+    params: { flat: false },
+  });
+  return response.data.data;
+};
+
 export const getPartList = async (
   modelId: string
 ): Promise<PartListResponse> => {
-  const response = await api.get(`/v1/part/list/${modelId}`);
+  const response = await api.get(`/v1/part/list/${modelId}`, {
+    params: { flat: true },
+  });
+  return response.data.data;
+};
+
+export const getPartDetail = async (
+  modelId: string,
+  partId: string
+): Promise<PartListResponse> => {
+  const response = await api.get(`/v1/part/${modelId}/${partId}`);
   return response.data.data;
 };

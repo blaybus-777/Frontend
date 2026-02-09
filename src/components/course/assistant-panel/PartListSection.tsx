@@ -1,31 +1,55 @@
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import type { Part } from './types';
-import { useCourseParts } from '@/hooks/useCourseParts';
 import PartItem from './PartItem';
+import { useCourseStore } from '@/stores/useCourseStore';
+import { usePartList } from '@/hooks/usePartList';
+import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
 
 interface PartListSectionProps {
   selectedPartId: string | null;
   parts?: Part[];
-  courseId?: string;
+  courseId?: string; // modelId와 동일하게 쓰임
 }
 
 /**
  * 부품 리스트 섹션 컴포넌트
  * - 단일 책임: 부품 목록 표시 및 확장/축소 기능만 담당
- * - 비즈니스 로직 분리: 부품 데이터 로딩 로직을 useCourseParts 훅으로 분리
  */
 export default function PartListSection({
   selectedPartId,
   parts: passedParts,
-  courseId,
 }: PartListSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { parts: hookParts } = useCourseParts(courseId);
+  const setSelectedPartId = useCourseStore((state) => state.setSelectedPartId);
+  const modelId = useCourseStore((state) => state.modelId);
+
+  const { data: apiPartData } = usePartList(modelId ?? undefined);
+  const { detail } = useCourseModelDetail(modelId ?? undefined);
+
+  const hookParts = useMemo(() => {
+    if (!apiPartData || !detail) return [];
+
+    return apiPartData.items.map((apiPart): Part => {
+      const matchingUrl = detail.parts[apiPart.code] || '';
+
+      return {
+        id: String(apiPart.partId),
+        name: apiPart.name,
+        image: matchingUrl, // GLB URL을 이미지로 사용
+        englishName: apiPart.englishName,
+      };
+    });
+  }, [apiPartData, detail]);
 
   // 외부에서 주입된 parts가 있으면 사용, 없으면 hook에서 가져온 parts 사용
   const displayParts = passedParts ?? hookParts;
+
+  const handlePartSelect = (id: string) => {
+    const nextId = selectedPartId === id ? null : id;
+    setSelectedPartId(nextId);
+  };
 
   return (
     <section>
@@ -52,6 +76,7 @@ export default function PartListSection({
                   key={part.id}
                   part={part}
                   isSelected={selectedPartId === part.id}
+                  onSelect={handlePartSelect}
                 />
               ))}
             </div>

@@ -8,7 +8,7 @@ interface HierarchyNodeProps {
   node: Part;
   level: number;
   selectedPartId?: string | null;
-  onSelectPart?: (id: string) => void;
+  onSelectPart?: (id: string | null) => void;
 }
 
 export default function HierarchyNode({
@@ -19,11 +19,20 @@ export default function HierarchyNode({
 }: HierarchyNodeProps) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
-  const isSelected = selectedPartId === node.code;
+  
+  // level이 0이고 selectedPartId가 null이면 완제품 선택 상태로 간주
+  const isSelected = level === 0 && selectedPartId === null 
+    ? true 
+    : selectedPartId === String(node.partId);
 
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onSelectPart?.(node.code);
+    // level이 0인 최상위 노드를 클릭하면 완제품(null)을 선택한 것으로 처리
+    if (level === 0) {
+      onSelectPart?.(null);
+    } else {
+      onSelectPart?.(String(node.partId));
+    }
   };
 
   return (
@@ -66,9 +75,9 @@ export default function HierarchyNode({
               hasChildren ? 'font-medium' : 'text-gray-600',
               isSelected && 'text-active'
             )}
-            title={node.name}
+            title={node.englishName}
           >
-            {node.name}
+            {node.englishName}
           </span>
         </div>
       </div>
