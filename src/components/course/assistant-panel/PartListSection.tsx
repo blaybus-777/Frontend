@@ -112,10 +112,10 @@ function PartItem({ part, isSelected }: PartItemProps) {
     <button className="group flex w-full shrink-0 flex-col items-center gap-1 focus:outline-none">
       <div
         className={cn(
-          'aspect-square w-full overflow-hidden rounded-lg border transition-all',
+          'aspect-square w-full overflow-hidden rounded-lg transition-all',
           isSelected
-            ? 'border-blue-500 bg-blue-50 shadow-sm ring-1 ring-blue-500'
-            : 'border-gray-200 bg-gray-50 hover:border-blue-300'
+            ? 'bg-blue-50 shadow-sm ring-1 ring-blue-500'
+            : 'bg-white hover:bg-foundation-blue-1'
         )}
       >
         {isGlb ? (
@@ -131,7 +131,7 @@ function PartItem({ part, isSelected }: PartItemProps) {
       <span
         className={cn(
           'w-full truncate text-center text-[10px] transition-colors',
-          isSelected ? 'font-medium text-blue-600' : 'text-gray-500'
+          isSelected ? 'font-medium text-blue-600' : 'text-gray-500 group-hover:text-active group-hover:font-medium'
         )}
       >
         {part.name}

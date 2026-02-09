@@ -8,7 +8,7 @@ interface ModelThumbnailProps {
 
 function Model({ url }: { url: string }) {
   const { scene } = useGLTF(url);
-  return <primitive object={scene} />;
+  return <primitive object={scene} rotation={[Math.PI / 8, Math.PI / 4, 0]} />;
 }
 
 export default function ModelThumbnail({ modelUrl }: ModelThumbnailProps) {
