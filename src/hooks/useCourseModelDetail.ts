@@ -5,6 +5,7 @@ import { ASSETS } from '@/constants/assets';
 export interface CourseModelDetail {
   title: string;
   modelUrls: string[];
+  parts: Record<string, string>;
   assetKey: keyof typeof ASSETS;
 }
 
@@ -38,7 +39,8 @@ export const useCourseModelDetail = (modelId: string | undefined) => {
       isError,
       detail: {
         title: model?.title || assetKey,
-        modelUrls: assetData.modelUrls,
+        modelUrls: Object.values(assetData.parts),
+        parts: assetData.parts,
         assetKey,
       },
     };

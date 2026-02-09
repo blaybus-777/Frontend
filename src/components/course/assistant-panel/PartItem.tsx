@@ -52,7 +52,7 @@ export default function PartItem({
             : 'group-hover:text-active text-gray-500 group-hover:font-medium'
         )}
       >
-        {part.name}
+        {part.englishName}
       </span>
     </button>
   );

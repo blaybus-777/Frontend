@@ -5,12 +5,14 @@ interface CourseState {
   activeTab: 'study' | 'memo' | 'ai-tutor';
   isPanelOpen: boolean;
   selectedPartId: string | null;
+  modelId: string | null;
 
   // Actions
   setActiveTab: (tab: 'study' | 'memo' | 'ai-tutor') => void;
   togglePanel: () => void;
   setPanelOpen: (isOpen: boolean) => void;
   setSelectedPartId: (id: string | null) => void;
+  setModelId: (id: string | null) => void;
 
   // 3D Control
   explosionLevel: number[];
@@ -39,6 +41,7 @@ export const useCourseStore = create<CourseState>((set) => ({
   activeTab: 'study',
   isPanelOpen: true,
   selectedPartId: null,
+  modelId: null,
 
   // Actions
   setActiveTab: (tab) =>
@@ -56,6 +59,8 @@ export const useCourseStore = create<CourseState>((set) => ({
   setPanelOpen: (isOpen) => set({ isPanelOpen: isOpen }),
 
   setSelectedPartId: (id) => set({ selectedPartId: id }),
+
+  setModelId: (id) => set({ modelId: id }),
 
   // 3D Control
   explosionLevel: [0],
