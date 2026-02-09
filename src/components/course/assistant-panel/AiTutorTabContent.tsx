@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { SquarePen, Plus, CircleArrowUp, X } from 'lucide-react';
+import quickActionIcon from '@/assets/quick-action.png';
 
 import { Input } from '@/components/ui/input';
 
 export default function AiTutorTabContent() {
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const suggestions = [
     '가장 많이 쓰이는 재질은 무엇인가요?',
     '핵심 역할은 무엇인가요?',
@@ -23,26 +26,51 @@ export default function AiTutorTabContent() {
 
       {/* Main Content (Chat Area) */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="flex min-h-full flex-col justify-end space-y-6 pb-2">
+        <div className="flex min-h-full flex-col space-y-6 pb-2">
+          {/* Spacer to push content down or keep it consistent */}
+          <div className="flex-1" />
+
           <div className="space-y-1 text-center">
             <h3 className="font-medium text-gray-900">안녕하세요.</h3>
             <p className="text-gray-900">현재 화면에서 궁금한 내용이 있나요?</p>
           </div>
 
-          <div className="flex flex-col items-end gap-2">
-            {suggestions.map((question, index) => (
-              <button
-                key={index}
-                className="rounded-full border border-blue-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm hover:bg-blue-50"
-              >
-                {question}
-              </button>
-            ))}
-          </div>
+          <div className="flex h-[200px] flex-col justify-end">
+            {showSuggestions ? (
+              <div className="flex flex-col items-end gap-6">
+                <div className="flex flex-col items-end gap-2">
+                  {suggestions.map((question, index) => (
+                    <button
+                      key={index}
+                      className="rounded-full border border-blue-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm hover:bg-blue-50"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
 
-          <button className="self-end rounded-full bg-gray-200 p-1 hover:bg-gray-300">
-            <X className="h-4 w-4 text-gray-500" />
-          </button>
+                <button
+                  onClick={() => setShowSuggestions(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300"
+                >
+                  <X className="h-6 w-6 text-gray-500" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowSuggestions(true)}
+                className="flex h-10 w-10 items-center justify-center self-end object-fill"
+              >
+                <img
+                  src={quickActionIcon}
+                  alt="quick action button"
+                  width={32}
+                  height={32}
+                  className="block h-full w-full"
+                />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
