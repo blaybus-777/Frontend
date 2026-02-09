@@ -66,9 +66,9 @@ export default function HierarchyNode({
               hasChildren ? 'font-medium' : 'text-gray-600',
               isSelected && 'text-active'
             )}
-            title={node.name}
+            title={node.englishName}
           >
-            {node.name}
+            {node.englishName}
           </span>
         </div>
       </div>
