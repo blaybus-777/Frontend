@@ -100,7 +100,7 @@ export default function CourseHierarchyTree({
 }: CourseHierarchyTreeProps) {
   return (
     <div className="flex h-full w-full flex-col bg-gray-50 text-black">
-      <div className="shrink-0 border-b border-gray-200 p-4 pt-6">
+      <div className="shrink-0 border-b border-gray-200 p-4">
         <h2 className="text-sm font-bold text-gray-500">
           하이라키 구조 테이블
         </h2>
