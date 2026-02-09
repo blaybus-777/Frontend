@@ -102,7 +102,7 @@ export function useCourseParts(courseId?: string) {
 
     if (!assetKey || !ASSETS[assetKey]) return MOCK_PARTS;
 
-    return ASSETS[assetKey].modelUrls.map((url): Part => {
+    return Object.values(ASSETS[assetKey].parts).map((url: string): Part => {
       // Extract name from file path: "/models/drone/Arm gear.glb" -> "Arm gear"
       const fileName = url.split('/').pop() || '';
       const name = fileName.replace('.glb', '');
@@ -114,6 +114,7 @@ export function useCourseParts(courseId?: string) {
         id: id,
         name: name,
         image: url,
+        englishName: name,
       };
     });
   }, [courseId]);

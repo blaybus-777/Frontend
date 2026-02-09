@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getPartDetail, Part } from '@/apis/part';
+import { getPartDetail } from '@/apis/part';
+import type { Part } from '@/apis/part';
 
 /**
  * 특정 부품의 상세 정보를 가져오는 커스텀 훅
