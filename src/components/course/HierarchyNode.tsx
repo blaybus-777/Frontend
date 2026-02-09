@@ -19,11 +19,11 @@ export default function HierarchyNode({
 }: HierarchyNodeProps) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
-  const isSelected = selectedPartId === node.code;
+  const isSelected = selectedPartId === String(node.partId);
 
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onSelectPart?.(node.code);
+    onSelectPart?.(String(node.partId));
   };
 
   return (
