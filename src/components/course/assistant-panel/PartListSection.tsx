@@ -1,23 +1,31 @@
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
-import { MOCK_PARTS } from './mockData';
 import type { Part } from './types';
+import { useCourseParts } from '@/hooks/useCourseParts';
+import PartItem from './PartItem';
 
 interface PartListSectionProps {
   selectedPartId: string | null;
   parts?: Part[];
+  courseId?: string;
 }
 
 /**
  * 부품 리스트 섹션 컴포넌트
  * - 단일 책임: 부품 목록 표시 및 확장/축소 기능만 담당
+ * - 비즈니스 로직 분리: 부품 데이터 로딩 로직을 useCourseParts 훅으로 분리
  */
 export default function PartListSection({
   selectedPartId,
-  parts = MOCK_PARTS,
+  parts: passedParts,
+  courseId,
 }: PartListSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { parts: hookParts } = useCourseParts(courseId);
+
+  // 외부에서 주입된 parts가 있으면 사용, 없으면 hook에서 가져온 parts 사용
+  const displayParts = passedParts ?? hookParts;
 
   return (
     <section>
@@ -39,7 +47,7 @@ export default function PartListSection({
             }}
           >
             <div className="grid grid-cols-4 gap-2 pb-2">
-              {parts.map((part) => (
+              {displayParts.map((part) => (
                 <PartItem
                   key={part.id}
                   part={part}
@@ -59,43 +67,5 @@ export default function PartListSection({
         </button>
       </div>
     </section>
-  );
-}
-
-/**
- * 개별 부품 아이템 컴포넌트
- * - 단일 책임: 개별 부품의 표시만 담당
- */
-interface PartItemProps {
-  part: Part;
-  isSelected: boolean;
-}
-
-function PartItem({ part, isSelected }: PartItemProps) {
-  return (
-    <button className="group flex w-full shrink-0 flex-col items-center gap-1 focus:outline-none">
-      <div
-        className={cn(
-          'aspect-square w-full overflow-hidden rounded-lg border transition-all',
-          isSelected
-            ? 'border-blue-500 bg-blue-50 shadow-sm ring-1 ring-blue-500'
-            : 'border-gray-200 bg-gray-50 hover:border-blue-300'
-        )}
-      >
-        <img
-          src={part.image}
-          alt={part.name}
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <span
-        className={cn(
-          'w-full truncate text-center text-[10px] transition-colors',
-          isSelected ? 'font-medium text-blue-600' : 'text-gray-500'
-        )}
-      >
-        {part.name}
-      </span>
-    </button>
   );
 }
