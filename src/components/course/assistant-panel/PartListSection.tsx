@@ -3,11 +3,25 @@ import { useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import { MOCK_PARTS } from './mockData';
 import type { Part } from './types';
+import { ASSETS } from '@/constants/assets';
+import ModelThumbnail from '@/components/common/ModelThumbnail';
 
 interface PartListSectionProps {
   selectedPartId: string | null;
   parts?: Part[];
+  courseId?: string;
 }
+
+// Map course IDs to ASSETS keys
+const COURSE_ID_MAP: Record<string, string> = {
+  '1': 'Quadcopter_DRONE',
+  '2': 'LEAF_SPRING',
+  '3': 'MACHINE_VICE',
+  '4': 'ROBOT_ARM',
+  '5': 'ROBOT_GRIPPER',
+  '6': 'SUSPENSION',
+  '7': 'V4_ENGINE',
+};
 
 /**
  * 부품 리스트 섹션 컴포넌트
@@ -15,9 +29,29 @@ interface PartListSectionProps {
  */
 export default function PartListSection({
   selectedPartId,
-  parts = MOCK_PARTS,
+  parts,
+  courseId,
 }: PartListSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Derive parts from ASSETS if not provided
+  const displayParts: Part[] = parts ?? (() => {
+    // Map the numeric course ID to the asset key
+    const assetKey = courseId ? COURSE_ID_MAP[courseId] : undefined;
+    
+    if (!assetKey || !ASSETS[assetKey]) return MOCK_PARTS;
+    
+    return ASSETS[assetKey].modelUrls.map((url) => {
+      // Extract name from file path: "/models/drone/Arm gear.glb" -> "Arm gear"
+      const fileName = url.split('/').pop() || '';
+      const name = fileName.replace('.glb', '');
+      return {
+        id: name, // Use name as ID for now to match selection logic if possible, or url
+        name: name,
+        image: url, // We use the model URL as the 'image' source
+      };
+    });
+  })();
 
   return (
     <section>
@@ -39,7 +73,7 @@ export default function PartListSection({
             }}
           >
             <div className="grid grid-cols-4 gap-2 pb-2">
-              {parts.map((part) => (
+              {displayParts.map((part) => (
                 <PartItem
                   key={part.id}
                   part={part}
@@ -72,6 +106,8 @@ interface PartItemProps {
 }
 
 function PartItem({ part, isSelected }: PartItemProps) {
+  const isGlb = part.image.endsWith('.glb');
+
   return (
     <button className="group flex w-full shrink-0 flex-col items-center gap-1 focus:outline-none">
       <div
@@ -82,11 +118,15 @@ function PartItem({ part, isSelected }: PartItemProps) {
             : 'border-gray-200 bg-gray-50 hover:border-blue-300'
         )}
       >
-        <img
-          src={part.image}
-          alt={part.name}
-          className="h-full w-full object-cover"
-        />
+        {isGlb ? (
+          <ModelThumbnail modelUrl={part.image} />
+        ) : (
+          <img
+            src={part.image}
+            alt={part.name}
+            className="h-full w-full object-cover"
+          />
+        )}
       </div>
       <span
         className={cn(
