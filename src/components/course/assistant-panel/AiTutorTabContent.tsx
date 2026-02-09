@@ -13,7 +13,9 @@ export default function AiTutorTabContent() {
     <div className="flex h-full flex-col bg-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b px-4 py-3">
-        <h2 className="text-sm font-semibold text-blue-500">Simvex Tutor</h2>
+        <div className="flex-1 text-center">
+          <h2 className="text-sm font-semibold text-blue-500">Simvex Tutor</h2>
+        </div>
         <button className="text-gray-500 hover:text-gray-700">
           <SquarePen className="h-4 w-4" />
         </button>
@@ -21,8 +23,8 @@ export default function AiTutorTabContent() {
 
       {/* Main Content (Chat Area) */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="flex flex-col justify-center space-y-6 pt-20 text-center">
-          <div className="space-y-1">
+        <div className="flex min-h-full flex-col justify-end space-y-6 pb-2">
+          <div className="space-y-1 text-center">
             <h3 className="font-medium text-gray-900">안녕하세요.</h3>
             <p className="text-gray-900">현재 화면에서 궁금한 내용이 있나요?</p>
           </div>
