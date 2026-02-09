@@ -34,6 +34,7 @@ export default function CourseDetailLayout({
             </div>
             <div className="flex-1 overflow-hidden bg-gray-50">
               <CourseHierarchyTree
+                modelId={id}
                 selectedPartId={selectedPartId}
                 onSelectPart={onSelectPart}
               />

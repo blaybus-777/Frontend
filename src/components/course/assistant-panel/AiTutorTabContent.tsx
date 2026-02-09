@@ -1,13 +1,12 @@
+import { SquarePen, Plus, CircleArrowUp, X } from 'lucide-react';
 
-import { SquarePen, Plus, CircleArrowUp, X } from "lucide-react";
-
-import { Input } from "@/components/ui/input";
+import { Input } from '@/components/ui/input';
 
 export default function AiTutorTabContent() {
   const suggestions = [
-    "가장 많이 쓰이는 재질은 무엇인가요?",
-    "핵심 역할은 무엇인가요?",
-    "가장 중요한 설계 요소는 무엇인가요?",
+    '가장 많이 쓰이는 재질은 무엇인가요?',
+    '핵심 역할은 무엇인가요?',
+    '가장 중요한 설계 요소는 무엇인가요?',
   ];
 
   return (
@@ -28,7 +27,7 @@ export default function AiTutorTabContent() {
             <p className="text-gray-900">현재 화면에서 궁금한 내용이 있나요?</p>
           </div>
 
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col items-end gap-2">
             {suggestions.map((question, index) => (
               <button
                 key={index}
@@ -38,8 +37,8 @@ export default function AiTutorTabContent() {
               </button>
             ))}
           </div>
-          
-          <button className="rounded-full bg-gray-200 p-1 hover:bg-gray-300 self-end">
+
+          <button className="self-end rounded-full bg-gray-200 p-1 hover:bg-gray-300">
             <X className="h-4 w-4 text-gray-500" />
           </button>
         </div>
@@ -48,18 +47,18 @@ export default function AiTutorTabContent() {
       {/* Input Area */}
       <div className="border-t p-4">
         <div className="flex flex-col gap-2 rounded-2xl bg-gray-100 p-4">
-            <Input 
-              className="border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-500" 
-              placeholder="무엇이든 물어보세요"
-            />
-            <div className="flex items-center justify-between">
-              <button className="text-gray-400 hover:text-gray-600">
-                <Plus className="h-6 w-6" />
-              </button>
-              <button className="text-gray-400 hover:text-gray-600">
-                <CircleArrowUp className="h-6 w-6" />
-              </button>
-            </div>
+          <Input
+            className="border-0 bg-transparent p-0 text-base shadow-none placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+            placeholder="무엇이든 물어보세요"
+          />
+          <div className="flex items-center justify-between">
+            <button className="text-gray-400 hover:text-gray-600">
+              <Plus className="h-6 w-6" />
+            </button>
+            <button className="text-gray-400 hover:text-gray-600">
+              <CircleArrowUp className="h-6 w-6" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

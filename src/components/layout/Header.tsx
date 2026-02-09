@@ -17,7 +17,7 @@ function Header() {
   return (
     <header className="border-foundation-gray-5 sticky top-0 z-50 w-full border-b bg-white">
       <nav className="flex h-20 items-center gap-[500px]">
-        <div className="py-5 px-2.5 to-foundation-blue-9 font-pretendard bg-linear-to-r from-[#42C2FF] bg-clip-text text-3xl font-extrabold text-transparent">
+        <div className="to-foundation-blue-9 font-pretendard bg-linear-to-r from-[#42C2FF] bg-clip-text px-2.5 py-5 text-3xl font-extrabold text-transparent">
           SIMVEX
         </div>
         <div className="flex gap-10">
