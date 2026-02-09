@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
-import { DRONE_PARTS, type PartNode } from '@/data/droneParts';
 import { cn } from '@/lib/utils';
+import { usePartList } from '@/hooks/usePartList';
+import { type Part } from '@/apis/part';
 
 interface TreeNodeProps {
-  node: PartNode;
+  node: Part;
   level: number;
   selectedPartId?: string | null;
   onSelectPart?: (id: string) => void;
@@ -19,11 +20,11 @@ function TreeNode({
 }: TreeNodeProps) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
-  const isSelected = selectedPartId === node.id;
+  const isSelected = selectedPartId === node.code;
 
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onSelectPart?.(node.id);
+    onSelectPart?.(node.code);
   };
 
   return (
@@ -64,6 +65,7 @@ function TreeNode({
               hasChildren ? 'font-medium' : 'text-gray-600',
               isSelected && 'text-active'
             )}
+            title={node.name}
           >
             {node.name}
           </span>
@@ -75,7 +77,7 @@ function TreeNode({
           <div className="flex flex-col">
             {node.children!.map((child) => (
               <TreeNode
-                key={child.id}
+                key={child.partId}
                 node={child}
                 level={level + 1}
                 selectedPartId={selectedPartId}
@@ -90,14 +92,18 @@ function TreeNode({
 }
 
 interface CourseHierarchyTreeProps {
+  modelId?: string;
   selectedPartId?: string | null;
   onSelectPart?: (id: string | null) => void;
 }
 
 export default function CourseHierarchyTree({
+  modelId,
   selectedPartId,
   onSelectPart,
 }: CourseHierarchyTreeProps) {
+  const { data, isLoading, error } = usePartList(modelId);
+
   return (
     <div className="flex h-full w-full flex-col bg-gray-50 text-black">
       <div className="shrink-0 border-b border-gray-200 p-4 pt-6">
@@ -106,15 +112,27 @@ export default function CourseHierarchyTree({
         </h2>
       </div>
       <div className="flex-1 overflow-y-auto p-2">
-        {DRONE_PARTS.map((node) => (
-          <TreeNode
-            key={node.id}
-            node={node}
-            level={0}
-            selectedPartId={selectedPartId}
-            onSelectPart={(id) => onSelectPart?.(id)}
-          />
-        ))}
+        {isLoading ? (
+          <div className="p-4 text-center text-sm text-gray-500">
+            로딩 중...
+          </div>
+        ) : error ? (
+          <div className="p-4 text-center text-sm text-red-500">
+            데이터를 불러올 수 없습니다.
+          </div>
+        ) : (
+          data?.items
+            .filter((node) => node.children && node.children.length > 0)
+            .map((node) => (
+              <TreeNode
+                key={node.partId}
+                node={node}
+                level={0}
+                selectedPartId={selectedPartId}
+                onSelectPart={(id) => onSelectPart?.(id)}
+              />
+            ))
+        )}
       </div>
     </div>
   );
