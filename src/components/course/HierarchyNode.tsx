@@ -31,9 +31,9 @@ export default function HierarchyNode({
       <div
         className={cn(
           'flex cursor-pointer items-center rounded-sm py-1 text-sm transition-colors select-none hover:bg-gray-100',
-          isSelected && 'text-active font-medium',
-          level > 0 && 'ml-4'
+          isSelected && 'text-active font-medium'
         )}
+        style={{ paddingLeft: `${level * 16}px` }}
         onClick={handleSelect}
       >
         <div className="flex w-full items-center gap-1 px-2">
