@@ -10,10 +10,11 @@ export interface ExtendedModel {
   tags: string[];
   image: string;
   modelUrls: string[];
+  assetKey?: string;
 }
 
 export const useModelList = () => {
-  const { tagMap, modelMap, isLoading: isEnumsLoading } = useEnums();
+  const { tagMap, modelMap, modelCodeMap, isLoading: isEnumsLoading } = useEnums();
 
   return useQuery({
     queryKey: ['modelList'],
@@ -21,13 +22,16 @@ export const useModelList = () => {
     enabled: !isEnumsLoading,
     select: (data) =>
       data.items.map((item) => {
-        const assetData = ASSETS[item.code] || { image: '', modelUrls: [] };
+        const assetKey = modelCodeMap[item.code.toLowerCase()];
+        const assetData = assetKey ? ASSETS[assetKey] : { image: '', modelUrls: [] };
+        
         return {
           ...item,
-          code: modelMap[item.code] || item.code,
+          code: modelMap[assetKey] || item.code,
           tags: item.tags?.map((t: string) => tagMap[t] || t) || [],
           image: assetData.image,
           modelUrls: assetData.modelUrls,
+          assetKey,
         } as ExtendedModel;
       }),
   });

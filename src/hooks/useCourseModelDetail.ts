@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useModelList } from "@/hooks/useModelList";
-import { ASSETS, MODEL_ID_TO_ASSET_KEY } from "@/constants/assets";
+import { ASSETS } from "@/constants/assets";
 
 export interface CourseModelDetail {
   title: string;
@@ -20,9 +20,10 @@ export const useCourseModelDetail = (modelId: string | undefined) => {
       };
     }
 
-    const assetKey = MODEL_ID_TO_ASSET_KEY[modelId];
-    const assetData = assetKey ? ASSETS[assetKey] : null;
     const model = modelList?.find((item) => String(item.modelId) === modelId);
+    // Cast to keyof ASSETS if it exists, otherwise undefined
+    const assetKey = model?.assetKey as keyof typeof ASSETS | undefined;
+    const assetData = assetKey ? ASSETS[assetKey] : null;
 
     if (!assetData) {
       return {

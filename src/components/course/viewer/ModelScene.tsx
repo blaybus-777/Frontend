@@ -169,7 +169,7 @@ function resolveSinglePartUrls(
   selectedPartId: string | null | undefined,
   assetKey: string | undefined
 ) {
-  if (!selectedPartId || assetKey !== "DRONE") return urls.slice(0, 1);
+  if (!selectedPartId || assetKey !== "Quadcopter_DRONE") return urls.slice(0, 1);
   const file = DRONE_PART_ID_TO_FILE[selectedPartId];
   if (!file) return urls.slice(0, 1);
   const match = urls.find((url) => url.endsWith(`/${file}`));

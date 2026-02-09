@@ -38,9 +38,19 @@ export const useEnums = () => {
       {} as Record<string, string>
     ) || {};
 
+  const modelCodeMap =
+    modelData?.items.reduce(
+      (acc, item) => {
+        acc[item.name.toLowerCase()] = item.name;
+        return acc;
+      },
+      {} as Record<string, string>
+    ) || {};
+
   return {
     tagMap,
     modelMap,
+    modelCodeMap,
     isLoading: !tagData || !modelData,
   };
 };
