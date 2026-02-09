@@ -14,7 +14,6 @@ interface ModelViewerCanvasProps {
   onSelect?: (part: SelectedPart | null) => void;
   selectedPartId?: string | null;
   viewMode?: 'general' | 'wireframe';
-  assemblyMode?: 'single' | 'assembly';
   assetKey?: string;
 }
 
@@ -26,7 +25,6 @@ export default function ModelViewerCanvas({
   onSelect,
   selectedPartId,
   viewMode,
-  assemblyMode,
   assetKey,
 }: ModelViewerCanvasProps) {
   const showWorldAxes = true;
@@ -66,7 +64,6 @@ export default function ModelViewerCanvas({
             onSelect={onSelect}
             selectedPartId={selectedPartId}
             viewMode={viewMode}
-            assemblyMode={assemblyMode}
             assetKey={assetKey}
             htmlPortal={htmlPortalRef}
             orbitRef={controlsRef}

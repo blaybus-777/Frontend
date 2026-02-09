@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import * as THREE from 'three';
 import type { PartInfoMap, SelectedPart } from './types';
-import { DRONE_PART_ID_TO_FILE } from '@/data/partMapping';
+import { DRONE_PART_ID_TO_FILE, PART_NAME_MAPPING } from '@/data/partMapping';
 import { FINAL_ASSET_URLS } from '@/constants/assets';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useCourseStore } from '@/stores/useCourseStore';
@@ -19,7 +19,6 @@ interface ModelSceneProps {
   onRegisterClearSelection?: (clearFn: () => void) => void;
   selectedPartId?: string | null;
   viewMode?: 'general' | 'wireframe';
-  assemblyMode?: 'single' | 'assembly';
   assetKey?: string;
   htmlPortal?: RefObject<HTMLElement>;
   orbitRef?: RefObject<OrbitControlsImpl | null>;
@@ -226,7 +225,6 @@ export default function ModelScene({
   onRegisterClearSelection,
   selectedPartId,
   viewMode = 'general',
-  assemblyMode = 'assembly',
   assetKey,
   htmlPortal,
   orbitRef,
@@ -256,14 +254,33 @@ export default function ModelScene({
   );
 
   const resolvedUrls = useMemo(() => {
-    if (assemblyMode === 'single') {
-      return resolveSinglePartUrls(urls, selectedPartId, assetKey);
+    // 1. 선택된 부품이 있는 경우, 해당 부품의 개별 GLB만 보여줌
+    if (selectedPartId) {
+      const fileName = DRONE_PART_ID_TO_FILE[selectedPartId];
+      if (fileName) {
+        const match = urls.find((url) => url.endsWith(`/${fileName}`));
+        if (match) return [match];
+      }
+      
+      // DRONE_PART_ID_TO_FILE에 없더라도 PART_NAME_MAPPING을 통해 유추 시도
+      const meshName = PART_NAME_MAPPING[selectedPartId];
+      if (meshName) {
+        const match = urls.find((url) => {
+          const decodedUrl = decodeURIComponent(url);
+          return decodedUrl.endsWith(`/${meshName}.glb`);
+        });
+        if (match) return [match];
+      }
     }
-    if (assemblyMode === 'assembly') {
-      return resolveAssemblyUrls(assetKey, urls);
+
+    // 2. 선택된 부품이 없거나 개별 GLB를 못 찾은 경우, 전체 조립 모델 표시
+    if (assetKey) {
+      const finalUrl = FINAL_ASSET_URLS[assetKey];
+      if (finalUrl) return [finalUrl];
     }
+    
     return urls;
-  }, [urls, assemblyMode, selectedPartId, assetKey]);
+  }, [urls, assetKey, selectedPartId]);
 
   const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
 
@@ -281,6 +298,49 @@ export default function ModelScene({
       if (onSelect) onSelect(null);
     });
   }, [onRegisterClearSelection, onSelect, setSelectedPartTransform]);
+
+  // 하이라키 트리 등 외부에서의 선택 상태 반영
+  useEffect(() => {
+    if (!groupRef.current) return;
+
+    // 선택이 해제된 경우
+    if (!selectedPartId) {
+      if (selectedRef.current) {
+        setHighlight(selectedRef.current, 'none');
+        selectedRef.current = null;
+        setSelectedLabel(null);
+        setSelectedObject(null);
+      }
+      return;
+    }
+
+    // ID를 Mesh 이름으로 변환
+    const meshName = PART_NAME_MAPPING[selectedPartId];
+    if (!meshName) return;
+
+    // 이미 선택된 것과 같다면 무시
+    if (selectedRef.current?.name === meshName) return;
+
+    let targetMesh: THREE.Mesh | null = null;
+    groupRef.current.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === meshName) {
+        targetMesh = child;
+      }
+    });
+
+    if (targetMesh) {
+      if (selectedRef.current && selectedRef.current !== targetMesh) {
+        setHighlight(selectedRef.current, 'none');
+      }
+      selectedRef.current = targetMesh;
+      setHighlight(targetMesh, 'select');
+      const selected = buildSelectedPart(targetMesh, partInfo);
+      setSelectedLabel(selected);
+      setHoveredLabel(null);
+      labelAnchorRef.current = targetMesh;
+      setSelectedObject(targetMesh);
+    }
+  }, [selectedPartId, watchKey, partInfo]);
 
   useEffect(() => {
     if (!groupRef.current) return;
