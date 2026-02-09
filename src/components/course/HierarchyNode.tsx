@@ -55,7 +55,9 @@ export default function HierarchyNode({
               )}
             </span>
           ) : (
-            <span className="size-4" />
+            <span className="flex size-4 shrink-0 items-center justify-center text-gray-500">
+              <ChevronRight className="size-4" />
+            </span>
           )}
 
           <span
