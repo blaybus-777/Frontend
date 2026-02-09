@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import {
+  useForm,
+  Controller,
+  type ControllerRenderProps,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -121,11 +125,15 @@ export default function NoteEditor({
             <Controller
               control={control}
               name="content"
-              render={({ field: { onChange, value } }) => (
+              render={({
+                field,
+              }: {
+                field: ControllerRenderProps<NoteFormValues, 'content'>;
+              }) => (
                 <MDXEditor
                   ref={editorRef}
-                  markdown={value || ''}
-                  onChange={onChange}
+                  markdown={field.value || ''}
+                  onChange={field.onChange}
                   className="note-editor-root"
                   contentEditableClassName="prose prose-sm max-w-none px-6 py-4 focus:outline-none"
                   placeholder="마크다운을 이용해서 편리하게 글을 작성할 수 있어요."

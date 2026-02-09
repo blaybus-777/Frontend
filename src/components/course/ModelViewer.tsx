@@ -11,6 +11,7 @@ interface ModelViewerProps {
   explodeDistance: number;
   explodeSpace: 'local' | 'world';
   assetKey?: string;
+  storageKey?: string;
 }
 
 export default function ModelViewer({
@@ -23,6 +24,7 @@ export default function ModelViewer({
   explodeDistance,
   explodeSpace,
   assetKey,
+  storageKey,
 }: ModelViewerProps) {
   const resolvedExplodeDistance =
     assemblyMode === 'assembly' ? explodeDistance : 0;
@@ -39,6 +41,7 @@ export default function ModelViewer({
         viewMode={viewMode}
         assemblyMode={assemblyMode}
         assetKey={assetKey}
+        storageKey={storageKey}
       />
     </div>
   );

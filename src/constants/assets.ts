@@ -5,7 +5,12 @@ export interface AssetData {
 
 export const FINAL_ASSET_URLS: Partial<Record<keyof typeof ASSETS, string>> = {
   Quadcopter_DRONE: '/models/final/Drone2.glb',
+  V4_ENGINE: '/models/final/v4.glb',
+  ROBOT_ARM: '/models/final/RobotArm.glb',
+  SUSPENSION: '/models/final/Suspention.glb',
 };
+
+export const FINAL_PREVIEW_URLS = FINAL_ASSET_URLS;
 
 export const ASSETS: Record<string, AssetData> = {
   Quadcopter_DRONE: {

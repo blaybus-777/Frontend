@@ -63,6 +63,7 @@ export default function CourseDetailLayout({
                   explodeDistance={explodeDistance}
                   explodeSpace={explodeSpace}
                   assetKey={detail.assetKey}
+                  storageKey={`viewer:${detail.assetKey}:${id ?? 'unknown'}`}
                 />
               </div>
             )}

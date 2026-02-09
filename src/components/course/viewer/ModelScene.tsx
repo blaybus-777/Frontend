@@ -1,7 +1,14 @@
 import { TransformControls, useGLTF } from '@react-three/drei';
 import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+  type MutableRefObject,
+} from 'react';
 import * as THREE from 'three';
 import type { PartInfoMap, SelectedPart } from './types';
 import { DRONE_PART_ID_TO_FILE } from '@/data/partMapping';
@@ -23,6 +30,11 @@ interface ModelSceneProps {
   assetKey?: string;
   htmlPortal?: RefObject<HTMLElement>;
   orbitRef?: RefObject<OrbitControlsImpl | null>;
+  canSetDefaultView?: boolean;
+  resetToken?: number;
+  storageKey?: string;
+  onRequestRestore?: () => void;
+  hasStoredView?: boolean;
 }
 
 interface MeshExplodeData {
@@ -185,10 +197,89 @@ function resolveSinglePartUrls(
   return match ? [match] : urls.slice(0, 1);
 }
 
-function resolveAssemblyUrls(assetKey: string | undefined, urls: string[]) {
+function resolveAssemblyUrls(
+  assetKey: string | undefined,
+  urls: string[],
+  explodeDistance: number
+) {
   if (!assetKey) return urls;
   const finalUrl = FINAL_ASSET_URLS[assetKey];
+
+  // Drone2.glb supports explode in a single file, keep using final for drone
+  if (assetKey === 'Quadcopter_DRONE') {
+    return finalUrl ? [finalUrl] : urls;
+  }
+
+  // Other models: if explode is active, fall back to multi-part URLs
+  if (explodeDistance > 0.001) {
+    return urls;
+  }
+
   return finalUrl ? [finalUrl] : urls;
+}
+
+function saveSceneTransforms(
+  root: THREE.Object3D,
+  storageKey: string | null,
+  lastSavedRef: MutableRefObject<number>
+) {
+  if (!storageKey) return;
+  const now = Date.now();
+  if (now - lastSavedRef.current < 150) return;
+  lastSavedRef.current = now;
+  const payload: Record<
+    string,
+    { position: number[]; quaternion: number[]; scale: number[] }
+  > = {};
+  root.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    if (!child.userData.__selectable || !child.name) return;
+    payload[child.name] = {
+      position: child.position.toArray(),
+      quaternion: child.quaternion.toArray(),
+      scale: child.scale.toArray(),
+    };
+  });
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+  } catch {
+    // ignore
+  }
+}
+
+function restoreSceneTransforms(
+  root: THREE.Object3D,
+  storageKey: string | null
+) {
+  if (!storageKey) return;
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Record<
+      string,
+      { position?: number[]; quaternion?: number[]; scale?: number[] }
+    >;
+    root.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      if (!child.userData.__selectable || !child.name) return;
+      const data = parsed[child.name];
+      if (!data) return;
+      if (data.position?.length === 3) {
+        child.position.fromArray(data.position);
+      }
+      if (data.quaternion?.length === 4) {
+        child.quaternion.fromArray(
+          data.quaternion as [number, number, number, number]
+        );
+      }
+      if (data.scale?.length === 3) {
+        child.scale.fromArray(data.scale);
+      }
+      child.updateMatrixWorld();
+    });
+  } catch {
+    // ignore
+  }
 }
 
 function ModelPart({
@@ -230,6 +321,11 @@ export default function ModelScene({
   assetKey,
   htmlPortal,
   orbitRef,
+  canSetDefaultView = true,
+  resetToken = 0,
+  storageKey,
+  onRequestRestore,
+  hasStoredView = false,
 }: ModelSceneProps) {
   const groupRef = useRef<THREE.Group>(null);
   const explodeDataRef = useRef<MeshExplodeData[]>([]);
@@ -246,6 +342,8 @@ export default function ModelScene({
   const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(
     null
   );
+  const transformSavedRef = useRef(0);
+  const transformsKey = storageKey ? `${storageKey}:transforms` : null;
   const { transformMode } = useCourseStore(
     useShallow((state) => ({
       transformMode: state.transformMode,
@@ -260,10 +358,10 @@ export default function ModelScene({
       return resolveSinglePartUrls(urls, selectedPartId, assetKey);
     }
     if (assemblyMode === 'assembly') {
-      return resolveAssemblyUrls(assetKey, urls);
+      return resolveAssemblyUrls(assetKey, urls, explodeDistance);
     }
     return urls;
-  }, [urls, assemblyMode, selectedPartId, assetKey]);
+  }, [urls, assemblyMode, selectedPartId, assetKey, explodeDistance]);
 
   const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
 
@@ -293,12 +391,17 @@ export default function ModelScene({
 
     group.position.sub(center);
 
+    restoreSceneTransforms(group, transformsKey);
+
     const distance = Math.max(size * 0.8, 2);
-    camera.position.set(distance, distance * 0.75, distance);
-    camera.lookAt(0, 0, 0);
-    if (orbitControls) {
-      orbitControls.target.set(0, 0, 0);
-      orbitControls.update();
+    if (!hasStoredView && (!orbitControls || canSetDefaultView)) {
+      camera.position.set(distance, distance * 0.75, distance);
+      camera.lookAt(0, 0, 0);
+      if (orbitControls) {
+        orbitControls.target.set(0, 0, 0);
+        orbitControls.update();
+        orbitControls.saveState();
+      }
     }
 
     const factor = Math.min(6, Math.max(2.5, size * 0.3));
@@ -329,7 +432,63 @@ export default function ModelScene({
       });
     });
     explodeDataRef.current = meshes;
-  }, [camera, watchKey, orbitControls]);
+    if (hasStoredView || !canSetDefaultView) {
+      onRequestRestore?.();
+    }
+  }, [
+    camera,
+    watchKey,
+    orbitControls,
+    canSetDefaultView,
+    transformsKey,
+    onRequestRestore,
+    hasStoredView,
+  ]);
+
+  useEffect(() => {
+    if (!groupRef.current) return;
+    if (resetToken === 0) return;
+
+    if (transformsKey) {
+      try {
+        localStorage.removeItem(transformsKey);
+      } catch {
+        // ignore
+      }
+    }
+
+    if (selectedRef.current) {
+      setHighlight(selectedRef.current, 'none');
+    }
+    selectedRef.current = null;
+    setSelectedLabel(null);
+    setHoveredLabel(null);
+    setSelectedObject(null);
+    setSelectedPartTransform(null);
+    labelAnchorRef.current = null;
+
+    const group = groupRef.current;
+    group.position.set(0, 0, 0);
+    const box = new THREE.Box3().setFromObject(group);
+    const size = box.getSize(new THREE.Vector3()).length();
+    const center = box.getCenter(new THREE.Vector3());
+    group.position.sub(center);
+
+    const distance = Math.max(size * 0.8, 2);
+    camera.position.set(distance, distance * 0.75, distance);
+    camera.lookAt(0, 0, 0);
+    if (orbitControls) {
+      orbitControls.target.set(0, 0, 0);
+      orbitControls.update();
+      orbitControls.saveState();
+    }
+  }, [
+    resetToken,
+    camera,
+    orbitControls,
+    setSelectedPartTransform,
+    transformsKey,
+  ]);
 
   useEffect(() => {
     if (!groupRef.current) return;
@@ -462,12 +621,22 @@ export default function ModelScene({
         <TransformControls
           object={selectedObject}
           mode={transformMode}
-          space="local"
+          space="world"
           onMouseDown={() => {
             if (orbitControls) orbitControls.enabled = false;
           }}
           onMouseUp={() => {
             if (orbitControls) orbitControls.enabled = true;
+          }}
+          onObjectChange={() => {
+            if (!selectedRef.current) return;
+            const { x, y, z } = selectedRef.current.position;
+            setSelectedPartTransform({ x, y, z });
+            saveSceneTransforms(
+              groupRef.current ?? selectedRef.current,
+              transformsKey,
+              transformSavedRef
+            );
           }}
         />
       ) : null}
