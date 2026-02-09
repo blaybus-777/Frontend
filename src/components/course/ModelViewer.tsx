@@ -1,15 +1,15 @@
-import ModelViewerCanvas from "./viewer/ModelViewerCanvas";
-import type { PartInfoMap, SelectedPart } from "./viewer/types";
+import ModelViewerCanvas from './viewer/ModelViewerCanvas';
+import type { PartInfoMap, SelectedPart } from './viewer/types';
 
 interface ModelViewerProps {
   urls: string[];
   partInfo?: PartInfoMap;
   onSelect?: (part: SelectedPart | null) => void;
   selectedPartId?: string | null;
-  viewMode?: "general" | "wireframe";
-  assemblyMode?: "single" | "assembly";
+  viewMode?: 'general' | 'wireframe';
+  assemblyMode?: 'single' | 'assembly';
   explodeDistance: number;
-  explodeSpace: "local" | "world";
+  explodeSpace: 'local' | 'world';
   assetKey?: string;
 }
 
@@ -18,17 +18,17 @@ export default function ModelViewer({
   partInfo,
   onSelect,
   selectedPartId,
-  viewMode = "general",
-  assemblyMode = "assembly",
+  viewMode = 'general',
+  assemblyMode = 'assembly',
   explodeDistance,
   explodeSpace,
   assetKey,
 }: ModelViewerProps) {
   const resolvedExplodeDistance =
-    assemblyMode === "assembly" ? explodeDistance : 0;
+    assemblyMode === 'assembly' ? explodeDistance : 0;
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <ModelViewerCanvas
         urls={urls}
         explodeDistance={resolvedExplodeDistance}

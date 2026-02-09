@@ -27,7 +27,7 @@ export default function CourseDetailLayout({
     <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6">
       <div className="flex h-[calc(100dvh-81px)] flex-col lg:flex-row">
         {/* Left Side: Control Panel */}
-        <div className="w-3xs shrink-0 p-3 border-l border-gray-200">
+        <div className="w-3xs shrink-0 border-l border-gray-200 p-3">
           <div className="flex h-full flex-col text-black">
             <div className="mb-3 shrink-0 rounded-md border border-gray-200 bg-white shadow-sm">
               <CourseControlPanel />

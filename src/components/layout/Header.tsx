@@ -21,7 +21,7 @@ function Header() {
           SIMVEX
         </div>
         <div className="absolute left-1/2 flex -translate-x-1/2 gap-10">
-        <Link to="/topic" className={`font-bold ${getLinkColor('/topic')}`}>
+          <Link to="/topic" className={`font-bold ${getLinkColor('/topic')}`}>
             Explore
           </Link>
           <div className={`cursor-default font-bold ${getLinkColor('study')}`}>

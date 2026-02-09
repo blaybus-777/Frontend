@@ -44,7 +44,7 @@ export default function DeleteConfirmModal({
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-neutral-100 rounded-sm cursor-pointer"
+          className="absolute top-4 right-4 cursor-pointer rounded-sm text-gray-400 hover:bg-neutral-100 hover:text-gray-600"
         >
           <X size={20} />
         </button>
@@ -59,13 +59,13 @@ export default function DeleteConfirmModal({
         <div className="flex gap-2">
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-700 hover:bg-neutral-100 cursor-pointer"
+            className="flex-1 cursor-pointer rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-700 hover:bg-neutral-100"
           >
             취소
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 rounded-lg bg-red-500 py-2 text-sm font-medium text-white hover:bg-[#DE3641] cursor-pointer"
+            className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 text-sm font-medium text-white hover:bg-[#DE3641]"
           >
             삭제
           </button>

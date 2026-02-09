@@ -1,20 +1,20 @@
-import { Canvas } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
-import { Suspense, useRef } from "react";
-import * as THREE from "three";
-import ModelScene from "./ModelScene";
-import type { PartInfoMap, SelectedPart } from "./types";
-import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { Canvas } from '@react-three/fiber';
+import { Environment, OrbitControls } from '@react-three/drei';
+import { Suspense, useRef } from 'react';
+import * as THREE from 'three';
+import ModelScene from './ModelScene';
+import type { PartInfoMap, SelectedPart } from './types';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 interface ModelViewerCanvasProps {
   urls: string[];
   explodeDistance: number;
-  explodeSpace: "local" | "world";
+  explodeSpace: 'local' | 'world';
   partInfo?: PartInfoMap;
   onSelect?: (part: SelectedPart | null) => void;
   selectedPartId?: string | null;
-  viewMode?: "general" | "wireframe";
-  assemblyMode?: "single" | "assembly";
+  viewMode?: 'general' | 'wireframe';
+  assemblyMode?: 'single' | 'assembly';
   assetKey?: string;
 }
 
@@ -45,13 +45,16 @@ export default function ModelViewerCanvas({
         className="relative z-0"
         camera={{ fov: 45 }}
         onCreated={({ gl }) => {
-          gl.setClearColor("#0a0e18");
+          gl.setClearColor('#0a0e18');
         }}
       >
         <ambientLight intensity={1.1} />
         <directionalLight position={[6, 6, 6]} />
         <Environment preset="studio" />
-        <gridHelper args={[10, 20, 0x324055, 0x1a2333]} position={[0, -0.0005, 0]} />
+        <gridHelper
+          args={[10, 20, 0x324055, 0x1a2333]}
+          position={[0, -0.0005, 0]}
+        />
         {showWorldAxes && <axesHelper args={[1.2]} />}
 
         <Suspense fallback={null}>

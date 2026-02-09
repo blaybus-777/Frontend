@@ -1,25 +1,25 @@
-import { TransformControls, useGLTF } from "@react-three/drei";
-import { Html } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
-import * as THREE from "three";
-import type { PartInfoMap, SelectedPart } from "./types";
-import { DRONE_PART_ID_TO_FILE } from "@/data/partMapping";
-import { FINAL_ASSET_URLS } from "@/constants/assets";
-import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { useCourseStore } from "@/stores/useCourseStore";
-import { useShallow } from "zustand/react/shallow";
+import { TransformControls, useGLTF } from '@react-three/drei';
+import { Html } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import * as THREE from 'three';
+import type { PartInfoMap, SelectedPart } from './types';
+import { DRONE_PART_ID_TO_FILE } from '@/data/partMapping';
+import { FINAL_ASSET_URLS } from '@/constants/assets';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { useCourseStore } from '@/stores/useCourseStore';
+import { useShallow } from 'zustand/react/shallow';
 
 interface ModelSceneProps {
   urls: string[];
   explodeDistance: number;
-  explodeSpace: "local" | "world";
+  explodeSpace: 'local' | 'world';
   partInfo?: PartInfoMap;
   onSelect?: (part: SelectedPart | null) => void;
   onRegisterClearSelection?: (clearFn: () => void) => void;
   selectedPartId?: string | null;
-  viewMode?: "general" | "wireframe";
-  assemblyMode?: "single" | "assembly";
+  viewMode?: 'general' | 'wireframe';
+  assemblyMode?: 'single' | 'assembly';
   assetKey?: string;
   htmlPortal?: RefObject<HTMLDivElement>;
   orbitRef?: RefObject<OrbitControlsImpl | null>;
@@ -47,19 +47,19 @@ function hasEmissive(
 function hasWireframe(
   material: THREE.Material
 ): material is THREE.Material & { wireframe: boolean } {
-  return "wireframe" in material;
+  return 'wireframe' in material;
 }
 
 function hasMetalness(
   material: THREE.Material
 ): material is THREE.MeshStandardMaterial {
-  return "metalness" in material;
+  return 'metalness' in material;
 }
 
 function hasRoughness(
   material: THREE.Material
 ): material is THREE.MeshStandardMaterial {
-  return "roughness" in material;
+  return 'roughness' in material;
 }
 
 function cloneMaterial(material: THREE.Material) {
@@ -78,7 +78,9 @@ function prepareMaterials(object: THREE.Object3D) {
     if (child instanceof THREE.Mesh) {
       child.userData.__selectable = true;
       if (Array.isArray(child.material)) {
-        child.material = child.material.map((material) => cloneMaterial(material));
+        child.material = child.material.map((material) =>
+          cloneMaterial(material)
+        );
       } else if (child.material) {
         child.material = cloneMaterial(child.material);
       }
@@ -96,9 +98,9 @@ function ensureMeshNames(object: THREE.Object3D, fallbackName: string) {
   });
 }
 
-function setHighlight(mesh: THREE.Mesh, mode: "hover" | "select" | "none") {
+function setHighlight(mesh: THREE.Mesh, mode: 'hover' | 'select' | 'none') {
   const highlightColor =
-    mode === "select" ? new THREE.Color("#f59e0b") : new THREE.Color("#60a5fa");
+    mode === 'select' ? new THREE.Color('#f59e0b') : new THREE.Color('#60a5fa');
 
   const materials: THREE.Material[] = Array.isArray(mesh.material)
     ? mesh.material
@@ -109,23 +111,29 @@ function setHighlight(mesh: THREE.Mesh, mode: "hover" | "select" | "none") {
       const baseEmissive =
         material.userData.__baseEmissive ?? material.emissive.clone();
       material.userData.__baseEmissive = baseEmissive;
-      material.emissive = mode === "none" ? baseEmissive.clone() : highlightColor;
+      material.emissive =
+        mode === 'none' ? baseEmissive.clone() : highlightColor;
     } else if (hasColor(material)) {
       const baseColor = material.userData.__baseColor ?? material.color.clone();
       material.userData.__baseColor = baseColor;
-      material.color = mode === "none" ? baseColor.clone() : highlightColor;
+      material.color = mode === 'none' ? baseColor.clone() : highlightColor;
     }
     material.needsUpdate = true;
   });
 }
 
-function buildSelectedPart(mesh: THREE.Mesh, partInfo?: PartInfoMap): SelectedPart {
-  const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+function buildSelectedPart(
+  mesh: THREE.Mesh,
+  partInfo?: PartInfoMap
+): SelectedPart {
+  const material = Array.isArray(mesh.material)
+    ? mesh.material[0]
+    : mesh.material;
   const materialName = material?.name ?? null;
   const role = partInfo?.[mesh.name]?.role ?? null;
 
   return {
-    name: mesh.name || "이름 없음",
+    name: mesh.name || '이름 없음',
     materialName: materialName && materialName.length > 0 ? materialName : null,
     role,
   };
@@ -133,7 +141,7 @@ function buildSelectedPart(mesh: THREE.Mesh, partInfo?: PartInfoMap): SelectedPa
 
 function applyViewerMaterialTuning(
   object: THREE.Object3D,
-  viewMode: "general" | "wireframe"
+  viewMode: 'general' | 'wireframe'
 ) {
   object.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
@@ -145,7 +153,7 @@ function applyViewerMaterialTuning(
         if (material.userData.__baseWireframe === undefined) {
           material.userData.__baseWireframe = material.wireframe;
         }
-        material.wireframe = viewMode === "wireframe";
+        material.wireframe = viewMode === 'wireframe';
       }
 
       if (hasMetalness(material)) {
@@ -156,7 +164,7 @@ function applyViewerMaterialTuning(
         const current = material.roughness ?? 1;
         material.roughness = Math.min(current, 0.35);
       }
-      if ("envMapIntensity" in material) {
+      if ('envMapIntensity' in material) {
         material.envMapIntensity = 1.2;
       }
       material.needsUpdate = true;
@@ -169,7 +177,8 @@ function resolveSinglePartUrls(
   selectedPartId: string | null | undefined,
   assetKey: string | undefined
 ) {
-  if (!selectedPartId || assetKey !== "Quadcopter_DRONE") return urls.slice(0, 1);
+  if (!selectedPartId || assetKey !== 'Quadcopter_DRONE')
+    return urls.slice(0, 1);
   const file = DRONE_PART_ID_TO_FILE[selectedPartId];
   if (!file) return urls.slice(0, 1);
   const match = urls.find((url) => url.endsWith(`/${file}`));
@@ -187,12 +196,12 @@ function ModelPart({
   viewMode,
 }: {
   url: string;
-  viewMode: "general" | "wireframe";
+  viewMode: 'general' | 'wireframe';
 }) {
   const { scene } = useGLTF(url) as unknown as { scene: THREE.Group };
   const fallbackName = useMemo(() => {
-    const file = url.split("/").pop() ?? "part";
-    return file.replace(/\.[^/.]+$/, "");
+    const file = url.split('/').pop() ?? 'part';
+    return file.replace(/\.[^/.]+$/, '');
   }, [url]);
   const cloned = useMemo(() => {
     const copy = scene.clone(true);
@@ -216,8 +225,8 @@ export default function ModelScene({
   onSelect,
   onRegisterClearSelection,
   selectedPartId,
-  viewMode = "general",
-  assemblyMode = "assembly",
+  viewMode = 'general',
+  assemblyMode = 'assembly',
   assetKey,
   htmlPortal,
   orbitRef,
@@ -247,22 +256,22 @@ export default function ModelScene({
   );
 
   const resolvedUrls = useMemo(() => {
-    if (assemblyMode === "single") {
+    if (assemblyMode === 'single') {
       return resolveSinglePartUrls(urls, selectedPartId, assetKey);
     }
-    if (assemblyMode === "assembly") {
+    if (assemblyMode === 'assembly') {
       return resolveAssemblyUrls(assetKey, urls);
     }
     return urls;
   }, [urls, assemblyMode, selectedPartId, assetKey]);
 
-  const watchKey = useMemo(() => resolvedUrls.join("|"), [resolvedUrls]);
+  const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
 
   useEffect(() => {
     if (!onRegisterClearSelection) return;
     onRegisterClearSelection(() => {
       if (selectedRef.current) {
-        setHighlight(selectedRef.current, "none");
+        setHighlight(selectedRef.current, 'none');
       }
       selectedRef.current = null;
       setSelectedLabel(null);
@@ -330,13 +339,14 @@ export default function ModelScene({
   useEffect(() => {
     explodeDataRef.current.forEach((item) => {
       const direction =
-        explodeSpace === "local" ? item.localDirection : item.worldDirection;
+        explodeSpace === 'local' ? item.localDirection : item.worldDirection;
       item.mesh.position.copy(
-        item.originalPosition.clone().add(direction.clone().multiplyScalar(explodeDistance))
+        item.originalPosition
+          .clone()
+          .add(direction.clone().multiplyScalar(explodeDistance))
       );
     });
   }, [explodeDistance, explodeSpace]);
-
 
   useFrame(() => {
     if (!labelAnchorRef.current || !labelGroupRef.current) return;
@@ -369,12 +379,12 @@ export default function ModelScene({
         if (!target) return;
         if (hoveredRef.current && hoveredRef.current !== target) {
           if (hoveredRef.current !== selectedRef.current) {
-            setHighlight(hoveredRef.current, "none");
+            setHighlight(hoveredRef.current, 'none');
           }
         }
         hoveredRef.current = target;
         if (target !== selectedRef.current) {
-          setHighlight(target, "hover");
+          setHighlight(target, 'hover');
           if (!selectedRef.current) {
             setHoveredLabel(buildSelectedPart(target, partInfo));
             labelAnchorRef.current = target;
@@ -383,7 +393,7 @@ export default function ModelScene({
       }}
       onPointerOut={() => {
         if (hoveredRef.current && hoveredRef.current !== selectedRef.current) {
-          setHighlight(hoveredRef.current, "none");
+          setHighlight(hoveredRef.current, 'none');
         }
         hoveredRef.current = null;
         if (!selectedRef.current) {
@@ -393,7 +403,7 @@ export default function ModelScene({
       }}
       onPointerMissed={() => {
         if (hoveredRef.current && hoveredRef.current !== selectedRef.current) {
-          setHighlight(hoveredRef.current, "none");
+          setHighlight(hoveredRef.current, 'none');
         }
         hoveredRef.current = null;
         if (!selectedRef.current) {
@@ -415,7 +425,7 @@ export default function ModelScene({
         if (!target) return;
 
         if (selectedRef.current === target) {
-          setHighlight(target, "none");
+          setHighlight(target, 'none');
           selectedRef.current = null;
           setSelectedLabel(null);
           setHoveredLabel(null);
@@ -427,11 +437,11 @@ export default function ModelScene({
         }
 
         if (selectedRef.current && selectedRef.current !== target) {
-          setHighlight(selectedRef.current, "none");
+          setHighlight(selectedRef.current, 'none');
         }
 
         selectedRef.current = target;
-        setHighlight(target, "select");
+        setHighlight(target, 'select');
         const selected = buildSelectedPart(target, partInfo);
         setSelectedLabel(selected);
         setHoveredLabel(null);
@@ -468,12 +478,12 @@ export default function ModelScene({
             center
             transform
             distanceFactor={labelDistanceFactor}
-            style={{ pointerEvents: "none" }}
+            style={{ pointerEvents: 'none' }}
             portal={htmlPortal}
           >
-            <div className="bg-white/90 border border-gray-300 text-[4px] text-gray-800 rounded-full px-1.5 py-0.5 shadow-sm whitespace-nowrap">
+            <div className="rounded-full border border-gray-300 bg-white/90 px-1.5 py-0.5 text-[4px] whitespace-nowrap text-gray-800 shadow-sm">
               {(selectedLabel ?? hoveredLabel)?.materialName ? (
-                <span className="text-gray-500 text-[5px]">
+                <span className="text-[5px] text-gray-500">
                   {(selectedLabel ?? hoveredLabel)?.materialName}
                 </span>
               ) : null}

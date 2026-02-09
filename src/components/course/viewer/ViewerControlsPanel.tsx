@@ -1,8 +1,8 @@
 interface ViewerControlsPanelProps {
   explodeDistance: number;
-  explodeSpace: "local" | "world";
+  explodeSpace: 'local' | 'world';
   onChangeDistance: (value: number) => void;
-  onChangeSpace: (value: "local" | "world") => void;
+  onChangeSpace: (value: 'local' | 'world') => void;
 }
 
 export default function ViewerControlsPanel({
@@ -12,10 +12,10 @@ export default function ViewerControlsPanel({
   onChangeSpace,
 }: ViewerControlsPanelProps) {
   return (
-    <div className="h-full w-full bg-white border border-foundation-gray-4 rounded-sm p-4 flex flex-col gap-6 text-foundation-black-text">
+    <div className="border-foundation-gray-4 text-foundation-black-text flex h-full w-full flex-col gap-6 rounded-sm border bg-white p-4">
       <div className="flex flex-col gap-2">
         <h3 className="text-sm font-semibold">마우스 조작</h3>
-        <div className="text-xs text-gray-600 leading-5">
+        <div className="text-xs leading-5 text-gray-600">
           <div>스크롤: 줌 인/아웃</div>
           <div>우클릭 드래그: 화면 회전</div>
           <div>좌클릭 드래그: 화면 이동</div>
@@ -27,22 +27,22 @@ export default function ViewerControlsPanel({
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => onChangeSpace("local")}
-            className={`px-3 py-1 text-xs rounded-sm border ${
-              explodeSpace === "local"
-                ? "bg-foundation-black-text text-white border-foundation-black-text"
-                : "bg-white text-foundation-black-text border-foundation-gray-4"
+            onClick={() => onChangeSpace('local')}
+            className={`rounded-sm border px-3 py-1 text-xs ${
+              explodeSpace === 'local'
+                ? 'bg-foundation-black-text border-foundation-black-text text-white'
+                : 'text-foundation-black-text border-foundation-gray-4 bg-white'
             }`}
           >
             로컬 좌표
           </button>
           <button
             type="button"
-            onClick={() => onChangeSpace("world")}
-            className={`px-3 py-1 text-xs rounded-sm border ${
-              explodeSpace === "world"
-                ? "bg-foundation-black-text text-white border-foundation-black-text"
-                : "bg-white text-foundation-black-text border-foundation-gray-4"
+            onClick={() => onChangeSpace('world')}
+            className={`rounded-sm border px-3 py-1 text-xs ${
+              explodeSpace === 'world'
+                ? 'bg-foundation-black-text border-foundation-black-text text-white'
+                : 'text-foundation-black-text border-foundation-gray-4 bg-white'
             }`}
           >
             월드 좌표
@@ -58,7 +58,9 @@ export default function ViewerControlsPanel({
             value={explodeDistance}
             onChange={(event) => onChangeDistance(Number(event.target.value))}
           />
-          <span className="text-xs w-10 text-right">{explodeDistance.toFixed(2)}</span>
+          <span className="w-10 text-right text-xs">
+            {explodeDistance.toFixed(2)}
+          </span>
         </div>
       </div>
     </div>
