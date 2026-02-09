@@ -8,56 +8,67 @@ export const MOCK_PARTS: Part[] = [
     id: 'main-frame',
     name: 'Main Frame',
     image: 'https://placehold.co/100x100/blue/white?text=Main+Frame',
+    englishName: 'Main Frame',
   },
   {
     id: 'propeller',
     name: 'Propeller',
     image: 'https://placehold.co/100x100/gray/white?text=Propeller',
+    englishName: 'Propeller',
   },
   {
     id: 'motor',
     name: 'Motor',
     image: 'https://placehold.co/100x100/gray/white?text=Motor',
+    englishName: 'Motor',
   },
   {
     id: 'battery',
     name: 'Battery',
     image: 'https://placehold.co/100x100/gray/white?text=Battery',
+    englishName: 'Battery',
   },
   {
     id: 'esc',
     name: 'ESC',
     image: 'https://placehold.co/100x100/gray/white?text=ESC',
+    englishName: 'ESC',
   },
   {
     id: 'fc',
     name: 'FC',
     image: 'https://placehold.co/100x100/gray/white?text=FC',
+    englishName: 'FC',
   },
   {
     id: 'gps',
     name: 'GPS',
     image: 'https://placehold.co/100x100/gray/white?text=GPS',
+    englishName: 'GPS',
   },
   {
     id: 'receiver',
     name: 'Receiver',
     image: 'https://placehold.co/100x100/gray/white?text=Receiver',
+    englishName: 'Receiver',
   },
   {
     id: 'camera',
     name: 'Camera',
     image: 'https://placehold.co/100x100/gray/white?text=Camera',
+    englishName: 'Camera',
   },
   {
     id: 'vtx',
     name: 'VTX',
     image: 'https://placehold.co/100x100/gray/white?text=VTX',
+    englishName: 'VTX',
   },
   {
     id: 'antenna',
     name: 'Antenna',
     image: 'https://placehold.co/100x100/gray/white?text=Antenna',
+    englishName: 'Antenna',
   },
 ];
 

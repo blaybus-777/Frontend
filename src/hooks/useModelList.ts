@@ -30,14 +30,14 @@ export const useModelList = () => {
         const assetKey = modelCodeMap[item.code.toLowerCase()];
         const assetData = assetKey
           ? ASSETS[assetKey]
-          : { image: '', modelUrls: [] };
+          : { image: '', parts: {} };
 
         return {
           ...item,
           code: modelMap[assetKey] || item.code,
           tag: item.tag?.map((t: string) => tagMap[t] || t) || [],
           image: assetData.image,
-          modelUrls: assetData.modelUrls,
+          modelUrls: Object.values(assetData.parts),
           assetKey,
         } as ExtendedModel;
       }),

@@ -19,11 +19,11 @@ export default function HierarchyNode({
 }: HierarchyNodeProps) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
-  const isSelected = selectedPartId === node.code;
+  const isSelected = selectedPartId === String(node.partId);
 
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onSelectPart?.(node.code);
+    onSelectPart?.(String(node.partId));
   };
 
   return (
@@ -66,9 +66,9 @@ export default function HierarchyNode({
               hasChildren ? 'font-medium' : 'text-gray-600',
               isSelected && 'text-active'
             )}
-            title={node.name}
+            title={node.englishName}
           >
-            {node.name}
+            {node.englishName}
           </span>
         </div>
       </div>
