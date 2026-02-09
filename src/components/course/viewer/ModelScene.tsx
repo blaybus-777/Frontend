@@ -21,7 +21,7 @@ interface ModelSceneProps {
   viewMode?: 'general' | 'wireframe';
   assemblyMode?: 'single' | 'assembly';
   assetKey?: string;
-  htmlPortal?: RefObject<HTMLDivElement>;
+  htmlPortal?: RefObject<HTMLElement>;
   orbitRef?: RefObject<OrbitControlsImpl | null>;
 }
 
