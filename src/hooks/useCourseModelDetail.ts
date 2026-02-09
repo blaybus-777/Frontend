@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { useModelList } from "@/hooks/useModelList";
-import { ASSETS } from "@/constants/assets";
+import { useMemo } from 'react';
+import { useModelList } from '@/hooks/useModelList';
+import { ASSETS } from '@/constants/assets';
 
 export interface CourseModelDetail {
   title: string;

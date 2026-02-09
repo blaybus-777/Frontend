@@ -4,7 +4,7 @@ export interface AssetData {
 }
 
 export const FINAL_ASSET_URLS: Partial<Record<keyof typeof ASSETS, string>> = {
-  Quadcopter_DRONE: "/models/final/Drone2.glb",
+  Quadcopter_DRONE: '/models/final/Drone2.glb',
 };
 
 export const ASSETS: Record<string, AssetData> = {

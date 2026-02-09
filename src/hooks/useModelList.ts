@@ -14,7 +14,12 @@ export interface ExtendedModel {
 }
 
 export const useModelList = () => {
-  const { tagMap, modelMap, modelCodeMap, isLoading: isEnumsLoading } = useEnums();
+  const {
+    tagMap,
+    modelMap,
+    modelCodeMap,
+    isLoading: isEnumsLoading,
+  } = useEnums();
 
   return useQuery({
     queryKey: ['modelList'],
@@ -23,8 +28,10 @@ export const useModelList = () => {
     select: (data) =>
       data.items.map((item) => {
         const assetKey = modelCodeMap[item.code.toLowerCase()];
-        const assetData = assetKey ? ASSETS[assetKey] : { image: '', modelUrls: [] };
-        
+        const assetData = assetKey
+          ? ASSETS[assetKey]
+          : { image: '', modelUrls: [] };
+
         return {
           ...item,
           code: modelMap[assetKey] || item.code,
