@@ -21,9 +21,6 @@ interface CourseState {
   viewMode: 'general' | 'wireframe';
   setViewMode: (mode: 'general' | 'wireframe') => void;
 
-  assemblyMode: 'single' | 'assembly';
-  setAssemblyMode: (mode: 'single' | 'assembly') => void;
-
   explodeSpace: 'local' | 'world';
   setExplodeSpace: (space: 'local' | 'world') => void;
 
@@ -68,9 +65,6 @@ export const useCourseStore = create<CourseState>((set) => ({
 
   viewMode: 'general',
   setViewMode: (mode) => set({ viewMode: mode }),
-
-  assemblyMode: 'assembly',
-  setAssemblyMode: (mode) => set({ assemblyMode: mode }),
 
   explodeSpace: 'local',
   setExplodeSpace: (space) => set({ explodeSpace: space }),

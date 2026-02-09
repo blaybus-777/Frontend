@@ -7,6 +7,7 @@ import ModelViewer from '@/components/course/ModelViewer';
 import { useCourseDetail } from '@/hooks/useCourseDetail';
 import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
 import { useParams } from 'react-router-dom';
+import { PART_ID_MAPPING } from '@/data/partMapping';
 
 interface CourseDetailLayoutProps {
   selectedPartId: string | null;
@@ -18,7 +19,7 @@ export default function CourseDetailLayout({
   onSelectPart,
 }: CourseDetailLayoutProps) {
   const { id } = useParams();
-  const { viewMode, assemblyMode, explosionLevel, explodeSpace, setModelId } =
+  const { viewMode, explosionLevel, explodeSpace, setModelId } =
     useCourseDetail();
   const { detail, isLoading, isError } = useCourseModelDetail(id);
 
@@ -67,8 +68,15 @@ export default function CourseDetailLayout({
                 <ModelViewer
                   urls={detail.modelUrls}
                   selectedPartId={selectedPartId}
+                  onSelect={(part) => {
+                    if (part) {
+                      const id = PART_ID_MAPPING[part.name];
+                      if (id) onSelectPart(id);
+                    } else {
+                      onSelectPart(null);
+                    }
+                  }}
                   viewMode={viewMode}
-                  assemblyMode={assemblyMode}
                   explodeDistance={explodeDistance}
                   explodeSpace={explodeSpace}
                   assetKey={detail.assetKey}

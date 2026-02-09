@@ -12,8 +12,6 @@ export const useCourseDetail = () => {
     isPanelOpen,
     viewMode,
     setViewMode,
-    assemblyMode,
-    setAssemblyMode,
     explodeSpace,
     setExplodeSpace,
     explosionLevel,
@@ -31,8 +29,6 @@ export const useCourseDetail = () => {
       isPanelOpen: state.isPanelOpen,
       viewMode: state.viewMode,
       setViewMode: state.setViewMode,
-      assemblyMode: state.assemblyMode,
-      setAssemblyMode: state.setAssemblyMode,
       explodeSpace: state.explodeSpace,
       setExplodeSpace: state.setExplodeSpace,
       explosionLevel: state.explosionLevel,
@@ -46,7 +42,6 @@ export const useCourseDetail = () => {
   return {
     // State
     viewMode,
-    assemblyMode,
     explodeSpace,
     explosionLevel,
     transformMode,
@@ -58,7 +53,6 @@ export const useCourseDetail = () => {
 
     // Actions
     setViewMode,
-    setAssemblyMode,
     setExplodeSpace,
     setTransformMode,
     setSelectedPartTransform,

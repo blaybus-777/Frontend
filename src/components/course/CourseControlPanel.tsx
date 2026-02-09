@@ -1,17 +1,16 @@
 import { ControlToggleButton } from './ControlToggleButton';
 import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
 
 import { useCourseStore } from '@/stores/useCourseStore';
 
 export default function CourseControlPanel() {
   const explosionLevel = useCourseStore((state) => state.explosionLevel);
   const setExplosionLevel = useCourseStore((state) => state.setExplosionLevel);
+  const selectedPartId = useCourseStore((state) => state.selectedPartId);
 
   const viewMode = useCourseStore((state) => state.viewMode);
   const setViewMode = useCourseStore((state) => state.setViewMode);
-
-  const assemblyMode = useCourseStore((state) => state.assemblyMode);
-  const setAssemblyMode = useCourseStore((state) => state.setAssemblyMode);
 
   const transformMode = useCourseStore((state) => state.transformMode);
   const setTransformMode = useCourseStore((state) => state.setTransformMode);
@@ -20,25 +19,9 @@ export default function CourseControlPanel() {
   );
   return (
     <div className="flex w-full flex-col">
-      {/* Assembly Mode Section */}
-      <div className="flex flex-col gap-3 border-b border-gray-200 p-4">
-        <h2 className="pl-1 text-base font-bold">쿼드콥터 드론 시스템</h2>
-        <div className="flex gap-2">
-          <ControlToggleButton
-            label="단일 부품"
-            isActive={assemblyMode === 'single'}
-            onClick={() => setAssemblyMode('single')}
-          />
-          <ControlToggleButton
-            label="조립도"
-            isActive={assemblyMode === 'assembly'}
-            onClick={() => setAssemblyMode('assembly')}
-          />
-        </div>
-      </div>
-
       {/* View Mode Section */}
       <div className="flex flex-col gap-3 p-4">
+        <h2 className="pl-1 text-base font-bold">쿼드콥터 드론 시스템</h2>
         <h2 className="text-base font-bold">View mode</h2>
         <div className="flex gap-2">
           <ControlToggleButton
@@ -55,23 +38,37 @@ export default function CourseControlPanel() {
       </div>
 
       {/* 분해 슬라이더 섹션 */}
-      {assemblyMode === 'assembly' && (
-        <div className="flex flex-col gap-3 border-t border-gray-200 p-4">
+      <div className="flex flex-col gap-3 border-t border-gray-200 p-4">
+        <div className="flex items-center justify-between">
           <h2 className="text-base font-bold">분해 슬라이더</h2>
-          <div className="flex items-center gap-4">
-            <Slider
-              value={explosionLevel}
-              onValueChange={setExplosionLevel}
-              max={100}
-              step={1}
-              className="flex-1 **:data-[slot=slider-range]:bg-[#3469FF] **:data-[slot=slider-thumb]:border-0 **:data-[slot=slider-thumb]:bg-[#3469FF]"
-            />
-            <span className="w-10 text-right text-sm font-medium">
-              {explosionLevel[0]}%
+          {selectedPartId && (
+            <span className="text-xs text-red-500">
+              전체 모델 뷰에서 조절 가능
             </span>
-          </div>
+          )}
         </div>
-      )}
+        <div className="flex items-center gap-4">
+          <Slider
+            value={explosionLevel}
+            onValueChange={setExplosionLevel}
+            max={100}
+            step={1}
+            disabled={!!selectedPartId}
+            className={cn(
+              'flex-1 **:data-[slot=slider-range]:bg-[#3469FF] **:data-[slot=slider-thumb]:border-0 **:data-[slot=slider-thumb]:bg-[#3469FF]',
+              selectedPartId && 'cursor-not-allowed opacity-50'
+            )}
+          />
+          <span
+            className={cn(
+              'w-10 text-right text-sm font-medium',
+              selectedPartId && 'text-gray-400'
+            )}
+          >
+            {explosionLevel[0]}%
+          </span>
+        </div>
+      </div>
 
       <div className="flex flex-col gap-3 border-t border-gray-200 p-4">
         <h2 className="text-base font-bold">부품 조작</h2>
