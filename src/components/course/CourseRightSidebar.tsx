@@ -13,7 +13,9 @@ interface CourseRightSidebarProps {
 export default function CourseRightSidebar({
   className,
 }: CourseRightSidebarProps) {
-  const { activeTab, setActiveTab } = useCourseStore();
+  const activeTab = useCourseStore((state) => state.activeTab);
+  const setActiveTab = useCourseStore((state) => state.setActiveTab);
+  const isPanelOpen = useCourseStore((state) => state.isPanelOpen);
 
   return (
     <aside
@@ -27,7 +29,7 @@ export default function CourseRightSidebar({
         <SidebarItem
           icon={StudyIcon}
           label="학습"
-          isActive={activeTab === 'study'}
+          isActive={isPanelOpen && activeTab === 'study'}
           onClick={() => setActiveTab('study')}
         />
 
@@ -35,7 +37,7 @@ export default function CourseRightSidebar({
         <SidebarItem
           icon={MemoIcon}
           label="메모"
-          isActive={activeTab === 'memo'}
+          isActive={isPanelOpen && activeTab === 'memo'}
           onClick={() => setActiveTab('memo')}
         />
 
@@ -43,7 +45,7 @@ export default function CourseRightSidebar({
         <SidebarItem
           icon={AiTutorIcon}
           label="AI 튜터"
-          isActive={activeTab === 'ai-tutor'}
+          isActive={isPanelOpen && activeTab === 'ai-tutor'}
           onClick={() => setActiveTab('ai-tutor')}
         />
       </div>
