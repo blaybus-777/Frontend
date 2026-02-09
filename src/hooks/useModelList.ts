@@ -7,7 +7,7 @@ export interface ExtendedModel {
   modelId: number;
   code: string;
   title: string;
-  tags: string[];
+  tag: string[];
   image: string;
   modelUrls: string[];
   assetKey?: string;
@@ -35,7 +35,7 @@ export const useModelList = () => {
         return {
           ...item,
           code: modelMap[assetKey] || item.code,
-          tags: item.tags?.map((t: string) => tagMap[t] || t) || [],
+          tag: item.tag?.map((t: string) => tagMap[t] || t) || [],
           image: assetData.image,
           modelUrls: assetData.modelUrls,
           assetKey,

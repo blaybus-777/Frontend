@@ -66,9 +66,7 @@ function ExplorePage() {
                   id={String(course.modelId)}
                   title={course.title}
                   image={course.image}
-                  level={course.tags?.[0] || 'Level'}
-                  category={course.tags?.[1] || 'Category'}
-                  tags={course.tags?.slice(2) || []}
+                  tags={course.tag}
                   modelUrls={course.modelUrls}
                 />
               ))

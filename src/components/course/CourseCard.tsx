@@ -7,9 +7,7 @@ interface CourseCardProps {
   id: string;
   title: string;
   image: string;
-  level: string;
-  category: string;
-  tags: string[];
+  tags?: string[];
   modelUrls?: string[];
 }
 
@@ -17,9 +15,7 @@ export default function CourseCard({
   id,
   title,
   image,
-  level,
-  category,
-  tags,
+  tags = [],
   modelUrls,
 }: CourseCardProps) {
   const navigate = useNavigate();
@@ -60,23 +56,6 @@ export default function CourseCard({
 
         {/* Tags */}
         <div className="mt-auto flex h-[50px] flex-wrap content-start gap-2 overflow-hidden">
-          {/* Level Badge */}
-          <Badge
-            variant="secondary"
-            className="text-foundation-black-text h-fit shrink rounded-sm border-none bg-neutral-100 px-1 text-sm leading-none font-medium shadow-none"
-          >
-            {level}
-          </Badge>
-
-          {/* Category Badge */}
-          <Badge
-            variant="secondary"
-            className="text-foundation-black-text h-fit shrink rounded-sm border-none bg-neutral-100 px-1 text-sm leading-none font-medium shadow-none"
-          >
-            {category}
-          </Badge>
-
-          {/* Other Tags */}
           {tags.map((tag) => (
             <Badge
               key={tag}

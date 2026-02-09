@@ -5,7 +5,7 @@ export interface Model {
   modelId: number;
   code: string;
   title: string;
-  tags: string[];
+  tag: string[];
 }
 
 export interface ModelListResponse {
