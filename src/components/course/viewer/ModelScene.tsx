@@ -7,7 +7,7 @@ import type { PartInfoMap, SelectedPart } from "./types";
 import { DRONE_PART_ID_TO_FILE } from "@/data/partMapping";
 import { FINAL_ASSET_URLS } from "@/constants/assets";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { useCourseStore } from "@/store/useCourseStore";
+import { useCourseStore } from "@/stores/useCourseStore";
 import { useShallow } from "zustand/react/shallow";
 
 interface ModelSceneProps {
@@ -21,7 +21,7 @@ interface ModelSceneProps {
   viewMode?: "general" | "wireframe";
   assemblyMode?: "single" | "assembly";
   assetKey?: string;
-  htmlPortal?: RefObject<HTMLDivElement | null>;
+  htmlPortal?: RefObject<HTMLDivElement>;
   orbitRef?: RefObject<OrbitControlsImpl | null>;
 }
 
@@ -42,6 +42,24 @@ function hasEmissive(
   material: THREE.Material
 ): material is THREE.Material & { emissive: THREE.Color } {
   return (material as { emissive?: unknown }).emissive instanceof THREE.Color;
+}
+
+function hasWireframe(
+  material: THREE.Material
+): material is THREE.Material & { wireframe: boolean } {
+  return "wireframe" in material;
+}
+
+function hasMetalness(
+  material: THREE.Material
+): material is THREE.MeshStandardMaterial {
+  return "metalness" in material;
+}
+
+function hasRoughness(
+  material: THREE.Material
+): material is THREE.MeshStandardMaterial {
+  return "roughness" in material;
 }
 
 function cloneMaterial(material: THREE.Material) {
@@ -123,16 +141,18 @@ function applyViewerMaterialTuning(
       ? child.material
       : [child.material];
     materials.forEach((material) => {
-      if (material.userData.__baseWireframe === undefined) {
-        material.userData.__baseWireframe = material.wireframe ?? false;
+      if (hasWireframe(material)) {
+        if (material.userData.__baseWireframe === undefined) {
+          material.userData.__baseWireframe = material.wireframe;
+        }
+        material.wireframe = viewMode === "wireframe";
       }
-      material.wireframe = viewMode === "wireframe";
 
-      if ("metalness" in material) {
+      if (hasMetalness(material)) {
         const current = material.metalness ?? 0;
         material.metalness = Math.max(current, 0.4);
       }
-      if ("roughness" in material) {
+      if (hasRoughness(material)) {
         const current = material.roughness ?? 1;
         material.roughness = Math.min(current, 0.35);
       }
@@ -449,7 +469,7 @@ export default function ModelScene({
             transform
             distanceFactor={labelDistanceFactor}
             style={{ pointerEvents: "none" }}
-            portal={htmlPortal?.current ?? undefined}
+            portal={htmlPortal}
           >
             <div className="bg-white/90 border border-gray-300 text-[4px] text-gray-800 rounded-full px-1.5 py-0.5 shadow-sm whitespace-nowrap">
               {(selectedLabel ?? hoveredLabel)?.materialName ? (
