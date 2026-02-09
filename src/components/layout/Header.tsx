@@ -16,11 +16,11 @@ function Header() {
 
   return (
     <header className="border-foundation-gray-5 sticky top-0 z-50 w-full border-b bg-white">
-      <nav className="relative mx-auto flex h-20 items-center px-60">
-        <div className="to-foundation-blue-9 font-pretendard bg-linear-to-r from-[#42C2FF] bg-clip-text text-3xl font-extrabold text-transparent">
+      <nav className="flex h-20 items-center gap-[500px]">
+        <div className="py-5 px-2.5 to-foundation-blue-9 font-pretendard bg-linear-to-r from-[#42C2FF] bg-clip-text text-3xl font-extrabold text-transparent">
           SIMVEX
         </div>
-        <div className="absolute left-1/2 flex -translate-x-1/2 gap-10">
+        <div className="flex gap-10">
           <Link to="/topic" className={`font-bold ${getLinkColor('/topic')}`}>
             Explore
           </Link>
