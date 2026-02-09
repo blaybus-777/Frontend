@@ -225,6 +225,10 @@ export default function ModelScene({
   const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(
     null
   );
+  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3());
+  const targetLookAt = useRef<THREE.Vector3>(new THREE.Vector3());
+  const isMovingCamera = useRef(false);
+
   const { transformMode } = useCourseStore(
     useShallow((state) => ({
       transformMode: state.transformMode,
@@ -320,8 +324,26 @@ export default function ModelScene({
       setHoveredLabel(null);
       labelAnchorRef.current = targetMesh;
       setSelectedObject(targetMesh);
+
+      // 카메라 포커싱 추가
+      const box = new THREE.Box3().setFromObject(targetMesh);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length();
+
+      // 부품 크기에 맞춰 화면에 꽉 차도록 거리 계산 (최소 거리 제한을 대폭 낮춤)
+      // size * 1.5~2.0 정도면 45도 FOV에서 부품이 화면에 적절히 꽉 참
+      const targetDistance = Math.max(size * 1.8, 0.1);
+
+      if (orbitControls) {
+        targetLookAt.current.copy(center);
+        const direction = camera.position.clone().sub(center).normalize();
+        targetCameraPos.current.copy(
+          center.clone().add(direction.multiplyScalar(targetDistance))
+        );
+        isMovingCamera.current = true;
+      }
     }
-  }, [selectedPartId, watchKey, partInfo]);
+  }, [selectedPartId, watchKey, partInfo, orbitControls, camera]);
 
   useEffect(() => {
     if (!groupRef.current) return;
@@ -334,14 +356,17 @@ export default function ModelScene({
 
     group.position.sub(center);
 
-    const distance = Math.max(size * 0.8, 2);
-    camera.position.set(distance, distance * 0.75, distance);
-    camera.lookAt(0, 0, 0);
+    // 전체 모델 보기 또는 단일 부품 보기 시의 카메라 거리 조정
+    // 단일 부품일 때는 size가 작으므로 distance도 그에 맞춰 작아져야 함
+    const distance = Math.max(size * 1.5, 0.2);
+    targetCameraPos.current.set(distance, distance * 0.75, distance);
+    targetLookAt.current.set(0, 0, 0);
+    isMovingCamera.current = true;
+
     if (orbitControls) {
       orbitControls.target.set(0, 0, 0);
       orbitControls.update();
     }
-
     const factor = Math.min(6, Math.max(2.5, size * 0.3));
     setLabelDistanceFactor(factor);
 
@@ -390,7 +415,25 @@ export default function ModelScene({
   }, [explodeDistance, explodeSpace]);
 
   useFrame(() => {
+    if (!isMovingCamera.current || !orbitControls) return;
+
+    // 카메라 위치 보간 (Lerp)
+    camera.position.lerp(targetCameraPos.current, 0.1);
+    orbitControls.target.lerp(targetLookAt.current, 0.1);
+    orbitControls.update();
+
+    // 목표 지점에 충분히 도달하면 이동 중지
+    if (
+      camera.position.distanceTo(targetCameraPos.current) < 0.01 &&
+      orbitControls.target.distanceTo(targetLookAt.current) < 0.01
+    ) {
+      isMovingCamera.current = false;
+    }
+  });
+
+  useFrame(() => {
     if (!labelAnchorRef.current || !labelGroupRef.current) return;
+
     const anchor = labelAnchorRef.current;
     const position = anchor.getWorldPosition(new THREE.Vector3());
     labelGroupRef.current.position.copy(position);

@@ -41,7 +41,7 @@ export default function ModelViewerCanvas({
       />
       <Canvas
         className="relative z-0"
-        camera={{ fov: 45 }}
+        camera={{ fov: 45, near: 0.01, far: 1000 }}
         onCreated={({ gl }) => {
           gl.setClearColor('#0a0e18');
         }}
