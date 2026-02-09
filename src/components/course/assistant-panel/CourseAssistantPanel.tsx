@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import type { ComponentType } from 'react';
 import PartListSection from './PartListSection';
 import StudyTabContent from './StudyTabContent';
+import { STUDY_CONTENT_BY_ID } from './studyContentData';
 import NoteTabContent from './NoteTabContent';
 import AiTutorTabContent from './AiTutorTabContent';
 import type { TabType, TabContentProps } from './types';
@@ -41,7 +42,11 @@ export default function CourseAssistantPanel() {
 
       {/* Content Area - Scrollable */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TabContentComponent />
+        <TabContentComponent
+          learningContent={
+            courseId ? STUDY_CONTENT_BY_ID[courseId] : undefined
+          }
+        />
       </div>
     </div>
   );

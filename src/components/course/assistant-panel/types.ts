@@ -30,4 +30,5 @@ export type TabType = 'study' | 'memo' | 'ai-tutor';
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TabContentProps {
   // 각 탭 컴포넌트가 필요로 하는 공통 Props (필요시 확장)
+  learningContent?: LearningContent;
 }

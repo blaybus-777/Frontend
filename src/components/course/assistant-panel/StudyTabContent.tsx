@@ -13,42 +13,48 @@ export default function StudyTabContent({
   learningContent = MOCK_LEARNING_CONTENT,
 }: StudyTabContentProps) {
   return (
-    <div
-      className="custom-scrollbar flex h-full flex-col gap-6 overflow-y-auto"
-      style={{
-        WebkitOverflowScrolling: 'touch',
-        touchAction: 'pan-y',
-      }}
-    >
-      {/* Learning Point Section */}
-      <section>
-        <h3 className="border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500">
-          학습 포인트
-        </h3>
+    <div className="flex h-full flex-col bg-gray-50">
+      {/* Header */}
+      <h3 className="bg-white flex-none px-6 py-4 text-sm font-bold text-gray-500 border-b">
+        학습 포인트
+      </h3>
 
-        <div className="bg-neutral-100 p-4 text-sm">
-          <h4 className="mb-4 text-base font-bold">{learningContent.title}</h4>
-
-          <div className="space-y-4">
-            <ContentList items={learningContent.description} />
+      {/* Scrollable Content Area */}
+      <div
+        className="custom-scrollbar flex-1 overflow-y-auto p-4"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
+        }}
+      >
+        {/* White Card */}
+        <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="space-y-6 text-base text-gray-800">
+            {/* Main Title Section */}
+            <section>
+              <h2 className="mb-3 text-base font-bold text-gray-900">
+                {learningContent.title}
+              </h2>
+              <ContentList items={learningContent.description} />
+            </section>
 
             <hr className="border-gray-100" />
 
-            <ContentSection
-              title="주요 재질"
-              items={learningContent.materials}
-            />
+            {/* Materials Section */}
+            <ContentSection title="주요 재질" items={learningContent.materials} />
 
             <hr className="border-gray-100" />
 
+            {/* Theory Section */}
             <ContentSection title="핵심 이론" items={learningContent.theory} />
 
             <hr className="border-gray-100" />
 
+            {/* Role Section */}
             <ContentSection title="부품의 역할" items={learningContent.role} />
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }
@@ -63,9 +69,11 @@ interface ContentListProps {
 
 function ContentList({ items }: ContentListProps) {
   return (
-    <ul className="list-disc space-y-1 pl-5 text-gray-700">
+    <ul className="list-disc space-y-1.5 pl-5 text-gray-700 marker:text-gray-400">
       {items.map((item, idx) => (
-        <li key={idx}>{item}</li>
+        <li key={idx} className="leading-relaxed">
+          {item}
+        </li>
       ))}
     </ul>
   );
@@ -82,9 +90,9 @@ interface ContentSectionProps {
 
 function ContentSection({ title, items }: ContentSectionProps) {
   return (
-    <div>
-      <h5 className="mb-1 font-semibold text-gray-900">{title}</h5>
+    <section>
+      <h3 className="mb-3 font-bold text-gray-900">{title}</h3>
       <ContentList items={items} />
-    </div>
+    </section>
   );
 }
