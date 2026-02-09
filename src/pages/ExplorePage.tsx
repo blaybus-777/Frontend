@@ -1,10 +1,9 @@
 import Footer from '@/components/layout/Footer';
 import ExploreSidebar from '@/components/explore/ExploreSidebar';
-import CourseCard from '@/components/explore/CourseCard';
+import CourseCard from '@/components/course/CourseCard';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { TAGS } from '@/constants/explore';
-// import { MOCK_COURSES } from "@/data/mockCourses";
 import { useModelList } from '@/hooks/useModelList';
 import type { ExtendedModel } from '@/hooks/useModelList';
 

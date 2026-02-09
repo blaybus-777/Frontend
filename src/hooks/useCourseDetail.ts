@@ -12,6 +12,13 @@ export const useCourseDetail = () => {
     setViewMode,
     assemblyMode,
     setAssemblyMode,
+    explodeSpace,
+    setExplodeSpace,
+    explosionLevel,
+    transformMode,
+    setTransformMode,
+    selectedPartTransform,
+    setSelectedPartTransform,
   } = useCourseStore(
     useShallow((state) => ({
       selectedPartId: state.selectedPartId,
@@ -22,6 +29,13 @@ export const useCourseDetail = () => {
       setViewMode: state.setViewMode,
       assemblyMode: state.assemblyMode,
       setAssemblyMode: state.setAssemblyMode,
+      explodeSpace: state.explodeSpace,
+      setExplodeSpace: state.setExplodeSpace,
+      explosionLevel: state.explosionLevel,
+      transformMode: state.transformMode,
+      setTransformMode: state.setTransformMode,
+      selectedPartTransform: state.selectedPartTransform,
+      setSelectedPartTransform: state.setSelectedPartTransform,
     }))
   );
 
@@ -29,6 +43,10 @@ export const useCourseDetail = () => {
     // State
     viewMode,
     assemblyMode,
+    explodeSpace,
+    explosionLevel,
+    transformMode,
+    selectedPartTransform,
     selectedPartId,
     activeTab,
     isPanelOpen,
@@ -36,6 +54,9 @@ export const useCourseDetail = () => {
     // Actions
     setViewMode,
     setAssemblyMode,
+    setExplodeSpace,
+    setTransformMode,
+    setSelectedPartTransform,
     setSelectedPartId,
   };
 };

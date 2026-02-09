@@ -3,8 +3,12 @@ export interface AssetData {
   modelUrls: string[];
 }
 
+export const FINAL_ASSET_URLS: Partial<Record<keyof typeof ASSETS, string>> = {
+  Quadcopter_DRONE: '/models/final/Drone2.glb',
+};
+
 export const ASSETS: Record<string, AssetData> = {
-  DRONE: {
+  Quadcopter_DRONE: {
     image: '/img/1.png',
     modelUrls: [
       '/models/drone/Main frame.glb',
@@ -33,7 +37,7 @@ export const ASSETS: Record<string, AssetData> = {
       '/models/spring/Clamp-Primary.glb',
     ],
   },
-  MACHINE_VISE: {
+  MACHINE_VICE: {
     image: '/img/3.jpg',
     modelUrls: [
       '/models/machine/Part1 Fuhrung.glb',

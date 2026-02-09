@@ -21,6 +21,17 @@ interface CourseState {
 
   assemblyMode: 'single' | 'assembly';
   setAssemblyMode: (mode: 'single' | 'assembly') => void;
+
+  explodeSpace: 'local' | 'world';
+  setExplodeSpace: (space: 'local' | 'world') => void;
+
+  transformMode: 'translate' | 'rotate';
+  setTransformMode: (mode: 'translate' | 'rotate') => void;
+
+  selectedPartTransform: { x: number; y: number; z: number } | null;
+  setSelectedPartTransform: (
+    value: { x: number; y: number; z: number } | null
+  ) => void;
 }
 
 export const useCourseStore = create<CourseState>((set) => ({
@@ -55,4 +66,13 @@ export const useCourseStore = create<CourseState>((set) => ({
 
   assemblyMode: 'assembly',
   setAssemblyMode: (mode) => set({ assemblyMode: mode }),
+
+  explodeSpace: 'local',
+  setExplodeSpace: (space) => set({ explodeSpace: space }),
+
+  transformMode: 'translate',
+  setTransformMode: (mode) => set({ transformMode: mode }),
+
+  selectedPartTransform: null,
+  setSelectedPartTransform: (value) => set({ selectedPartTransform: value }),
 }));
