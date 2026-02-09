@@ -5,6 +5,8 @@ import type { Part } from './types';
 import { useCourseParts } from '@/hooks/useCourseParts';
 import PartItem from './PartItem';
 
+import { useCourseStore } from '@/stores/useCourseStore';
+
 interface PartListSectionProps {
   selectedPartId: string | null;
   parts?: Part[];
@@ -22,10 +24,16 @@ export default function PartListSection({
   courseId,
 }: PartListSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const setSelectedPartId = useCourseStore((state) => state.setSelectedPartId);
   const { parts: hookParts } = useCourseParts(courseId);
 
   // 외부에서 주입된 parts가 있으면 사용, 없으면 hook에서 가져온 parts 사용
   const displayParts = passedParts ?? hookParts;
+
+  const handlePartSelect = (id: string) => {
+    const nextId = selectedPartId === id ? null : id;
+    setSelectedPartId(nextId);
+  };
 
   return (
     <section>
@@ -52,6 +60,7 @@ export default function PartListSection({
                   key={part.id}
                   part={part}
                   isSelected={selectedPartId === part.id}
+                  onSelect={handlePartSelect}
                 />
               ))}
             </div>
