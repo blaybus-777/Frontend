@@ -22,7 +22,7 @@ export default function PartItem({ part, isSelected }: PartItemProps) {
           'aspect-square w-full overflow-hidden rounded-lg transition-all',
           isSelected
             ? 'bg-blue-50 shadow-sm ring-1 ring-blue-500'
-            : 'bg-white hover:bg-foundation-blue-1'
+            : 'hover:bg-foundation-blue-1 bg-white'
         )}
       >
         {isGlb ? (
@@ -38,7 +38,9 @@ export default function PartItem({ part, isSelected }: PartItemProps) {
       <span
         className={cn(
           'w-full truncate text-center text-[10px] transition-colors',
-          isSelected ? 'font-medium text-blue-600' : 'text-gray-500 group-hover:text-active group-hover:font-medium'
+          isSelected
+            ? 'font-medium text-blue-600'
+            : 'group-hover:text-active text-gray-500 group-hover:font-medium'
         )}
       >
         {part.name}

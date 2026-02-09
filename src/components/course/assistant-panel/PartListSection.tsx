@@ -23,7 +23,7 @@ export default function PartListSection({
 }: PartListSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { parts: hookParts } = useCourseParts(courseId);
-  
+
   // 외부에서 주입된 parts가 있으면 사용, 없으면 hook에서 가져온 parts 사용
   const displayParts = passedParts ?? hookParts;
 

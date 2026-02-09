@@ -17,7 +17,7 @@ const COURSE_ID_MAP: Record<string, string> = {
 /**
  * Hook to retrieve parts for a given course ID.
  * Encapsulates the logic of mapping course IDs to asset keys and transforming asset data into Part objects.
- * 
+ *
  * @param courseId The ID of the course.
  * @returns An object containing the list of parts.
  */
@@ -25,9 +25,9 @@ export function useCourseParts(courseId?: string) {
   const parts = useMemo(() => {
     // Map the numeric course ID to the asset key
     const assetKey = courseId ? COURSE_ID_MAP[courseId] : undefined;
-    
+
     if (!assetKey || !ASSETS[assetKey]) return MOCK_PARTS;
-    
+
     return ASSETS[assetKey].modelUrls.map((url): Part => {
       // Extract name from file path: "/models/drone/Arm gear.glb" -> "Arm gear"
       const fileName = url.split('/').pop() || '';

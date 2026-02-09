@@ -23,7 +23,9 @@ export interface PartListResponse {
   page: number;
 }
 
-export const getPartList = async (modelId: string): Promise<PartListResponse> => {
+export const getPartList = async (
+  modelId: string
+): Promise<PartListResponse> => {
   const response = await api.get(`/v1/part/list/${modelId}`);
   return response.data.data;
 };
