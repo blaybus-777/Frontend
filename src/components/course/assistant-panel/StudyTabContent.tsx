@@ -2,6 +2,8 @@ import { useParams } from 'react-router-dom';
 import { useCourseStore } from '@/stores/useCourseStore';
 import { STUDY_CONTENT_BY_ID, PART_STUDY_CONTENT } from './studyContentData';
 import { MOCK_LEARNING_CONTENT } from './mockData';
+import { usePartDetail } from '@/hooks/usePartDetail';
+import { useMemo } from 'react';
 
 /**
  * 학습 탭 콘텐츠 컴포넌트
@@ -10,13 +12,28 @@ import { MOCK_LEARNING_CONTENT } from './mockData';
 export default function StudyTabContent() {
   const { id: courseId } = useParams<{ id: string }>();
   const selectedPartId = useCourseStore((state) => state.selectedPartId);
+  const modelId = useCourseStore((state) => state.modelId);
+
+  // API를 통해 상세 정보 가져오기
+  const { partDetail, isLoading } = usePartDetail(modelId, selectedPartId);
 
   // 현재 컨텍스트에 맞는 학습 데이터 결정
-  const learningContent = (() => {
+  const learningContent = useMemo(() => {
+    // 1. API에서 가져온 상세 정보가 있으면 우선 사용
+    if (selectedPartId && partDetail) {
+      return {
+        title: `${partDetail.name} (${partDetail.englishName})`,
+        description: [partDetail.description],
+        materials: partDetail.commonMaterials,
+        theory: partDetail.keyEngineeringTheories,
+        role: partDetail.functionalRoles,
+      };
+    }
+
     if (!courseId) return MOCK_LEARNING_CONTENT;
 
-    // 1. 선택된 부품 데이터가 있는지 먼저 확인
-    if (selectedPartId) {
+    // 2. 선택된 부품 데이터가 있는지 목 데이터에서 확인 (API 데이터가 없을 경우를 대비한 폴백)
+    if (selectedPartId && !isLoading) {
       const partContent = PART_STUDY_CONTENT[courseId]?.[selectedPartId];
       if (partContent) return partContent;
 
@@ -26,9 +43,9 @@ export default function StudyTabContent() {
       );
     }
 
-    // 2. 부품이 선택되지 않았거나 데이터가 없으면 코스 전체 데이터 반환
+    // 3. 부품이 선택되지 않았거나 데이터가 없으면 코스 전체 데이터 반환
     return STUDY_CONTENT_BY_ID[courseId] || MOCK_LEARNING_CONTENT;
-  })();
+  }, [courseId, selectedPartId, partDetail, isLoading]);
 
   return (
     <div className="flex h-full flex-col bg-gray-50">
@@ -45,36 +62,48 @@ export default function StudyTabContent() {
           touchAction: 'pan-y',
         }}
       >
-        {/* White Card */}
-        <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="space-y-6 text-base text-gray-800">
-            {/* Main Title Section */}
-            <section>
-              <h2 className="mb-3 text-base font-bold text-gray-900">
-                {learningContent.title}
-              </h2>
-              <ContentList items={learningContent.description} />
-            </section>
-
-            <hr className="border-gray-100" />
-
-            {/* Materials Section */}
-            <ContentSection
-              title="주요 재질"
-              items={learningContent.materials}
-            />
-
-            <hr className="border-gray-100" />
-
-            {/* Theory Section */}
-            <ContentSection title="핵심 이론" items={learningContent.theory} />
-
-            <hr className="border-gray-100" />
-
-            {/* Role Section */}
-            <ContentSection title="부품의 역할" items={learningContent.role} />
+        {isLoading && selectedPartId ? (
+          <div className="flex h-32 items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
           </div>
-        </div>
+        ) : (
+          /* White Card */
+          <div className="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="space-y-6 text-base text-gray-800">
+              {/* Main Title Section */}
+              <section>
+                <h2 className="mb-3 text-base font-bold text-gray-900">
+                  {learningContent.title}
+                </h2>
+                <ContentList items={learningContent.description} />
+              </section>
+
+              <hr className="border-gray-100" />
+
+              {/* Materials Section */}
+              <ContentSection
+                title="주요 재질"
+                items={learningContent.materials}
+              />
+
+              <hr className="border-gray-100" />
+
+              {/* Theory Section */}
+              <ContentSection
+                title="핵심 이론"
+                items={learningContent.theory}
+              />
+
+              <hr className="border-gray-100" />
+
+              {/* Role Section */}
+              <ContentSection
+                title="부품의 역할"
+                items={learningContent.role}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

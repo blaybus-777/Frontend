@@ -40,3 +40,11 @@ export const getPartList = async (
   });
   return response.data.data;
 };
+
+export const getPartDetail = async (
+  modelId: string,
+  partId: string
+): Promise<PartListResponse> => {
+  const response = await api.get(`/v1/part/${modelId}/${partId}`);
+  return response.data.data;
+};
