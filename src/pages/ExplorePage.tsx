@@ -4,7 +4,6 @@ import CourseCard from '@/components/course/CourseCard';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { TAGS } from '@/constants/explore';
-// import { MOCK_COURSES } from "@/data/mockCourses";
 import { useModelList } from '@/hooks/useModelList';
 import type { ExtendedModel } from '@/hooks/useModelList';
 
