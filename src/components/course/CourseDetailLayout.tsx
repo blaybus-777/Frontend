@@ -24,7 +24,7 @@ export default function CourseDetailLayout({
   const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 2;
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6">
+    <div className="w-full">
       <div className="flex h-[calc(100dvh-81px)] flex-col lg:flex-row">
         {/* Left Side: Control Panel */}
         <div className="w-3xs shrink-0 border-l border-gray-200 p-3">
