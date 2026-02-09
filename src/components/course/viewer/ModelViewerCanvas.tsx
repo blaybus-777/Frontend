@@ -30,7 +30,7 @@ export default function ModelViewerCanvas({
   assetKey,
 }: ModelViewerCanvasProps) {
   const showWorldAxes = true;
-  const htmlPortalRef = useRef<HTMLDivElement | null>(null);
+  const htmlPortalRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   return (
     <div
