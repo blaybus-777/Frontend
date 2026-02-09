@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import CourseControlPanel from '@/components/course/CourseControlPanel';
 import CourseHierarchyTree from '@/components/course/CourseHierarchyTree';
 import CourseRightSidebar from '@/components/course/CourseRightSidebar';
@@ -17,9 +18,16 @@ export default function CourseDetailLayout({
   onSelectPart,
 }: CourseDetailLayoutProps) {
   const { id } = useParams();
-  const { viewMode, assemblyMode, explosionLevel, explodeSpace } =
+  const { viewMode, assemblyMode, explosionLevel, explodeSpace, setModelId } =
     useCourseDetail();
   const { detail, isLoading, isError } = useCourseModelDetail(id);
+
+  // modelId가 변경될 때 store 업데이트
+  useEffect(() => {
+    if (id) {
+      setModelId(id);
+    }
+  }, [id, setModelId]);
 
   const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 2;
 

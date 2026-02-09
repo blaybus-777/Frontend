@@ -6,6 +6,8 @@ export const useCourseDetail = () => {
   const {
     selectedPartId,
     setSelectedPartId,
+    modelId,
+    setModelId,
     activeTab,
     isPanelOpen,
     viewMode,
@@ -23,6 +25,8 @@ export const useCourseDetail = () => {
     useShallow((state) => ({
       selectedPartId: state.selectedPartId,
       setSelectedPartId: state.setSelectedPartId,
+      modelId: state.modelId,
+      setModelId: state.setModelId,
       activeTab: state.activeTab,
       isPanelOpen: state.isPanelOpen,
       viewMode: state.viewMode,
@@ -48,6 +52,7 @@ export const useCourseDetail = () => {
     transformMode,
     selectedPartTransform,
     selectedPartId,
+    modelId,
     activeTab,
     isPanelOpen,
 
@@ -58,5 +63,6 @@ export const useCourseDetail = () => {
     setTransformMode,
     setSelectedPartTransform,
     setSelectedPartId,
+    setModelId,
   };
 };
