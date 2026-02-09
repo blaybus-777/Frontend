@@ -1,11 +1,13 @@
 import { ControlToggleButton } from './ControlToggleButton';
 import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
 
 import { useCourseStore } from '@/stores/useCourseStore';
 
 export default function CourseControlPanel() {
   const explosionLevel = useCourseStore((state) => state.explosionLevel);
   const setExplosionLevel = useCourseStore((state) => state.setExplosionLevel);
+  const selectedPartId = useCourseStore((state) => state.selectedPartId);
 
   const viewMode = useCourseStore((state) => state.viewMode);
   const setViewMode = useCourseStore((state) => state.setViewMode);
@@ -37,16 +39,32 @@ export default function CourseControlPanel() {
 
       {/* 분해 슬라이더 섹션 */}
       <div className="flex flex-col gap-3 border-t border-gray-200 p-4">
-        <h2 className="text-base font-bold">분해 슬라이더</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-bold">분해 슬라이더</h2>
+          {selectedPartId && (
+            <span className="text-xs text-red-500">
+              전체 모델 뷰에서 조절 가능
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-4">
           <Slider
             value={explosionLevel}
             onValueChange={setExplosionLevel}
             max={100}
             step={1}
-            className="flex-1 **:data-[slot=slider-range]:bg-[#3469FF] **:data-[slot=slider-thumb]:border-0 **:data-[slot=slider-thumb]:bg-[#3469FF]"
+            disabled={!!selectedPartId}
+            className={cn(
+              'flex-1 **:data-[slot=slider-range]:bg-[#3469FF] **:data-[slot=slider-thumb]:border-0 **:data-[slot=slider-thumb]:bg-[#3469FF]',
+              selectedPartId && 'cursor-not-allowed opacity-50'
+            )}
           />
-          <span className="w-10 text-right text-sm font-medium">
+          <span
+            className={cn(
+              'w-10 text-right text-sm font-medium',
+              selectedPartId && 'text-gray-400'
+            )}
+          >
             {explosionLevel[0]}%
           </span>
         </div>
