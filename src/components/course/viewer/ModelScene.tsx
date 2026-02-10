@@ -469,9 +469,9 @@ export default function ModelScene({
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3()).length();
 
-      // 부품 크기에 맞춰 화면에 꽉 차도록 거리 계산 (최소 거리 제한을 대폭 낮춤)
-      // size * 1.5~2.0 정도면 45도 FOV에서 부품이 화면에 적절히 꽉 참
-      const targetDistance = Math.max(size * 1.8, 0.1);
+      // 부품 크기에 맞춰 화면에 꽉 차도록 거리 계산
+      // size * 1.2~1.5 정도면 45도 FOV에서 부품이 화면에 적절히 꽉 참
+      const targetDistance = Math.max(size * 1.2, 0.05);
 
       if (orbitControls) {
         targetLookAt.current.copy(center);
@@ -499,11 +499,12 @@ export default function ModelScene({
 
     restoreSceneTransforms(group, transformsKey);
 
-    const distance = Math.max(size * 0.8, 2);
-    const defaultDistance = Math.max(size * 0.8, 2);
+    // 단일 부품 모드 등에서 초기 거리를 설정할 때도 작은 부품에 대응하도록 최소값 조정
+    const distance = Math.max(size * 1.1, 0.1);
+    const defaultDistance = Math.max(size * 1.1, 0.1);
 
     if (!hasStoredView && (!orbitControls || canSetDefaultView)) {
-      camera.position.set(distance, distance * 0.75, distance);
+      camera.position.set(distance * 0.5, distance * 0.2, distance);
       camera.lookAt(0, 0, 0);
       if (orbitControls) {
         orbitControls.target.set(0, 0, 0);
@@ -526,8 +527,8 @@ export default function ModelScene({
         !Number.isFinite(targetDistance) || targetDistance > maxTargetDistance;
       if (invalidCamera || invalidTarget) {
         camera.position.set(
-          defaultDistance,
-          defaultDistance * 0.75,
+          defaultDistance * 0.5,
+          defaultDistance * 0.2,
           defaultDistance
         );
         camera.lookAt(0, 0, 0);
@@ -536,7 +537,7 @@ export default function ModelScene({
         orbitControls.saveState();
       }
     }
-    targetCameraPos.current.set(distance, distance * 0.75, distance);
+    targetCameraPos.current.set(distance * 0.5, distance * 0.2, distance);
     targetLookAt.current.set(0, 0, 0);
     isMovingCamera.current = true;
 
@@ -614,8 +615,8 @@ export default function ModelScene({
     const center = box.getCenter(new THREE.Vector3());
     group.position.sub(center);
 
-    const distance = Math.max(size * 0.8, 2);
-    camera.position.set(distance, distance * 0.75, distance);
+    const distance = Math.max(size * 1.1, 0.1);
+    camera.position.set(distance * 0.5, distance * 0.2, distance);
     camera.lookAt(0, 0, 0);
     if (orbitControls) {
       orbitControls.target.set(0, 0, 0);
