@@ -34,7 +34,7 @@ export default function StudyTabContent() {
 
     // 2. 루트 노드가 선택되었거나, 아무것도 선택되지 않은 경우 코스 전체 데이터 반환
     return STUDY_CONTENT_BY_ID[courseId] || MOCK_LEARNING_CONTENT;
-  }, [courseId, selectedPartId, partDetail, isLoading]);
+  }, [courseId, selectedPartId, partDetail]);
 
   return (
     <div className="flex h-full flex-col bg-gray-50">
