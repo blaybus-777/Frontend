@@ -19,11 +19,12 @@ export default function HierarchyNode({
 }: HierarchyNodeProps) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
-  
+
   // level이 0이고 selectedPartId가 null이면 완제품 선택 상태로 간주
-  const isSelected = level === 0 && selectedPartId === null 
-    ? true 
-    : selectedPartId === String(node.partId);
+  const isSelected =
+    level === 0 && selectedPartId === null
+      ? true
+      : selectedPartId === String(node.partId);
 
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
