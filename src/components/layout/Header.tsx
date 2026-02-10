@@ -16,7 +16,7 @@ function Header() {
   };
 
   return (
-    <header className="border-foundation-gray-5 z-50o sticky top-0 w-full border-b bg-white">
+    <header className="border-foundation-gray-5 z-50 sticky top-0 w-full border-b bg-white">
       <nav className="mx-auto flex h-20 max-w-360 items-center gap-125">
         <div
           onClick={() => navigate('/')}
