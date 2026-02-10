@@ -11,7 +11,7 @@ import {
 } from 'react';
 import * as THREE from 'three';
 import type { PartInfoMap, SelectedPart } from './types';
-import { PART_NAME_MAPPING, PART_ID_TO_CODE } from '@/data/partMapping';
+import { PART_NAME_MAPPING, PART_ID_TO_CODE, ASSET_KEY_TO_MODEL_ID } from '@/data/partMapping';
 import { FINAL_ASSET_URLS, ASSETS } from '@/constants/assets';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useCourseStore } from '@/stores/useCourseStore';
@@ -363,15 +363,17 @@ export default function ModelScene({
 
   const resolvedUrls = useMemo(() => {
     // 선택된 부품이 있는 경우, 해당 부품의 개별 GLB만 보여줌
-    if (selectedPartId) {
-      // 1. Part ID → Code 변환 후 ASSETS에서 직접 URL 가져오기 (권장)
-      const code = PART_ID_TO_CODE[selectedPartId];
-      if (code && assetKey) {
-        const assetData = ASSETS[assetKey];
-        const partUrl = assetData?.parts[code];
-        if (partUrl) {
-          console.log('[ModelScene] Found part URL via code:', code, '→', partUrl);
-          return [partUrl];
+    if (selectedPartId && assetKey) {
+      // 1. Model ID 기반 매칭 (권장)
+      const modelId = ASSET_KEY_TO_MODEL_ID[assetKey];
+      if (modelId) {
+        const code = PART_ID_TO_CODE[selectedPartId];
+        if (code) {
+          const partUrl = ASSETS[assetKey]?.parts[code];
+          if (partUrl) {
+            console.log('[ModelScene] Found via Model ID:', { modelId, selectedPartId, code, partUrl });
+            return [partUrl];
+          }
         }
       }
 
@@ -394,10 +396,8 @@ export default function ModelScene({
         }
       }
     }
-    // if (assemblyMode === 'assembly') {
-    //   return resolveAssemblyUrls(assetKey, urls, explodeDistance);
 
-    // 2. 선택된 부품이 없거나 개별 GLB를 못 찾은 경우, 전체 조립 모델 표시
+    // 선택된 부품이 없거나 개별 GLB를 못 찾은 경우, 전체 조립 모델 표시
     if (assetKey) {
       const finalUrl = FINAL_ASSET_URLS[assetKey];
       if (finalUrl) return [finalUrl];
