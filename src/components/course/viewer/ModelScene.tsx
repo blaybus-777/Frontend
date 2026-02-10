@@ -16,6 +16,8 @@ import { FINAL_ASSET_URLS } from '@/constants/assets';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useCourseStore } from '@/stores/useCourseStore';
 import { useShallow } from 'zustand/react/shallow';
+import { disposeObject } from '@/utils/three-memory';
+import { useThreeMemoryMonitor } from '@/hooks/useThreeMemoryMonitor';
 
 interface ModelSceneProps {
   urls: string[];
@@ -184,24 +186,6 @@ function applyViewerMaterialTuning(
   });
 }
 
-// function saveSceneTransforms(
-//   root: THREE.Object3D,
-//   storageKey: string | null,
-//   lastSavedRef: MutableRefObject<number>
-// ) {
-//   if (assetKey && assetKey !== 'Quadcopter_DRONE') {
-//     const finalUrl = FINAL_ASSET_URLS[assetKey];
-//     return finalUrl ? [finalUrl] : urls.slice(0, 1);
-//   }
-//   if (!selectedPartId || assetKey !== 'Quadcopter_DRONE') {
-//     return urls.slice(0, 1);
-//   }
-//   const file = DRONE_PART_ID_TO_FILE[selectedPartId];
-//   if (!file) return urls.slice(0, 1);
-//   const match = urls.find((url) => url.endsWith(`/${file}`));
-//   return match ? [match] : urls.slice(0, 1);
-// }
-
 function getExplodeScale(assetKey: string | undefined) {
   if (assetKey === 'SUSPENSION') return 0.85;
   if (assetKey === 'ROBOT_ARM') return 0.75;
@@ -316,6 +300,13 @@ function ModelPart({
     applyViewerMaterialTuning(cloned, viewMode);
   }, [cloned, viewMode]);
 
+  useEffect(() => {
+    return () => {
+      // 5. Shared resources (geometry) are cached, cloned materials are disposed.
+      disposeObject(cloned, false, true);
+    };
+  }, [cloned]);
+
   return <primitive object={cloned} />;
 }
 
@@ -337,6 +328,9 @@ export default function ModelScene({
   onRequestRestore,
   hasStoredView = false,
 }: ModelSceneProps) {
+  // 7. Memory debug tool (dev only - hook handles check internally)
+  useThreeMemoryMonitor();
+
   const groupRef = useRef<THREE.Group>(null);
   const explodeDataRef = useRef<MeshExplodeData[]>([]);
   const selectedRef = useRef<THREE.Mesh | null>(null);
@@ -518,7 +512,7 @@ export default function ModelScene({
       const targetDistance = orbitControls.target.distanceTo(centerWorld);
       const minDistance = Math.max(size * 0.2, 0.8);
       const maxDistance = Math.max(size * 6, 12);
-      const maxTargetDistance = Math.max(size * 1.5, 3);
+      const maxTargetDistance = Math.max(size * 0.5, 1.5);
       const invalidCamera =
         !Number.isFinite(cameraDistance) ||
         cameraDistance < minDistance ||
@@ -537,9 +531,19 @@ export default function ModelScene({
         orbitControls.saveState();
       }
     }
-    targetCameraPos.current.set(distance * 0.5, distance * 0.2, distance);
-    targetLookAt.current.set(0, 0, 0);
-    isMovingCamera.current = true;
+    if (hasStoredView || !canSetDefaultView) {
+      onRequestRestore?.();
+    }
+
+    if (hasStoredView && orbitControls) {
+      targetCameraPos.current.copy(camera.position);
+      targetLookAt.current.copy(orbitControls.target);
+      isMovingCamera.current = false;
+    } else {
+      targetCameraPos.current.set(distance * 0.5, distance * 0.2, distance);
+      targetLookAt.current.set(0, 0, 0);
+      isMovingCamera.current = true;
+    }
 
     const factor = Math.min(6, Math.max(2.5, size * 0.3));
     setLabelDistanceFactor(factor);
@@ -573,9 +577,6 @@ export default function ModelScene({
       });
     });
     explodeDataRef.current = meshes;
-    if (hasStoredView || !canSetDefaultView) {
-      onRequestRestore?.();
-    }
   }, [
     camera,
     watchKey,

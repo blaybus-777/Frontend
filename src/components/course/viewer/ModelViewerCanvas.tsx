@@ -43,6 +43,8 @@ export default function ModelViewerCanvas({
   const lastSavedRef = useRef<number>(0);
   const saveTimerRef = useRef<number | null>(null);
   const [resetToken, setResetToken] = useState(0);
+  const [controlsReady, setControlsReady] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
   const hasStoredView = useMemo(() => {
     if (!storageKey || typeof window === 'undefined') return false;
     try {
@@ -55,10 +57,16 @@ export default function ModelViewerCanvas({
 
   const saveState = useCallback(() => {
     if (!storageKey || !controlsRef.current || !cameraRef.current) return;
-    if (hasStoredView && !restoredViewRef.current) return;
+    if (hasStoredView && !restoredViewRef.current) {
+      console.warn('[ModelViewer] Changes ignored: waiting for restore');
+      return;
+    }
     const now = Date.now();
     if (now - lastSavedRef.current < 150) return;
     lastSavedRef.current = now;
+    
+    // ... saving logic
+    console.log('[ModelViewer] Saving state to localStorage');
     const payload = {
       position: cameraRef.current.position.toArray(),
       target: controlsRef.current.target.toArray(),
@@ -66,22 +74,24 @@ export default function ModelViewerCanvas({
     };
     try {
       localStorage.setItem(storageKey, JSON.stringify(payload));
-    } catch {
-      // ignore storage errors
+    } catch (e) {
+      console.error('[ModelViewer] Failed to save state:', e);
     }
   }, [hasStoredView, storageKey]);
 
   const restoreState = useCallback(() => {
     if (!storageKey || !controlsRef.current || !cameraRef.current) return;
-    if (restoredViewRef.current) return;
+    
     try {
       const raw = localStorage.getItem(storageKey);
       if (!raw) return;
+
       const parsed = JSON.parse(raw) as {
         position?: number[];
         target?: number[];
         zoom?: number;
       };
+
       if (parsed.position?.length === 3) {
         cameraRef.current.position.fromArray(parsed.position);
       }
@@ -90,15 +100,21 @@ export default function ModelViewerCanvas({
           parsed.target as [number, number, number]
         );
       }
+      
+      // zoom logic for PerspectiveCamera (usually handled by position, but just in case)
       if (typeof parsed.zoom === 'number') {
-        cameraRef.current.zoom = parsed.zoom;
-        cameraRef.current.updateProjectionMatrix();
+         cameraRef.current.zoom = parsed.zoom;
+         cameraRef.current.updateProjectionMatrix();
       }
+
       controlsRef.current.update();
       controlsRef.current.saveState();
       restoredViewRef.current = true;
-    } catch {
-      // ignore
+      console.log('[ModelViewer] State restored:', parsed);
+    } catch (e) {
+      console.warn('[ModelViewer] Failed to restore state:', e);
+      // If restore fails, we should still allow saving new state
+      restoredViewRef.current = true;
     }
   }, [storageKey]);
 
@@ -112,6 +128,7 @@ export default function ModelViewerCanvas({
   }, [saveState]);
 
   const handleControlsEnd = useCallback(() => {
+    console.log('[ModelViewer] Controls interaction ended, saving...');
     saveState();
   }, [saveState]);
 
@@ -129,19 +146,37 @@ export default function ModelViewerCanvas({
 
   useEffect(() => {
     if (!storageKey) return;
-    let attempts = 0;
-    let rafId = 0;
-    const tick = () => {
-      if (restoredViewRef.current) return;
-      restoreState();
-      attempts += 1;
-      if (attempts < 30 && !restoredViewRef.current) {
-        rafId = requestAnimationFrame(tick);
+    restoreState();
+  }, [restoreState, storageKey]);
+
+  useEffect(() => {
+    if (!storageKey || !controlsReady || !cameraReady) return;
+    if (restoredViewRef.current) return;
+    restoreState();
+  }, [storageKey, controlsReady, cameraReady, restoreState]);
+
+  useEffect(() => {
+    if (!storageKey || typeof window === 'undefined') return;
+
+    const handlePageHide = () => {
+      saveState();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        saveState();
       }
     };
-    tick();
-    return () => cancelAnimationFrame(rafId);
-  }, [restoreState, storageKey]);
+
+    window.addEventListener('pagehide', handlePageHide);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('pagehide', handlePageHide);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      saveState();
+    };
+  }, [saveState, storageKey]);
 
   return (
     <div
@@ -163,16 +198,55 @@ export default function ModelViewerCanvas({
       />
       <Canvas
         className="relative z-0"
+        dpr={1}
         camera={{ fov: 45, near: 0.01, far: 1000 }}
+        gl={{ antialias: true }}
         onCreated={({ gl, camera }) => {
           gl.setClearColor('#0a0e18');
           cameraRef.current = camera as THREE.PerspectiveCamera;
+          setCameraReady(true);
           if (controlsRef.current) {
             controlsRef.current.target.set(0, 0, 0);
             controlsRef.current.update();
-            controlsRef.current.saveState();
           }
           restoreState();
+
+          const handleContextLost = (event: Event) => {
+            event.preventDefault();
+            console.warn('WebGL Context Lost: Attempting to restore...');
+          };
+
+          const handleContextRestored = () => {
+            console.log('WebGL Context Restored.');
+            if (cameraRef.current) {
+              cameraRef.current.updateProjectionMatrix();
+            }
+            restoreState();
+          };
+
+          gl.domElement.addEventListener(
+            'webglcontextlost',
+            handleContextLost,
+            false
+          );
+          gl.domElement.addEventListener(
+            'webglcontextrestored',
+            handleContextRestored,
+            false
+          );
+
+          return () => {
+            gl.domElement.removeEventListener(
+              'webglcontextlost',
+              handleContextLost
+            );
+            gl.domElement.removeEventListener(
+              'webglcontextrestored',
+              handleContextRestored
+            );
+            gl.dispose();
+            gl.forceContextLoss();
+          };
         }}
       >
         <ambientLight intensity={1.1} />
@@ -205,7 +279,10 @@ export default function ModelViewerCanvas({
         </Suspense>
 
         <OrbitControls
-          ref={controlsRef}
+          ref={(instance) => {
+            controlsRef.current = instance;
+            setControlsReady(Boolean(instance));
+          }}
           makeDefault
           enableDamping
           enableZoom
