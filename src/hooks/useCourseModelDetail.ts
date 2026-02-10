@@ -5,6 +5,7 @@ import { ASSETS } from '@/constants/assets';
 export interface CourseModelDetail {
   title: string;
   modelUrls: string[];
+  parts: Record<string, string>;
   assetKey: keyof typeof ASSETS;
 }
 
@@ -34,7 +35,7 @@ export const useCourseModelDetail = (modelId: string | undefined) => {
 
     const model = modelList?.find((item) => String(item.modelId) === modelId);
     const assetKey = model?.assetKey as keyof typeof ASSETS | undefined;
-    
+
     // 1. 내부 정의된 ASSETS 데이터 확인
     const assetData = assetKey ? ASSETS[assetKey] : null;
 
@@ -45,12 +46,13 @@ export const useCourseModelDetail = (modelId: string | undefined) => {
         detail: null,
       };
     }
-    
+
     // 2. 만약 ASSETS에는 없지만, 모델 리스트 API에서 직접 URL을 준 경우 처리
-    const finalModelUrls = assetData?.modelUrls || model?.modelUrls || [];
+    const assetModelUrls = assetData ? Object.values(assetData.parts) : [];
+    const finalModelUrls = assetModelUrls.length > 0 ? assetModelUrls : (model?.modelUrls || []);
     const hasModels = finalModelUrls.length > 0;
 
-    if (!hasModels) {
+    if (!hasModels || !assetData) {
       return {
         isLoading: false,
         isError: true,
@@ -62,9 +64,10 @@ export const useCourseModelDetail = (modelId: string | undefined) => {
       isLoading: false,
       isError: false,
       detail: {
-        title: model?.title || (assetKey as string) || 'Unknown',
+        title: model?.title || assetKey || '',
         modelUrls: finalModelUrls,
-        assetKey: (assetKey as string) ?? 'Unknown',
+        parts: assetData.parts,
+        assetKey: assetKey!,
       },
     };
   }, [modelId, modelList, isLoading, isError]);

@@ -6,12 +6,14 @@ interface CourseState {
   activeTab: 'study' | 'memo' | 'ai-tutor';
   isPanelOpen: boolean;
   selectedPartId: string | null;
+  modelId: string | null;
 
   // Actions
   setActiveTab: (tab: 'study' | 'memo' | 'ai-tutor') => void;
   togglePanel: () => void;
   setPanelOpen: (isOpen: boolean) => void;
   setSelectedPartId: (id: string | null) => void;
+  setModelId: (id: string | null) => void;
 
   // 3D Control
   explosionLevel: number[];
@@ -19,9 +21,6 @@ interface CourseState {
 
   viewMode: 'general' | 'wireframe';
   setViewMode: (mode: 'general' | 'wireframe') => void;
-
-  assemblyMode: 'single' | 'assembly';
-  setAssemblyMode: (mode: 'single' | 'assembly') => void;
 
   explodeSpace: 'local' | 'world';
   setExplodeSpace: (space: 'local' | 'world') => void;
@@ -42,42 +41,43 @@ export const useCourseStore = create<CourseState>()(
       activeTab: 'study',
       isPanelOpen: true,
       selectedPartId: null,
+      modelId: null,
 
-  // Actions
-  setActiveTab: (tab) =>
-    set((state) => {
-      // If clicking the same tab, toggle the panel
-      if (state.activeTab === tab) {
-        return { isPanelOpen: !state.isPanelOpen };
-      }
-      // If clicking a different tab, ensure panel is open
-      return { activeTab: tab, isPanelOpen: true };
-    }),
+      // Actions
+      setActiveTab: (tab) =>
+        set((state) => {
+          // If clicking the same tab, toggle the panel
+          if (state.activeTab === tab) {
+            return { isPanelOpen: !state.isPanelOpen };
+          }
+          // If clicking a different tab, ensure panel is open
+          return { activeTab: tab, isPanelOpen: true };
+        }),
 
-  togglePanel: () => set((state) => ({ isPanelOpen: !state.isPanelOpen })),
+      togglePanel: () => set((state) => ({ isPanelOpen: !state.isPanelOpen })),
 
-  setPanelOpen: (isOpen) => set({ isPanelOpen: isOpen }),
+      setPanelOpen: (isOpen) => set({ isPanelOpen: isOpen }),
 
-  setSelectedPartId: (id) => set({ selectedPartId: id }),
+      setSelectedPartId: (id) => set({ selectedPartId: id }),
 
-  // 3D Control
-  explosionLevel: [0],
-  setExplosionLevel: (level) => set({ explosionLevel: level }),
+      setModelId: (id) => set({ modelId: id }),
 
-  viewMode: 'general',
-  setViewMode: (mode) => set({ viewMode: mode }),
+      // 3D Control
+      explosionLevel: [0],
+      setExplosionLevel: (level) => set({ explosionLevel: level }),
 
-  assemblyMode: 'assembly',
-  setAssemblyMode: (mode) => set({ assemblyMode: mode }),
+      viewMode: 'general',
+      setViewMode: (mode) => set({ viewMode: mode }),
 
-  explodeSpace: 'local',
-  setExplodeSpace: (space) => set({ explodeSpace: space }),
+      explodeSpace: 'local',
+      setExplodeSpace: (space) => set({ explodeSpace: space }),
 
-  transformMode: 'translate',
-  setTransformMode: (mode) => set({ transformMode: mode }),
+      transformMode: 'translate',
+      setTransformMode: (mode) => set({ transformMode: mode }),
 
-  selectedPartTransform: null,
-      setSelectedPartTransform: (value) => set({ selectedPartTransform: value }),
+      selectedPartTransform: null,
+      setSelectedPartTransform: (value) =>
+        set({ selectedPartTransform: value }),
     }),
     {
       name: 'course-panel',

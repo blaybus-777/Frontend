@@ -1,7 +1,9 @@
 import { useCourseStore } from '@/stores/useCourseStore';
+import { useParams } from 'react-router-dom';
 import type { ComponentType } from 'react';
 import PartListSection from './PartListSection';
 import StudyTabContent from './StudyTabContent';
+import { STUDY_CONTENT_BY_ID } from './studyContentData';
 import NoteTabContent from './NoteTabContent';
 import AiTutorTabContent from './AiTutorTabContent';
 import type { TabType, TabContentProps } from './types';
@@ -26,7 +28,11 @@ const TAB_COMPONENTS: Record<TabType, ComponentType<TabContentProps>> = {
  * - 의존성 역전 원칙: 구체적인 컴포넌트가 아닌 TabContentProps 인터페이스에 의존
  */
 export default function CourseAssistantPanel() {
-  const { isPanelOpen, activeTab, selectedPartId } = useCourseStore();
+  const isPanelOpen = useCourseStore((state) => state.isPanelOpen);
+  const activeTab = useCourseStore((state) => state.activeTab);
+  const selectedPartId = useCourseStore((state) => state.selectedPartId);
+
+  const { id: courseId } = useParams<{ id: string }>();
 
   if (!isPanelOpen) return null;
 
@@ -35,11 +41,13 @@ export default function CourseAssistantPanel() {
   return (
     <div className="absolute top-0 right-0 bottom-0 flex w-[320px] flex-col bg-white shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.1)]">
       {/* Part List Section - Fixed */}
-      <PartListSection selectedPartId={selectedPartId} />
+      <PartListSection selectedPartId={selectedPartId} courseId={courseId} />
 
       {/* Content Area - Scrollable */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TabContentComponent />
+        <TabContentComponent
+          learningContent={courseId ? STUDY_CONTENT_BY_ID[courseId] : undefined}
+        />
       </div>
     </div>
   );

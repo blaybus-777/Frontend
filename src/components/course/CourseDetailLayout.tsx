@@ -7,6 +7,7 @@ import { useCourseDetail } from '@/hooks/useCourseDetail';
 import { useEffect, useRef } from 'react';
 import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
 import { useParams } from 'react-router-dom';
+import { PART_ID_MAPPING } from '@/data/partMapping';
 
 interface CourseDetailLayoutProps {
   selectedPartId: string | null;
@@ -18,33 +19,19 @@ export default function CourseDetailLayout({
   onSelectPart,
 }: CourseDetailLayoutProps) {
   const { id } = useParams();
-  const {
-    viewMode,
-    assemblyMode,
-    explosionLevel,
-    explodeSpace,
-    setExplosionLevel,
-    setAssemblyMode,
-    setExplodeSpace,
-    setSelectedPartId,
-  } = useCourseDetail();
+  const { viewMode, explosionLevel, explodeSpace, setModelId } =
+    useCourseDetail();
   const { detail, isLoading, isError } = useCourseModelDetail(id);
   const lastDetailRef = useRef(detail);
 
+  // modelId가 변경될 때 store 업데이트
   useEffect(() => {
-    if (detail) {
-      lastDetailRef.current = detail;
+    if (id) {
+      setModelId(id);
     }
-  }, [detail]);
+  }, [id, setModelId]);
 
   const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 0.6;
-
-  useEffect(() => {
-    setExplosionLevel([0]);
-    setAssemblyMode('assembly');
-    setExplodeSpace('local');
-    setSelectedPartId(null);
-  }, [id, setAssemblyMode, setExplodeSpace, setExplosionLevel, setSelectedPartId]);
 
   return (
     <div className="w-full">
@@ -57,6 +44,7 @@ export default function CourseDetailLayout({
             </div>
             <div className="flex-1 overflow-hidden bg-gray-50">
               <CourseHierarchyTree
+                modelId={id}
                 selectedPartId={selectedPartId}
                 onSelectPart={onSelectPart}
               />
@@ -81,8 +69,15 @@ export default function CourseDetailLayout({
                 <ModelViewer
                   urls={(detail ?? lastDetailRef.current)?.modelUrls ?? []}
                   selectedPartId={selectedPartId}
+                  onSelect={(part) => {
+                    if (part) {
+                      const id = PART_ID_MAPPING[part.name];
+                      if (id) onSelectPart(id);
+                    } else {
+                      onSelectPart(null);
+                    }
+                  }}
                   viewMode={viewMode}
-                  assemblyMode={assemblyMode}
                   explodeDistance={explodeDistance}
                   explodeSpace={explodeSpace}
                   assetKey={(detail ?? lastDetailRef.current)?.assetKey}

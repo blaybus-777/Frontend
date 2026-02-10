@@ -11,7 +11,7 @@ import {
 } from 'react';
 import * as THREE from 'three';
 import type { PartInfoMap, SelectedPart } from './types';
-import { DRONE_PART_ID_TO_FILE } from '@/data/partMapping';
+import { DRONE_PART_ID_TO_FILE, PART_NAME_MAPPING } from '@/data/partMapping';
 import { FINAL_ASSET_URLS } from '@/constants/assets';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useCourseStore } from '@/stores/useCourseStore';
@@ -26,7 +26,6 @@ interface ModelSceneProps {
   onRegisterClearSelection?: (clearFn: () => void) => void;
   selectedPartId?: string | null;
   viewMode?: 'general' | 'wireframe';
-  assemblyMode?: 'single' | 'assembly';
   assetKey?: string;
   htmlPortal?: RefObject<HTMLElement>;
   orbitRef?: RefObject<OrbitControlsImpl | null>;
@@ -185,40 +184,23 @@ function applyViewerMaterialTuning(
   });
 }
 
-function resolveSinglePartUrls(
-  urls: string[],
-  selectedPartId: string | null | undefined,
-  assetKey: string | undefined
-) {
-  if (assetKey && assetKey !== 'Quadcopter_DRONE') {
-    const finalUrl = FINAL_ASSET_URLS[assetKey];
-    return finalUrl ? [finalUrl] : urls.slice(0, 1);
-  }
-  if (!selectedPartId || assetKey !== 'Quadcopter_DRONE') {
-    return urls.slice(0, 1);
-  }
-  const file = DRONE_PART_ID_TO_FILE[selectedPartId];
-  if (!file) return urls.slice(0, 1);
-  const match = urls.find((url) => url.endsWith(`/${file}`));
-  return match ? [match] : urls.slice(0, 1);
-}
-
-function resolveAssemblyUrls(assetKey: string | undefined, urls: string[]) {
-  if (!assetKey) return urls;
-  const finalUrl = FINAL_ASSET_URLS[assetKey];
-
-  // Use single final glb for all non-drone models.
-  if (assetKey !== 'Quadcopter_DRONE') {
-    return finalUrl ? [finalUrl] : urls;
-  }
-
-  // Drone keeps its existing behavior.
-  if (assetKey === 'Quadcopter_DRONE') {
-    return finalUrl ? [finalUrl] : urls;
-  }
-
-  return urls;
-}
+// function saveSceneTransforms(
+//   root: THREE.Object3D,
+//   storageKey: string | null,
+//   lastSavedRef: MutableRefObject<number>
+// ) {
+//   if (assetKey && assetKey !== 'Quadcopter_DRONE') {
+//     const finalUrl = FINAL_ASSET_URLS[assetKey];
+//     return finalUrl ? [finalUrl] : urls.slice(0, 1);
+//   }
+//   if (!selectedPartId || assetKey !== 'Quadcopter_DRONE') {
+//     return urls.slice(0, 1);
+//   }
+//   const file = DRONE_PART_ID_TO_FILE[selectedPartId];
+//   if (!file) return urls.slice(0, 1);
+//   const match = urls.find((url) => url.endsWith(`/${file}`));
+//   return match ? [match] : urls.slice(0, 1);
+// }
 
 function getExplodeScale(assetKey: string | undefined) {
   if (assetKey === 'SUSPENSION') return 0.85;
@@ -346,7 +328,6 @@ export default function ModelScene({
   onRegisterClearSelection,
   selectedPartId,
   viewMode = 'general',
-  assemblyMode = 'assembly',
   assetKey,
   htmlPortal,
   orbitRef,
@@ -373,6 +354,10 @@ export default function ModelScene({
   );
   const transformSavedRef = useRef(0);
   const transformsKey = storageKey ? `${storageKey}:transforms` : null;
+  const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3());
+  const targetLookAt = useRef<THREE.Vector3>(new THREE.Vector3());
+  const isMovingCamera = useRef(false);
+
   const { transformMode } = useCourseStore(
     useShallow((state) => ({
       transformMode: state.transformMode,
@@ -383,21 +368,41 @@ export default function ModelScene({
   );
 
   const resolvedUrls = useMemo(() => {
-    if (assemblyMode === 'single') {
-      return resolveSinglePartUrls(urls, selectedPartId, assetKey);
+    // 1. 선택된 부품이 있는 경우, 해당 부품의 개별 GLB만 보여줌
+    if (selectedPartId) {
+      const fileName = DRONE_PART_ID_TO_FILE[selectedPartId];
+      if (fileName) {
+        const match = urls.find((url) => url.endsWith(`/${fileName}`));
+        if (match) return [match];
+      }
+
+      // DRONE_PART_ID_TO_FILE에 없더라도 PART_NAME_MAPPING을 통해 유추 시도
+      const meshName = PART_NAME_MAPPING[selectedPartId];
+      if (meshName) {
+        const match = urls.find((url) => {
+          const decodedUrl = decodeURIComponent(url);
+          return decodedUrl.endsWith(`/${meshName}.glb`);
+        });
+        if (match) return [match];
+      }
     }
-    if (assemblyMode === 'assembly') {
-      return resolveAssemblyUrls(assetKey, urls);
+    // if (assemblyMode === 'assembly') {
+    //   return resolveAssemblyUrls(assetKey, urls, explodeDistance);
+
+    // 2. 선택된 부품이 없거나 개별 GLB를 못 찾은 경우, 전체 조립 모델 표시
+    if (assetKey) {
+      const finalUrl = FINAL_ASSET_URLS[assetKey];
+      if (finalUrl) return [finalUrl];
     }
+
     return urls;
-  }, [urls, assemblyMode, selectedPartId, assetKey]);
+  }, [urls, selectedPartId, assetKey]);
 
   const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
 
   console.log('ModelScene - Props:', {
     assetKey,
     urlsCount: urls.length,
-    assemblyMode,
     resolvedUrlsCount: resolvedUrls.length,
     resolvedUrls,
   });
@@ -417,19 +422,80 @@ export default function ModelScene({
     });
   }, [onRegisterClearSelection, onSelect, setSelectedPartTransform]);
 
+  // 하이라키 트리 등 외부에서의 선택 상태 반영
+  useEffect(() => {
+    if (!groupRef.current) return;
+
+    // 선택이 해제된 경우
+    if (!selectedPartId) {
+      if (selectedRef.current) {
+        setHighlight(selectedRef.current, 'none');
+        selectedRef.current = null;
+        setSelectedLabel(null);
+        setSelectedObject(null);
+      }
+      return;
+    }
+
+    // ID를 Mesh 이름으로 변환
+    const meshName = PART_NAME_MAPPING[selectedPartId];
+    if (!meshName) return;
+
+    // 이미 선택된 것과 같다면 무시
+    if (selectedRef.current?.name === meshName) return;
+
+    let targetMesh: THREE.Mesh | null = null;
+    groupRef.current.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name === meshName) {
+        targetMesh = child;
+      }
+    });
+
+    if (targetMesh) {
+      if (selectedRef.current && selectedRef.current !== targetMesh) {
+        setHighlight(selectedRef.current, 'none');
+      }
+      selectedRef.current = targetMesh;
+      setHighlight(targetMesh, 'select');
+      const selected = buildSelectedPart(targetMesh, partInfo);
+      setSelectedLabel(selected);
+      setHoveredLabel(null);
+      labelAnchorRef.current = targetMesh;
+      setSelectedObject(targetMesh);
+
+      // 카메라 포커싱 추가
+      const box = new THREE.Box3().setFromObject(targetMesh);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length();
+
+      // 부품 크기에 맞춰 화면에 꽉 차도록 거리 계산 (최소 거리 제한을 대폭 낮춤)
+      // size * 1.5~2.0 정도면 45도 FOV에서 부품이 화면에 적절히 꽉 참
+      const targetDistance = Math.max(size * 1.8, 0.1);
+
+      if (orbitControls) {
+        targetLookAt.current.copy(center);
+        const direction = camera.position.clone().sub(center).normalize();
+        targetCameraPos.current.copy(
+          center.clone().add(direction.multiplyScalar(targetDistance))
+        );
+        isMovingCamera.current = true;
+      }
+    }
+  }, [selectedPartId, watchKey, partInfo, orbitControls, camera]);
+
   useEffect(() => {
     console.log('ModelScene - Mounted/Updated with watchKey:', watchKey);
     if (!groupRef.current) return;
 
     const group = groupRef.current;
     console.log('ModelScene - Group children count:', group.children.length);
-    
+
     group.position.set(0, 0, 0);
     const box = new THREE.Box3().setFromObject(group);
     const size = box.getSize(new THREE.Vector3()).length();
     const groupSize = size || 1;
     const center = box.getCenter(new THREE.Vector3());
-    
+
     console.log('ModelScene - Bounding box size:', size, 'center:', center);
 
     group.position.sub(center);
@@ -473,6 +539,9 @@ export default function ModelScene({
         orbitControls.saveState();
       }
     }
+    targetCameraPos.current.set(distance, distance * 0.75, distance);
+    targetLookAt.current.set(0, 0, 0);
+    isMovingCamera.current = true;
 
     const factor = Math.min(6, Math.max(2.5, size * 0.3));
     setLabelDistanceFactor(factor);
@@ -587,7 +656,25 @@ export default function ModelScene({
   }, [explodeDistance, explodeSpace, assetKey]);
 
   useFrame(() => {
+    if (!isMovingCamera.current || !orbitControls) return;
+
+    // 카메라 위치 보간 (Lerp)
+    camera.position.lerp(targetCameraPos.current, 0.1);
+    orbitControls.target.lerp(targetLookAt.current, 0.1);
+    orbitControls.update();
+
+    // 목표 지점에 충분히 도달하면 이동 중지
+    if (
+      camera.position.distanceTo(targetCameraPos.current) < 0.01 &&
+      orbitControls.target.distanceTo(targetLookAt.current) < 0.01
+    ) {
+      isMovingCamera.current = false;
+    }
+  });
+
+  useFrame(() => {
     if (!labelAnchorRef.current || !labelGroupRef.current) return;
+
     const anchor = labelAnchorRef.current;
     const position = anchor.getWorldPosition(new THREE.Vector3());
     labelGroupRef.current.position.copy(position);

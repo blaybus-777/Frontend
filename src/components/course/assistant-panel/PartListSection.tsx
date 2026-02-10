@@ -1,12 +1,16 @@
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
-import { MOCK_PARTS } from './mockData';
 import type { Part } from './types';
+import PartItem from './PartItem';
+import { useCourseStore } from '@/stores/useCourseStore';
+import { usePartList } from '@/hooks/usePartList';
+import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
 
 interface PartListSectionProps {
   selectedPartId: string | null;
   parts?: Part[];
+  courseId?: string; // modelId와 동일하게 쓰임
 }
 
 /**
@@ -15,9 +19,37 @@ interface PartListSectionProps {
  */
 export default function PartListSection({
   selectedPartId,
-  parts = MOCK_PARTS,
+  parts: passedParts,
 }: PartListSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const setSelectedPartId = useCourseStore((state) => state.setSelectedPartId);
+  const modelId = useCourseStore((state) => state.modelId);
+
+  const { data: apiPartData } = usePartList(modelId ?? undefined);
+  const { detail } = useCourseModelDetail(modelId ?? undefined);
+
+  const hookParts = useMemo(() => {
+    if (!apiPartData || !detail) return [];
+
+    return apiPartData.items.map((apiPart): Part => {
+      const matchingUrl = detail.parts[apiPart.code] || '';
+
+      return {
+        id: String(apiPart.partId),
+        name: apiPart.name,
+        image: matchingUrl, // GLB URL을 이미지로 사용
+        englishName: apiPart.englishName,
+      };
+    });
+  }, [apiPartData, detail]);
+
+  // 외부에서 주입된 parts가 있으면 사용, 없으면 hook에서 가져온 parts 사용
+  const displayParts = passedParts ?? hookParts;
+
+  const handlePartSelect = (id: string) => {
+    const nextId = selectedPartId === id ? null : id;
+    setSelectedPartId(nextId);
+  };
 
   return (
     <section>
@@ -39,11 +71,12 @@ export default function PartListSection({
             }}
           >
             <div className="grid grid-cols-4 gap-2 pb-2">
-              {parts.map((part) => (
+              {displayParts.map((part) => (
                 <PartItem
                   key={part.id}
                   part={part}
                   isSelected={selectedPartId === part.id}
+                  onSelect={handlePartSelect}
                 />
               ))}
             </div>
@@ -59,43 +92,5 @@ export default function PartListSection({
         </button>
       </div>
     </section>
-  );
-}
-
-/**
- * 개별 부품 아이템 컴포넌트
- * - 단일 책임: 개별 부품의 표시만 담당
- */
-interface PartItemProps {
-  part: Part;
-  isSelected: boolean;
-}
-
-function PartItem({ part, isSelected }: PartItemProps) {
-  return (
-    <button className="group flex w-full shrink-0 flex-col items-center gap-1 focus:outline-none">
-      <div
-        className={cn(
-          'aspect-square w-full overflow-hidden rounded-lg border transition-all',
-          isSelected
-            ? 'border-blue-500 bg-blue-50 shadow-sm ring-1 ring-blue-500'
-            : 'border-gray-200 bg-gray-50 hover:border-blue-300'
-        )}
-      >
-        <img
-          src={part.image}
-          alt={part.name}
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <span
-        className={cn(
-          'w-full truncate text-center text-[10px] transition-colors',
-          isSelected ? 'font-medium text-blue-600' : 'text-gray-500'
-        )}
-      >
-        {part.name}
-      </span>
-    </button>
   );
 }

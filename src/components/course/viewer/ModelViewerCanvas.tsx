@@ -21,7 +21,6 @@ interface ModelViewerCanvasProps {
   onSelect?: (part: SelectedPart | null) => void;
   selectedPartId?: string | null;
   viewMode?: 'general' | 'wireframe';
-  assemblyMode?: 'single' | 'assembly';
   assetKey?: string;
   storageKey?: string;
 }
@@ -34,7 +33,6 @@ export default function ModelViewerCanvas({
   onSelect,
   selectedPartId,
   viewMode,
-  assemblyMode,
   assetKey,
   storageKey,
 }: ModelViewerCanvasProps) {
@@ -165,7 +163,7 @@ export default function ModelViewerCanvas({
       />
       <Canvas
         className="relative z-0"
-        camera={{ fov: 45 }}
+        camera={{ fov: 45, near: 0.01, far: 1000 }}
         onCreated={({ gl, camera }) => {
           gl.setClearColor('#0a0e18');
           cameraRef.current = camera as THREE.PerspectiveCamera;
@@ -195,7 +193,6 @@ export default function ModelViewerCanvas({
             onSelect={onSelect}
             selectedPartId={selectedPartId}
             viewMode={viewMode}
-            assemblyMode={assemblyMode}
             assetKey={assetKey}
             htmlPortal={htmlPortalRef}
             orbitRef={controlsRef}
