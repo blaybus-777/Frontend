@@ -11,10 +11,10 @@ import Footer from '@/components/layout/Footer';
 
 // 캐러셀 이미지 목록 (상수)
 const CAROUSEL_IMAGES = [
-  '/public/landing/main_1.png',
-  '/public/landing/main_2.png',
-  '/public/landing/main_3.png',
-  '/public/landing/main_4.png',
+  '/landing/main_1.png',
+  '/landing/main_2.png',
+  '/landing/main_3.png',
+  '/landing/main_4.png',
 ];
 
 const LandingPage = () => {
@@ -290,7 +290,7 @@ const LandingPage = () => {
             </div>
             <div className="border-foundation-gray-4 overflow-hidden rounded-2xl border bg-white shadow-xl lg:w-1/2">
               <img
-                src="/public/landing/middle2.png"
+                src="/landing/middle2.png"
                 className="bg-foundation-gray-3 h-80 w-full object-cover"
                 alt="Feature 2"
               />
