@@ -17,6 +17,7 @@ export interface LearningContent {
   materials: string[];
   theory: string[];
   role: string[];
+  children?: string[];
 }
 
 /**
