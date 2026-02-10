@@ -61,13 +61,13 @@ export const ASSETS: Record<string, AssetData> = {
     image: '/img/4.png',
     parts: {
       actuator_housing: '/models/last/robotArm/Actuator_Hoursing.glb',
-      end_effector_mount1: '/models/last/robotArm/End_Effector_Mount1.glb',
+      end_effector_mount: '/models/last/robotArm/End_Effector_Mount1.glb',
       wrist_joint: '/models/last/robotArm/Wrist_Joint.glb',
       parallel_gripper: '/models/last/robotArm/Parallel_Gripper.glb',
       link_arm: '/models/last/robotArm/Link_Arm.glb',
-      join_bracket: '/models/last/robotArm/Join_Bracket.glb',
+      joint_bracket: '/models/last/robotArm/Join_Bracket.glb',
       rotary_base: '/models/last/robotArm/Rotary_Base.glb',
-      join_coupling: '/models/last/robotArm/Join_Coupling.glb',
+      joint_coupling: '/models/last/robotArm/Join_Coupling.glb',
     },
   },
   ROBOT_GRIPPER: {
@@ -88,7 +88,7 @@ export const ASSETS: Record<string, AssetData> = {
     parts: {
       base: '/models/last/suspention/Base.glb',
       rod: '/models/last/suspention/Rod.glb',
-      nut1: '/models/last/suspention/Nut1.glb',
+      nut: '/models/last/suspention/Nut1.glb',
       spring: '/models/last/suspention/Spring.glb',
     },
   },
