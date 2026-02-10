@@ -64,7 +64,7 @@ export default function ModelViewerCanvas({
     const now = Date.now();
     if (now - lastSavedRef.current < 150) return;
     lastSavedRef.current = now;
-    
+
     // ... saving logic
     console.log('[ModelViewer] Saving state to localStorage');
     const payload = {
@@ -81,7 +81,7 @@ export default function ModelViewerCanvas({
 
   const restoreState = useCallback(() => {
     if (!storageKey || !controlsRef.current || !cameraRef.current) return;
-    
+
     try {
       const raw = localStorage.getItem(storageKey);
       if (!raw) return;
@@ -100,11 +100,11 @@ export default function ModelViewerCanvas({
           parsed.target as [number, number, number]
         );
       }
-      
+
       // zoom logic for PerspectiveCamera (usually handled by position, but just in case)
       if (typeof parsed.zoom === 'number') {
-         cameraRef.current.zoom = parsed.zoom;
-         cameraRef.current.updateProjectionMatrix();
+        cameraRef.current.zoom = parsed.zoom;
+        cameraRef.current.updateProjectionMatrix();
       }
 
       controlsRef.current.update();
