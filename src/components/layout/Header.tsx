@@ -18,7 +18,10 @@ function Header() {
   return (
     <header className="border-foundation-gray-5 z-50o sticky top-0 w-full border-b bg-white">
       <nav className="mx-auto flex h-20 max-w-360 items-center gap-125">
-        <div onClick={() => navigate('/')} className="to-foundation-blue-9 cursor-pointer font-pretendard bg-linear-to-r from-[#42C2FF] bg-clip-text px-2.5 py-5 pl-15 text-3xl font-extrabold text-transparent">
+        <div
+          onClick={() => navigate('/')}
+          className="to-foundation-blue-9 font-pretendard cursor-pointer bg-linear-to-r from-[#42C2FF] bg-clip-text px-2.5 py-5 pl-15 text-3xl font-extrabold text-transparent"
+        >
           SIMVEX
         </div>
         <div className="flex gap-10">

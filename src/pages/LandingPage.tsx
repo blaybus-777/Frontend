@@ -9,35 +9,43 @@ import {
 } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 
+// 캐러셀 이미지 목록 (상수)
+const CAROUSEL_IMAGES = [
+  '/public/landing/main_1.png',
+  '/public/landing/main_2.png',
+  '/public/landing/main_3.png',
+  '/public/landing/main_4.png',
+];
+
 const LandingPage = () => {
   const navigate = useNavigate();
-  
+
   // 캐러셀 상태 관리
   const [currentIndex, setCurrentIndex] = useState(0);
-  const images = [
-    '/public/landing/main_1.png',
-    '/public/landing/main_2.png',
-    '/public/landing/main_3.png',
-    '/public/landing/main_4.png',
-  ];
 
   // 좌우 이동 핸들러
   const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    setCurrentIndex((prev) =>
+      prev === 0 ? CAROUSEL_IMAGES.length - 1 : prev - 1
+    );
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) =>
+      prev === CAROUSEL_IMAGES.length - 1 ? 0 : prev + 1
+    );
   };
 
   // 자동 슬라이드 (5초마다)
   useEffect(() => {
     const interval = setInterval(() => {
-      handleNext();
+      setCurrentIndex((prev) =>
+        prev === CAROUSEL_IMAGES.length - 1 ? 0 : prev + 1
+      );
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, []);
 
   return (
     <div className="font-pretendard flex w-full flex-col bg-white">
@@ -55,23 +63,23 @@ const LandingPage = () => {
         </p>
         <button
           onClick={() => navigate('/topic')}
-          className="mb-16 cursor-pointer flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#42C2FF] to-[#4D94FF] px-5 py-3 text-base font-bold text-white shadow-lg shadow-[#42C2FF]/30 transition-all hover:shadow-xl hover:shadow-[#42C2FF]/40 hover:brightness-110"
+          className="mb-16 flex cursor-pointer items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#42C2FF] to-[#4D94FF] px-5 py-3 text-base font-bold text-white shadow-lg shadow-[#42C2FF]/30 transition-all hover:shadow-xl hover:shadow-[#42C2FF]/40 hover:brightness-110"
         >
           지금 바로 시작하기 <ChevronRight className="h-5 w-5" />
         </button>
 
         <div className="relative w-full max-w-5xl px-4">
-          <button 
+          <button
             onClick={handlePrevious}
-            className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -left-5 -translate-y-1/2 rounded-full p-2 transition-colors cursor-pointer z-10"
+            className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -left-5 z-10 -translate-y-1/2 cursor-pointer rounded-full p-2 transition-colors"
           >
             <ChevronLeft className="h-8 w-8" />
           </button>
-          
+
           {/* 캐러셀 이미지 */}
           <div className="overflow-hidden rounded-2xl">
             <img
-              src={images[currentIndex]}
+              src={CAROUSEL_IMAGES[currentIndex]}
               alt={`랜딩 이미지 ${currentIndex + 1}`}
               className="h-96 w-full object-contain transition-all duration-500"
             />
@@ -79,11 +87,11 @@ const LandingPage = () => {
 
           {/* 인디케이터 점 */}
           <div className="mt-6 flex justify-center gap-2">
-            {images.map((_, idx) => (
+            {CAROUSEL_IMAGES.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
-                className={`h-2 w-2 rounded-full transition-all cursor-pointer ${
+                className={`h-2 w-2 cursor-pointer rounded-full transition-all ${
                   idx === currentIndex
                     ? 'bg-foundation-blue-9 w-8'
                     : 'bg-foundation-gray-4 hover:bg-foundation-gray-5'
@@ -92,10 +100,10 @@ const LandingPage = () => {
               />
             ))}
           </div>
-          
-          <button 
+
+          <button
             onClick={handleNext}
-            className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -right-5 -translate-y-1/2 rounded-full p-2 transition-colors cursor-pointer z-10"
+            className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -right-5 z-10 -translate-y-1/2 cursor-pointer rounded-full p-2 transition-colors"
           >
             <ChevronRight className="h-8 w-8" />
           </button>
@@ -118,7 +126,7 @@ const LandingPage = () => {
         <div className="w-full max-w-7xl space-y-8 overflow-hidden">
           {/* 첫 번째 줄 - 왼쪽으로 스크롤 */}
           <div className="relative flex">
-            <div className="flex animate-scroll-left gap-12">
+            <div className="animate-scroll-left flex gap-12">
               {[
                 'university1.png',
                 'university2.png',
@@ -157,7 +165,7 @@ const LandingPage = () => {
 
           {/* 두 번째 줄 - 오른쪽으로 스크롤 */}
           <div className="relative flex">
-            <div className="flex animate-scroll-right gap-12">
+            <div className="animate-scroll-right flex gap-12">
               {[
                 'university8.png',
                 'university9.png',
@@ -233,7 +241,7 @@ const LandingPage = () => {
           HOW IT WORKS
         </span>
         <h2 className="mb-24 text-center text-4xl leading-tight font-bold">
-          <span className="bg-linear-to-r from-[#42C2FF] to-foundation-blue-9 bg-clip-text text-transparent">
+          <span className="to-foundation-blue-9 bg-linear-to-r from-[#42C2FF] bg-clip-text text-transparent">
             전공 공부
           </span>
           를 게임처럼
@@ -318,7 +326,7 @@ const LandingPage = () => {
 
       {/* Step Section */}
       <section className="flex flex-col items-center py-24">
-        <span className="bg-linear-to-r from-[#42C2FF] to-foundation-blue-9 bg-clip-text mb-4 text-xl font-bold tracking-widest uppercase text-transparent">
+        <span className="to-foundation-blue-9 mb-4 bg-linear-to-r from-[#42C2FF] bg-clip-text text-xl font-bold tracking-widest text-transparent uppercase">
           NOW, SIMVEX
         </span>
         <h2 className="mb-12 text-center text-4xl leading-tight font-bold">
@@ -328,7 +336,7 @@ const LandingPage = () => {
         </h2>
         <button
           onClick={() => navigate('/topic')}
-          className="cursor-pointer bg-foundation-black-text mb-20 flex items-center gap-2 rounded-full px-5 py-3 text-base font-bold text-white hover:bg-black"
+          className="bg-foundation-black-text mb-20 flex cursor-pointer items-center gap-2 rounded-full px-5 py-3 text-base font-bold text-white hover:bg-black"
         >
           지금 바로 시작하기 <ChevronRight className="h-5 w-5" />
         </button>
