@@ -77,11 +77,19 @@ const LandingPage = () => {
           </button>
 
           {/* 캐러셀 이미지 */}
-          <div className="overflow-hidden rounded-2xl">
+          <div className="relative overflow-hidden rounded-2xl">
+            {/* 파란색 빛 번짐 효과 (Glow) */}
+            <div
+              className="pointer-events-none absolute inset-0 z-0"
+              style={{
+                background:
+                  'radial-gradient(ellipse at center, rgba(40, 49, 255, 0.4) 0%, rgba(40, 49, 255, 0) 70%)',
+              }}
+            />
             <img
               src={CAROUSEL_IMAGES[currentIndex]}
               alt={`랜딩 이미지 ${currentIndex + 1}`}
-              className="h-96 w-full object-contain transition-all duration-500"
+              className="relative z-10 h-96 w-full object-contain transition-all duration-500"
             />
           </div>
 
