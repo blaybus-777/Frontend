@@ -15,7 +15,7 @@ export const useModelSearch = (tag: string[], search: string) => {
   return useQuery({
     queryKey: ['modelSearch', tag, search],
     queryFn: () => searchModels({ tag, search }),
-    enabled: !isEnumsLoading && tag.length > 0,
+    enabled: !isEnumsLoading && (tag.length > 0 || search.trim().length > 0),
     select: (data) =>
       data.items.map((item) => {
         const assetKey = modelCodeMap[item.code.toLowerCase()];

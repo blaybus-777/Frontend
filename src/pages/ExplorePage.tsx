@@ -11,7 +11,8 @@ import type { ExtendedModel } from '@/hooks/useModelList';
 
 function ExplorePage() {
   const [selectedTag, setSelectedTag] = useState('전체');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // 실제 검색에 사용되는 쿼리
+  const [inputValue, setInputValue] = useState(''); // 입력 필드의 값
   
   // Enum 데이터 가져오기
   const { levelTags, levelTagMap, levelDisplayMap, isLoading: isEnumsLoading } = useEnums();
@@ -33,9 +34,22 @@ function ExplorePage() {
   } = useModelSearch(apiTag, searchQuery);
   
   // 전체인 경우 목록, 아닌 경우 검색 결과 사용
-  const displayData = selectedTag === '전체' ? modelList : searchResults;
-  const isLoading = selectedTag === '전체' ? isListLoading : isSearchLoading || isEnumsLoading;
-  const isError = selectedTag === '전체' ? isListError : isSearchError;
+  const shouldUseSearch = selectedTag !== '전체' || searchQuery.trim().length > 0;
+  const displayData = shouldUseSearch ? searchResults : modelList;
+  const isLoading = shouldUseSearch ? isSearchLoading || isEnumsLoading : isListLoading;
+  const isError = shouldUseSearch ? isSearchError : isListError;
+
+  // 검색 실행 함수
+  const handleSearch = () => {
+    setSearchQuery(inputValue);
+  };
+
+  // Enter 키로 검색
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <>
@@ -72,11 +86,24 @@ function ExplorePage() {
                 <input
                   type="text"
                   placeholder="검색"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border-default-gray-3 text-foundation-black-text placeholder:text-tertiary-gray-3 focus:border-foundation-black-text w-full rounded-xl border-2 px-4 py-2.5 transition-colors focus:outline-none"
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    // 검색어가 비워지면 즉시 전체 목록으로 복귀
+                    if (e.target.value.trim() === '') {
+                      setSearchQuery('');
+                    }
+                  }}
+                  onKeyPress={handleKeyPress}
+                  className="border-default-gray-3 text-foundation-black-text placeholder:text-tertiary-gray-3 focus:border-foundation-black-text w-full rounded-xl border-2 px-4 py-2.5 pr-10 transition-colors focus:outline-none"
                 />
-                <Search className="absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                <button
+                  onClick={handleSearch}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label="검색"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
               </div>
             </div>
           </div>
