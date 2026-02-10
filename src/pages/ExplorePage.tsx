@@ -2,21 +2,89 @@ import Footer from '@/components/layout/Footer';
 import ExploreSidebar from '@/components/explore/ExploreSidebar';
 import CourseCard from '@/components/course/CourseCard';
 import { Search } from 'lucide-react';
-import { useState } from 'react';
-import { TAGS } from '@/constants/explore';
+import { useState, useMemo } from 'react';
 import { FINAL_PREVIEW_URLS } from '@/constants/assets';
 import { useModelList } from '@/hooks/useModelList';
+import { useModelSearch } from '@/hooks/useModelSearch';
+import { useEnums } from '@/hooks/useEnums';
 import type { ExtendedModel } from '@/hooks/useModelList';
 
 function ExplorePage() {
+  const [selectedCategory, setSelectedCategory] = useState('전체'); // 사이드바 카테고리
   const [selectedTag, setSelectedTag] = useState('전체');
-  const { data: modelList, isLoading, isError } = useModelList();
+  const [searchQuery, setSearchQuery] = useState(''); // 실제 검색에 사용되는 쿼리
+  const [inputValue, setInputValue] = useState(''); // 입력 필드의 값
+
+  // Enum 데이터 가져오기
+  const {
+    levelTags,
+    levelTagMap,
+    levelDisplayMap,
+    isLoading: isEnumsLoading,
+  } = useEnums();
+
+  // 전체 목록 조회
+  const {
+    data: modelList,
+    isLoading: isListLoading,
+    isError: isListError,
+  } = useModelList();
+
+  // 태그 목록 생성 (전체 + API에서 가져온 난이도 태그)
+  const tags = useMemo(() => {
+    return ['전체', ...levelTags.map((tag) => tag.code)];
+  }, [levelTags]);
+
+  // 난이도별 검색
+  const apiTag =
+    selectedTag !== '전체' && levelTagMap[selectedTag]
+      ? [levelTagMap[selectedTag]]
+      : [];
+  const {
+    data: searchResults,
+    isLoading: isSearchLoading,
+    isError: isSearchError,
+  } = useModelSearch(apiTag, searchQuery);
+
+  // 전체인 경우 목록, 아닌 경우 검색 결과 사용
+  const shouldUseSearch =
+    selectedTag !== '전체' || searchQuery.trim().length > 0;
+  const displayData = shouldUseSearch ? searchResults : modelList;
+  const isLoading = shouldUseSearch
+    ? isSearchLoading || isEnumsLoading
+    : isListLoading;
+  const isError = shouldUseSearch ? isSearchError : isListError;
+
+  // 카테고리별 필터링 (부분 일치 허용)
+  const filteredByCategory = useMemo(() => {
+    if (!displayData || selectedCategory === '전체') return displayData;
+
+    return displayData.filter((model: ExtendedModel) => {
+      // 제목에 카테고리 이름이 포함되어 있는지 확인
+      return model.title.includes(selectedCategory);
+    });
+  }, [displayData, selectedCategory]);
+
+  // 검색 실행 함수
+  const handleSearch = () => {
+    setSearchQuery(inputValue);
+  };
+
+  // Enter 키로 검색
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <>
       <div className="mx-auto my-20 flex h-full w-full max-w-[1200px] gap-10 px-4 md:px-6">
         <div>
-          <ExploreSidebar />
+          <ExploreSidebar
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
         </div>
         <div className="flex w-full flex-col justify-between gap-6">
           {/* Header Section */}
@@ -27,7 +95,7 @@ function ExplorePage() {
             <div className="flex items-center justify-between">
               {/* Tags */}
               <div className="flex gap-2">
-                {TAGS.map((tag) => (
+                {tags.map((tag) => (
                   <button
                     key={tag}
                     onClick={() => setSelectedTag(tag)}
@@ -37,7 +105,7 @@ function ExplorePage() {
                         : 'text-foundation-black-text border-default-gray-3 hover:bg-foundation-gray-1 bg-white'
                     }`}
                   >
-                    {tag}
+                    {levelDisplayMap[tag] || tag}
                   </button>
                 ))}
               </div>
@@ -47,9 +115,24 @@ function ExplorePage() {
                 <input
                   type="text"
                   placeholder="검색"
-                  className="border-default-gray-3 text-foundation-black-text placeholder:text-tertiary-gray-3 focus:border-foundation-black-text w-full rounded-xl border-2 px-4 py-2.5 transition-colors focus:outline-none"
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    // 검색어가 비워지면 즉시 전체 목록으로 복귀
+                    if (e.target.value.trim() === '') {
+                      setSearchQuery('');
+                    }
+                  }}
+                  onKeyPress={handleKeyPress}
+                  className="border-default-gray-3 text-foundation-black-text placeholder:text-tertiary-gray-3 focus:border-foundation-black-text w-full rounded-xl border-2 px-4 py-2.5 pr-10 transition-colors focus:outline-none"
                 />
-                <Search className="absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                <button
+                  onClick={handleSearch}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
+                  aria-label="검색"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
               </div>
             </div>
           </div>
@@ -61,7 +144,7 @@ function ExplorePage() {
             ) : isError ? (
               <div>Error loading courses</div>
             ) : (
-              modelList
+              filteredByCategory
                 ?.filter(
                   (course: ExtendedModel) =>
                     course.assetKey &&

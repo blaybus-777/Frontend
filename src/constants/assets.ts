@@ -87,8 +87,9 @@ export const ASSETS: Record<string, AssetData> = {
     image: '/img/6.png',
     parts: {
       base: '/models/last/suspention/Base.glb',
-      rod: '/models/last/suspention/Rod.glb',
+      nit: '/models/last/suspention/Nit.glb',
       nut: '/models/last/suspention/Nut1.glb',
+      rod: '/models/last/suspention/Rod.glb',
       spring: '/models/last/suspention/Spring.glb',
     },
   },
