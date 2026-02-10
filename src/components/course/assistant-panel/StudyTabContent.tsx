@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useCourseStore } from '@/stores/useCourseStore';
-import { STUDY_CONTENT_BY_ID, PART_STUDY_CONTENT } from './studyContentData';
+import { STUDY_CONTENT_BY_ID } from './studyContentData';
 import { MOCK_LEARNING_CONTENT } from './mockData';
 import { usePartDetail } from '@/hooks/usePartDetail';
 import { useMemo } from 'react';
@@ -138,9 +138,7 @@ function PartInfoCard({
         )}
 
         {/* Role Section */}
-        {role.length > 0 && (
-          <ContentSection title="부품의 역할" items={role} />
-        )}
+        {role.length > 0 && <ContentSection title="부품의 역할" items={role} />}
       </div>
     </div>
   );
