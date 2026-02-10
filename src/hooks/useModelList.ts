@@ -34,7 +34,11 @@ export const useModelList = () => {
 
         return {
           ...item,
-          code: modelMap[assetKey] || item.code,
+          code:
+            modelMap[assetKey!] ||
+            (modelCodeMap[item.code.trim().toLowerCase()] &&
+              modelMap[modelCodeMap[item.code.trim().toLowerCase()]]) ||
+            item.code,
           tag: item.tag?.map((t: string) => tagMap[t] || t) || [],
           image: assetData.image,
           modelUrls: Object.values(assetData.parts),

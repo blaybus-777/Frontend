@@ -30,7 +30,7 @@ function Header() {
           <Link to="#" className={`font-bold ${getLinkColor('#')}`}>
             CAD
           </Link>
-          <Link to="#" className={`font-bold ${getLinkColor('#')}`}>
+          <Link to="/lab" className={`font-bold ${getLinkColor('/lab')}`}>
             Lab
           </Link>
         </div>

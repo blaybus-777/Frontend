@@ -11,4 +11,30 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (
+              id.includes('/three') ||
+              id.includes('@react-three') ||
+              id.includes('three-stdlib')
+            ) {
+              return 'three-vendor';
+            }
+            if (id.includes('@xyflow')) {
+              return 'flow-vendor';
+            }
+            if (id.includes('@mdxeditor')) {
+              return 'editor-vendor';
+            }
+            if (id.includes('@tanstack')) {
+              return 'query-vendor';
+            }
+          }
+        },
+      },
+    },
+  },
 });

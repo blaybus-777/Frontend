@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
 import CourseControlPanel from '@/components/course/CourseControlPanel';
 import CourseHierarchyTree from '@/components/course/CourseHierarchyTree';
 import CourseRightSidebar from '@/components/course/CourseRightSidebar';
 import CourseAssistantPanel from '@/components/course/assistant-panel';
 import ModelViewer from '@/components/course/ModelViewer';
 import { useCourseDetail } from '@/hooks/useCourseDetail';
+import { useEffect, useRef } from 'react';
 import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
 import { useParams } from 'react-router-dom';
 import { PART_ID_MAPPING } from '@/data/partMapping';
@@ -22,6 +22,7 @@ export default function CourseDetailLayout({
   const { viewMode, explosionLevel, explodeSpace, setModelId } =
     useCourseDetail();
   const { detail, isLoading, isError } = useCourseModelDetail(id);
+  const lastDetailRef = useRef(detail);
 
   // modelId가 변경될 때 store 업데이트
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function CourseDetailLayout({
     }
   }, [id, setModelId]);
 
-  const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 2;
+  const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 0.6;
 
   return (
     <div className="w-full">
@@ -55,18 +56,18 @@ export default function CourseDetailLayout({
         <div className="flex flex-1 overflow-hidden">
           {/* Center: 3D Viewer Placeholder */}
           <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gray-100">
-            {isLoading ? (
+            {isLoading && !lastDetailRef.current ? (
               <div className="text-center text-sm text-gray-500">
                 3D 모델을 불러오는 중입니다.
               </div>
-            ) : isError || !detail ? (
+            ) : isError && !lastDetailRef.current ? (
               <div className="text-center text-sm text-gray-500">
                 3D 모델을 불러올 수 없습니다.
               </div>
             ) : (
               <div className="h-full w-full">
                 <ModelViewer
-                  urls={detail.modelUrls}
+                  urls={(detail ?? lastDetailRef.current)?.modelUrls ?? []}
                   selectedPartId={selectedPartId}
                   onSelect={(part) => {
                     if (part) {
@@ -79,8 +80,10 @@ export default function CourseDetailLayout({
                   viewMode={viewMode}
                   explodeDistance={explodeDistance}
                   explodeSpace={explodeSpace}
-                  assetKey={detail.assetKey}
-                  storageKey={`viewer:${detail.assetKey}:${id ?? 'unknown'}`}
+                  assetKey={(detail ?? lastDetailRef.current)?.assetKey}
+                  storageKey={`viewer:${
+                    (detail ?? lastDetailRef.current)?.assetKey ?? 'unknown'
+                  }:${id ?? 'unknown'}`}
                 />
               </div>
             )}

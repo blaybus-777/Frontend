@@ -15,6 +15,7 @@ export const useCourseDetail = () => {
     explodeSpace,
     setExplodeSpace,
     explosionLevel,
+    setExplosionLevel,
     transformMode,
     setTransformMode,
     selectedPartTransform,
@@ -32,6 +33,7 @@ export const useCourseDetail = () => {
       explodeSpace: state.explodeSpace,
       setExplodeSpace: state.setExplodeSpace,
       explosionLevel: state.explosionLevel,
+      setExplosionLevel: state.setExplosionLevel,
       transformMode: state.transformMode,
       setTransformMode: state.setTransformMode,
       selectedPartTransform: state.selectedPartTransform,
@@ -54,6 +56,7 @@ export const useCourseDetail = () => {
     // Actions
     setViewMode,
     setExplodeSpace,
+    setExplosionLevel,
     setTransformMode,
     setSelectedPartTransform,
     setSelectedPartId,

@@ -114,8 +114,10 @@ export default function AiTutorTabContent() {
       try {
         const response = await getChatHistory(modelId);
         // 응답이 배열이거나 { items: [] } 형태인 경우 모두 대응
-        const items = Array.isArray(response) ? response : response?.items || [];
-        
+        const items = Array.isArray(response)
+          ? response
+          : response?.items || [];
+
         // historyId 기준으로 정렬
         const sortedItems = [...items].sort((a, b) => {
           if (a.historyId && b.historyId) return a.historyId - b.historyId;
@@ -156,9 +158,7 @@ export default function AiTutorTabContent() {
       role: 'USER',
       promptRes: '',
       message: displayQuestion,
-      files: data.files.map(
-        (f, i) => `${filePreviews[i]}|${f.type}|${f.name}`
-      ),
+      files: data.files.map((f, i) => `${filePreviews[i]}|${f.type}|${f.name}`),
     } as ChatMessage;
 
     setMessages((prev) => [...prev, newUserMessage]);
@@ -176,12 +176,14 @@ export default function AiTutorTabContent() {
       };
 
       const response = await askQuestion(requestData, data.files);
-      const responseItems = Array.isArray(response) ? response : response?.items || [];
-      
+      const responseItems = Array.isArray(response)
+        ? response
+        : response?.items || [];
+
       setMessages((prev) => {
         // 기존 메시지(낙관적 업데이트 포함)와 새 응답 합치기
         const combined = [...prev, ...responseItems];
-        
+
         // historyId 기준으로 중복 제거 및 최신 데이터 유지
         const messageMap = new Map<number, ChatMessage>();
         const temporaryMessages: ChatMessage[] = [];
@@ -320,7 +322,8 @@ export default function AiTutorTabContent() {
                   const isUser = msg.role === 'USER';
                   const isAssistant = msg.role === 'ASSISTANT';
                   // question이나 promptRes가 없으면 message 필드를 대체제로 사용
-                  const userContent = msg.question || (isUser ? msg.message : '');
+                  const userContent =
+                    msg.question || (isUser ? msg.message : '');
                   const assistantContent =
                     msg.promptRes || (isAssistant ? msg.message : '');
 
@@ -353,9 +356,13 @@ export default function AiTutorTabContent() {
                                       .pop()
                                       ?.toLowerCase();
                                     if (
-                                      ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(
-                                        ext || ''
-                                      )
+                                      [
+                                        'jpg',
+                                        'jpeg',
+                                        'png',
+                                        'gif',
+                                        'webp',
+                                      ].includes(ext || '')
                                     ) {
                                       fileType = 'image/jpeg';
                                     } else if (ext === 'pdf') {
@@ -371,7 +378,7 @@ export default function AiTutorTabContent() {
                                     return (
                                       <div
                                         key={fIdx}
-                                        className="relative h-24 w-24 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer"
+                                        className="relative h-24 w-24 cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
                                         onClick={() =>
                                           setPreviewImageUrl(displayUrl)
                                         }
@@ -388,9 +395,9 @@ export default function AiTutorTabContent() {
                                   return (
                                     <div
                                       key={fIdx}
-                                      className="flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 p-2 text-gray-700 shadow-sm min-w-[160px]"
+                                      className="flex min-w-[160px] items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2 text-gray-700 shadow-sm"
                                     >
-                                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white border border-gray-100">
+                                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-gray-100 bg-white">
                                         {fileType === 'application/pdf' ||
                                         fileName
                                           .toLowerCase()
@@ -400,7 +407,7 @@ export default function AiTutorTabContent() {
                                           <FileIcon className="h-5 w-5 text-gray-500" />
                                         )}
                                       </div>
-                                      <span className="text-xs font-medium truncate max-w-[120px]">
+                                      <span className="max-w-[120px] truncate text-xs font-medium">
                                         {fileName}
                                       </span>
                                     </div>
@@ -499,10 +506,10 @@ export default function AiTutorTabContent() {
                     return (
                       <div
                         key={index}
-                        className="group relative h-13.5 flex-1 min-w-0"
+                        className="group relative h-13.5 min-w-0 flex-1"
                       >
                         <div
-                          className="h-full w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer"
+                          className="h-full w-full cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
                           onClick={() => setPreviewImageUrl(previewUrl)}
                         >
                           <img
@@ -516,7 +523,7 @@ export default function AiTutorTabContent() {
                         <button
                           type="button"
                           onClick={() => removeFile(index)}
-                          className="absolute top-1 right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/20 text-white opacity-0 transition-opacity hover:bg-black/40 group-hover:opacity-100"
+                          className="absolute top-1 right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/20 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/40"
                           title="삭제"
                         >
                           <X className="h-3.5 w-3.5" />

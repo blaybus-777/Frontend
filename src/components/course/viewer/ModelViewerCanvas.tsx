@@ -102,6 +102,19 @@ export default function ModelViewerCanvas({
     }
   }, [storageKey]);
 
+  const handleControlsChange = useCallback(() => {
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+    }
+    saveTimerRef.current = window.setTimeout(() => {
+      saveState();
+    }, 120);
+  }, [saveState]);
+
+  const handleControlsEnd = useCallback(() => {
+    saveState();
+  }, [saveState]);
+
   const resetView = () => {
     if (!storageKey || !controlsRef.current || !cameraRef.current) return;
     try {
@@ -129,32 +142,6 @@ export default function ModelViewerCanvas({
     tick();
     return () => cancelAnimationFrame(rafId);
   }, [restoreState, storageKey]);
-
-  useEffect(() => {
-    const controls = controlsRef.current;
-    if (!controls) return;
-
-    const onChange = () => {
-      if (saveTimerRef.current) {
-        window.clearTimeout(saveTimerRef.current);
-      }
-      saveTimerRef.current = window.setTimeout(() => {
-        saveState();
-      }, 120);
-    };
-
-    const onEnd = () => {
-      saveState();
-    };
-
-    controls.addEventListener('change', onChange);
-    controls.addEventListener('end', onEnd);
-
-    return () => {
-      controls.removeEventListener('change', onChange);
-      controls.removeEventListener('end', onEnd);
-    };
-  }, [saveState]);
 
   return (
     <div
@@ -223,6 +210,8 @@ export default function ModelViewerCanvas({
           enableDamping
           enableZoom
           enablePan
+          onChange={handleControlsChange}
+          onEnd={handleControlsEnd}
           mouseButtons={{
             LEFT: THREE.MOUSE.PAN,
             MIDDLE: THREE.MOUSE.DOLLY,

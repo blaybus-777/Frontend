@@ -41,6 +41,7 @@ interface MeshExplodeData {
   originalPosition: THREE.Vector3;
   localDirection: THREE.Vector3;
   worldDirection: THREE.Vector3;
+  sizeRatio: number;
 }
 
 function hasColor(
@@ -181,6 +182,51 @@ function applyViewerMaterialTuning(
       material.needsUpdate = true;
     });
   });
+}
+
+// function saveSceneTransforms(
+//   root: THREE.Object3D,
+//   storageKey: string | null,
+//   lastSavedRef: MutableRefObject<number>
+// ) {
+//   if (assetKey && assetKey !== 'Quadcopter_DRONE') {
+//     const finalUrl = FINAL_ASSET_URLS[assetKey];
+//     return finalUrl ? [finalUrl] : urls.slice(0, 1);
+//   }
+//   if (!selectedPartId || assetKey !== 'Quadcopter_DRONE') {
+//     return urls.slice(0, 1);
+//   }
+//   const file = DRONE_PART_ID_TO_FILE[selectedPartId];
+//   if (!file) return urls.slice(0, 1);
+//   const match = urls.find((url) => url.endsWith(`/${file}`));
+//   return match ? [match] : urls.slice(0, 1);
+// }
+
+function getExplodeScale(assetKey: string | undefined) {
+  if (assetKey === 'SUSPENSION') return 0.85;
+  if (assetKey === 'ROBOT_ARM') return 0.75;
+  return 1;
+}
+
+function weightDirection(
+  assetKey: string | undefined,
+  direction: THREE.Vector3
+) {
+  if (assetKey === 'SUSPENSION') {
+    return new THREE.Vector3(
+      direction.x * 0.6,
+      direction.y * 1.4,
+      direction.z * 0.8
+    ).normalize();
+  }
+  if (assetKey === 'ROBOT_ARM') {
+    return new THREE.Vector3(
+      direction.x * 1.2,
+      direction.y * 0.8,
+      direction.z * 1.1
+    ).normalize();
+  }
+  return direction;
 }
 
 function saveSceneTransforms(
@@ -326,7 +372,10 @@ export default function ModelScene({
     if (selectedPartId) {
       const fileName = DRONE_PART_ID_TO_FILE[selectedPartId];
       if (fileName) {
-        const match = urls.find((url) => url.endsWith(`/${fileName}`));
+        const match = urls.find((url) => {
+          const decodedUrl = decodeURIComponent(url).toLowerCase();
+          return decodedUrl.endsWith(`/${fileName.toLowerCase()}`);
+        });
         if (match) return [match];
       }
 
@@ -334,8 +383,13 @@ export default function ModelScene({
       const meshName = PART_NAME_MAPPING[selectedPartId];
       if (meshName) {
         const match = urls.find((url) => {
-          const decodedUrl = decodeURIComponent(url);
-          return decodedUrl.endsWith(`/${meshName}.glb`);
+          const decodedUrl = decodeURIComponent(url).toLowerCase();
+          const targetBase = meshName.toLowerCase();
+          return (
+            decodedUrl.endsWith(`/${targetBase}.glb`) ||
+            decodedUrl.endsWith(`/${targetBase.replace(/\s+/g, '_')}.glb`) ||
+            decodedUrl.endsWith(`/${targetBase.replace(/_/g, ' ')}.glb`)
+          );
         });
         if (match) return [match];
       }
@@ -415,9 +469,9 @@ export default function ModelScene({
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3()).length();
 
-      // 부품 크기에 맞춰 화면에 꽉 차도록 거리 계산 (최소 거리 제한을 대폭 낮춤)
-      // size * 1.5~2.0 정도면 45도 FOV에서 부품이 화면에 적절히 꽉 참
-      const targetDistance = Math.max(size * 1.8, 0.1);
+      // 부품 크기에 맞춰 화면에 꽉 차도록 거리 계산
+      // size * 1.2~1.5 정도면 45도 FOV에서 부품이 화면에 적절히 꽉 참
+      const targetDistance = Math.max(size * 1.2, 0.05);
 
       if (orbitControls) {
         targetLookAt.current.copy(center);
@@ -434,20 +488,23 @@ export default function ModelScene({
     if (!groupRef.current) return;
 
     const group = groupRef.current;
+
     group.position.set(0, 0, 0);
     const box = new THREE.Box3().setFromObject(group);
     const size = box.getSize(new THREE.Vector3()).length();
+    const groupSize = size || 1;
     const center = box.getCenter(new THREE.Vector3());
 
     group.position.sub(center);
 
     restoreSceneTransforms(group, transformsKey);
 
-    // 전체 모델 보기 또는 단일 부품 보기 시의 카메라 거리 조정
-    // 단일 부품일 때는 size가 작으므로 distance도 그에 맞춰 작아져야 함
-    const distance = Math.max(size * 1.5, 0.2);
+    // 단일 부품 모드 등에서 초기 거리를 설정할 때도 작은 부품에 대응하도록 최소값 조정
+    const distance = Math.max(size * 1.1, 0.1);
+    const defaultDistance = Math.max(size * 1.1, 0.1);
+
     if (!hasStoredView && (!orbitControls || canSetDefaultView)) {
-      camera.position.set(distance, distance * 0.75, distance);
+      camera.position.set(distance * 0.5, distance * 0.2, distance);
       camera.lookAt(0, 0, 0);
       if (orbitControls) {
         orbitControls.target.set(0, 0, 0);
@@ -455,7 +512,32 @@ export default function ModelScene({
         orbitControls.saveState();
       }
     }
-    targetCameraPos.current.set(distance, distance * 0.75, distance);
+    if (hasStoredView && orbitControls) {
+      const centerWorld = new THREE.Vector3(0, 0, 0);
+      const cameraDistance = camera.position.distanceTo(centerWorld);
+      const targetDistance = orbitControls.target.distanceTo(centerWorld);
+      const minDistance = Math.max(size * 0.2, 0.8);
+      const maxDistance = Math.max(size * 6, 12);
+      const maxTargetDistance = Math.max(size * 1.5, 3);
+      const invalidCamera =
+        !Number.isFinite(cameraDistance) ||
+        cameraDistance < minDistance ||
+        cameraDistance > maxDistance;
+      const invalidTarget =
+        !Number.isFinite(targetDistance) || targetDistance > maxTargetDistance;
+      if (invalidCamera || invalidTarget) {
+        camera.position.set(
+          defaultDistance * 0.5,
+          defaultDistance * 0.2,
+          defaultDistance
+        );
+        camera.lookAt(0, 0, 0);
+        orbitControls.target.set(0, 0, 0);
+        orbitControls.update();
+        orbitControls.saveState();
+      }
+    }
+    targetCameraPos.current.set(distance * 0.5, distance * 0.2, distance);
     targetLookAt.current.set(0, 0, 0);
     isMovingCamera.current = true;
 
@@ -467,23 +549,27 @@ export default function ModelScene({
       if (!(child instanceof THREE.Mesh)) return;
 
       const originalPosition = child.position.clone();
-      const parent = child.parent ?? group;
-      const meshWorld = child.getWorldPosition(new THREE.Vector3());
+      const meshBox = new THREE.Box3().setFromObject(child);
+      const meshCenterWorld = meshBox.getCenter(new THREE.Vector3());
       const centerWorld = new THREE.Vector3(0, 0, 0);
-      const meshLocal = parent.worldToLocal(meshWorld.clone());
-      const centerLocal = parent.worldToLocal(centerWorld.clone());
-      const worldDirection = meshLocal.sub(centerLocal).normalize();
+      const worldDirection = meshCenterWorld
+        .clone()
+        .sub(centerWorld)
+        .normalize();
 
       let localDirection = originalPosition.clone().normalize();
       if (localDirection.length() === 0 && worldDirection.length() > 0) {
         localDirection = worldDirection.clone();
       }
+      const meshSize = meshBox.getSize(new THREE.Vector3()).length();
+      const sizeRatio = Math.min(1, meshSize / groupSize);
 
       meshes.push({
         mesh: child,
         originalPosition,
         localDirection,
         worldDirection,
+        sizeRatio,
       });
     });
     explodeDataRef.current = meshes;
@@ -529,8 +615,8 @@ export default function ModelScene({
     const center = box.getCenter(new THREE.Vector3());
     group.position.sub(center);
 
-    const distance = Math.max(size * 0.8, 2);
-    camera.position.set(distance, distance * 0.75, distance);
+    const distance = Math.max(size * 1.1, 0.1);
+    camera.position.set(distance * 0.5, distance * 0.2, distance);
     camera.lookAt(0, 0, 0);
     if (orbitControls) {
       orbitControls.target.set(0, 0, 0);
@@ -552,15 +638,20 @@ export default function ModelScene({
 
   useEffect(() => {
     explodeDataRef.current.forEach((item) => {
-      const direction =
+      const baseDirection =
         explodeSpace === 'local' ? item.localDirection : item.worldDirection;
+      const direction = weightDirection(assetKey, baseDirection.clone());
+      const distance =
+        explodeDistance *
+        getExplodeScale(assetKey) *
+        (1 + item.sizeRatio * 0.6);
       item.mesh.position.copy(
         item.originalPosition
           .clone()
-          .add(direction.clone().multiplyScalar(explodeDistance))
+          .add(direction.clone().multiplyScalar(distance))
       );
     });
-  }, [explodeDistance, explodeSpace]);
+  }, [explodeDistance, explodeSpace, assetKey]);
 
   useFrame(() => {
     if (!isMovingCamera.current || !orbitControls) return;

@@ -3,11 +3,11 @@ export interface AssetData {
   parts: Record<string, string>;
 }
 
-export const FINAL_ASSET_URLS: Partial<Record<string, string>> = {
-  Quadcopter_DRONE: '/models/final/Drone2.glb',
-  V4_ENGINE: '/models/final/v4.glb',
-  ROBOT_ARM: '/models/final/RobotArm.glb',
-  SUSPENSION: '/models/final/Suspention.glb',
+export const FINAL_ASSET_URLS: Partial<Record<keyof typeof ASSETS, string>> = {
+  Quadcopter_DRONE: '/models/last/final/Drone.glb',
+  V4_ENGINE: '/models/last/final/v4.glb',
+  ROBOT_ARM: '/models/last/final/RobotArm.glb',
+  SUSPENSION: '/models/last/final/Suspention1.glb',
 };
 
 export const FINAL_PREVIEW_URLS = FINAL_ASSET_URLS;
@@ -16,16 +16,16 @@ export const ASSETS: Record<string, AssetData> = {
   Quadcopter_DRONE: {
     image: '/img/1.png',
     parts: {
-      main_frame: '/models/drone/Main frame.glb',
-      arm_gear: '/models/drone/Arm gear.glb',
-      beater_disc: '/models/drone/Beater disc.glb',
-      gearing: '/models/drone/Gearing.glb',
-      xyz: '/models/drone/xyz.glb',
-      screw: '/models/drone/Screw.glb',
-      nut: '/models/drone/Nut.glb',
-      main_frame_mir: '/models/drone/Main frame_MIR.glb',
-      leg: '/models/drone/Leg.glb',
-      impeller_blade: '/models/drone/Impellar Blade.glb',
+      main_frame: '/models/last/drone/Main_Frame.glb',
+      arm_gear: '/models/last/drone/Arm Gear.glb',
+      beater_disc: '/models/last/drone/Beater_Disc.glb',
+      gearing: '/models/last/drone/Gearing.glb',
+      xyz: '/models/last/drone/xyz.glb',
+      screw: '/models/last/drone/Screw.glb',
+      nut: '/models/last/drone/Nut.glb',
+      main_frame_mir: '/models/last/drone/Main_Frame_MIR.glb',
+      leg: '/models/last/drone/Leg.glb',
+      impeller_blade: '/models/last/drone/Impeller_blade.glb',
     },
   },
   LEAF_SPRING: {
@@ -60,14 +60,14 @@ export const ASSETS: Record<string, AssetData> = {
   ROBOT_ARM: {
     image: '/img/4.png',
     parts: {
-      part2: '/models/robotArm/Part2.glb',
-      part3: '/models/robotArm/Part3.glb',
-      part4: '/models/robotArm/Part4.glb',
-      part5: '/models/robotArm/Part5.glb',
-      part6: '/models/robotArm/Part6.glb',
-      part7: '/models/robotArm/Part7.glb',
-      part8: '/models/robotArm/Part8.glb',
-      base: '/models/robotArm/base.glb',
+      actuator_housing: '/models/last/robotArm/Actuator_Hoursing.glb',
+      end_effector_mount: '/models/last/robotArm/End_Effector_Mount1.glb',
+      wrist_joint: '/models/last/robotArm/Wrist_Joint.glb',
+      parallel_gripper: '/models/last/robotArm/Parallel_Gripper.glb',
+      link_arm: '/models/last/robotArm/Link_Arm.glb',
+      joint_bracket: '/models/last/robotArm/Join_Bracket.glb',
+      rotary_base: '/models/last/robotArm/Rotary_Base.glb',
+      joint_coupling: '/models/last/robotArm/Join_Coupling.glb',
     },
   },
   ROBOT_GRIPPER: {
@@ -86,23 +86,22 @@ export const ASSETS: Record<string, AssetData> = {
   SUSPENSION: {
     image: '/img/6.png',
     parts: {
-      base: '/models/suspention/BASE.glb',
-      nit: '/models/suspention/NIT.glb',
-      nut: '/models/suspention/NUT.glb',
-      rod: '/models/suspention/ROD.glb',
-      spring: '/models/suspention/SPRING.glb',
+      base: '/models/last/suspention/Base.glb',
+      rod: '/models/last/suspention/Rod.glb',
+      nut: '/models/last/suspention/Nut1.glb',
+      spring: '/models/last/suspention/Spring.glb',
     },
   },
   V4_ENGINE: {
     image: '/img/7.png',
     parts: {
-      connecting_rod_cap: '/models/v4/Connecting Rod Cap.glb',
-      connecting_rod: '/models/v4/Connecting Rod.glb',
-      conrod_bolt: '/models/v4/Conrod Bolt.glb',
-      crankshaft: '/models/v4/Crankshaft.glb',
-      piston_pin: '/models/v4/Piston Pin.glb',
-      piston_ring: '/models/v4/Piston Ring.glb',
-      piston: '/models/v4/Piston.glb',
+      connecting_rod_cap: '/models/last/v4/Connecting_Rod_Cap.glb',
+      connecting_rod: '/models/last/v4/Conecting_Rod.glb',
+      conrod_bolt: '/models/last/v4/Conrod_Bolt.glb',
+      crankshaft: '/models/last/v4/Cranksharft.glb',
+      piston_pin: '/models/last/v4/Piston_Pin.glb',
+      piston_ring: '/models/last/v4/Piston_Ring.glb',
+      piston: '/models/last/v4/Piston.glb',
     },
   },
 };

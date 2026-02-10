@@ -113,7 +113,6 @@ export const MOCK_COURSES: Course[] = [
     tags: ['요소/조립체'],
     modelUrls: [
       '/models/suspention/BASE.glb',
-      '/models/suspention/NIT.glb',
       '/models/suspention/NUT.glb',
       '/models/suspention/ROD.glb',
       '/models/suspention/SPRING.glb',

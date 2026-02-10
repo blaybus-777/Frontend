@@ -61,23 +61,31 @@ function ExplorePage() {
             ) : isError ? (
               <div>Error loading courses</div>
             ) : (
-              modelList?.map((course: ExtendedModel) => {
-                const previewUrl = course.assetKey
-                  ? FINAL_PREVIEW_URLS[
+              modelList
+                ?.filter(
+                  (course: ExtendedModel) =>
+                    course.assetKey &&
+                    FINAL_PREVIEW_URLS[
                       course.assetKey as keyof typeof FINAL_PREVIEW_URLS
                     ]
-                  : undefined;
-                return (
-                  <CourseCard
-                    key={course.modelId}
-                    id={String(course.modelId)}
-                    title={course.title}
-                    image={course.image}
-                    tags={course.tag}
-                    modelUrls={previewUrl ? [previewUrl] : course.modelUrls}
-                  />
-                );
-              })
+                )
+                .map((course: ExtendedModel) => {
+                  const previewUrl = course.assetKey
+                    ? FINAL_PREVIEW_URLS[
+                        course.assetKey as keyof typeof FINAL_PREVIEW_URLS
+                      ]
+                    : undefined;
+                  return (
+                    <CourseCard
+                      key={course.modelId}
+                      id={String(course.modelId)}
+                      title={course.title}
+                      image={course.image}
+                      tags={course.tag}
+                      modelUrls={previewUrl ? [previewUrl] : course.modelUrls}
+                    />
+                  );
+                })
             )}
           </div>
         </div>
