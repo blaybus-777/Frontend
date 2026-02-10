@@ -372,7 +372,10 @@ export default function ModelScene({
     if (selectedPartId) {
       const fileName = DRONE_PART_ID_TO_FILE[selectedPartId];
       if (fileName) {
-        const match = urls.find((url) => url.endsWith(`/${fileName}`));
+        const match = urls.find((url) => {
+          const decodedUrl = decodeURIComponent(url).toLowerCase();
+          return decodedUrl.endsWith(`/${fileName.toLowerCase()}`);
+        });
         if (match) return [match];
       }
 
@@ -380,8 +383,13 @@ export default function ModelScene({
       const meshName = PART_NAME_MAPPING[selectedPartId];
       if (meshName) {
         const match = urls.find((url) => {
-          const decodedUrl = decodeURIComponent(url);
-          return decodedUrl.endsWith(`/${meshName}.glb`);
+          const decodedUrl = decodeURIComponent(url).toLowerCase();
+          const targetBase = meshName.toLowerCase();
+          return (
+            decodedUrl.endsWith(`/${targetBase}.glb`) ||
+            decodedUrl.endsWith(`/${targetBase.replace(/\s+/g, '_')}.glb`) ||
+            decodedUrl.endsWith(`/${targetBase.replace(/_/g, ' ')}.glb`)
+          );
         });
         if (match) return [match];
       }

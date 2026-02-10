@@ -15,12 +15,9 @@ export default function CourseHierarchyTree({
 }: CourseHierarchyTreeProps) {
   const { data, isLoading, error } = usePartHierarchy(modelId);
 
-  // 최상위 노드들 중에서 자식이 있는 노드만 필터링하여 유효한 트리 구조만 보여줍니다.
+  // 모든 노드를 보여줍니다.
   const items = useMemo(() => {
-    return (
-      data?.items.filter((node) => node.children && node.children.length > 0) ||
-      []
-    );
+    return data?.items || [];
   }, [data]);
 
   return (
