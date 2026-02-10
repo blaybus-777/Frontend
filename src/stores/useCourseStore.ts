@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface CourseState {
   // State
@@ -34,11 +35,13 @@ interface CourseState {
   ) => void;
 }
 
-export const useCourseStore = create<CourseState>((set) => ({
-  // Initial State
-  activeTab: 'study',
-  isPanelOpen: true,
-  selectedPartId: null,
+export const useCourseStore = create<CourseState>()(
+  persist(
+    (set) => ({
+      // Initial State
+      activeTab: 'study',
+      isPanelOpen: true,
+      selectedPartId: null,
 
   // Actions
   setActiveTab: (tab) =>
@@ -74,5 +77,14 @@ export const useCourseStore = create<CourseState>((set) => ({
   setTransformMode: (mode) => set({ transformMode: mode }),
 
   selectedPartTransform: null,
-  setSelectedPartTransform: (value) => set({ selectedPartTransform: value }),
-}));
+      setSelectedPartTransform: (value) => set({ selectedPartTransform: value }),
+    }),
+    {
+      name: 'course-panel',
+      partialize: (state) => ({
+        activeTab: state.activeTab,
+        isPanelOpen: state.isPanelOpen,
+      }),
+    }
+  )
+);
