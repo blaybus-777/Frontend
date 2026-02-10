@@ -365,34 +365,36 @@ export default function AiTutorTabContent() {
 
         {/* Input Area */}
         <div className="border-t p-4">
-          <div className="flex flex-col gap-2 rounded-2xl bg-gray-100 p-4">
+          <div className="flex grid-cols-2 flex-col gap-2 rounded-2xl bg-gray-100 p-4">
             {/* Selected Files Preview */}
             {selectedFiles.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-3">
+              <div className="mb-2 flex flex-wrap gap-2">
                 {selectedFiles.map((file, index) => {
                   const isImage = file.type.startsWith('image/');
                   const previewUrl = filePreviews[index];
 
                   if (isImage && previewUrl) {
                     return (
-                      <div key={index} className="group relative">
-                        <button
-                          type="button"
+                      <div key={index} className="group relative h-13.5 w-13.5">
+                        <div
+                          className="h-full w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer"
                           onClick={() => setPreviewImageUrl(previewUrl)}
-                          className="h-13.5 w-13.5 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
                         >
                           <img
                             src={previewUrl}
                             alt={file.name}
                             className="h-full w-full object-cover"
                           />
-                        </button>
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100" />
+                        </div>
                         <button
                           type="button"
                           onClick={() => removeFile(index)}
-                          className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                          className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center text-white opacity-0 transition-opacity group-hover:opacity-100"
+                          title="삭제"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     );
@@ -401,21 +403,25 @@ export default function AiTutorTabContent() {
                   return (
                     <div
                       key={index}
-                      className="flex items-center gap-1.5 rounded-lg bg-white px-2 py-1 text-xs text-gray-600 shadow-sm"
+                      className="group relative flex h-13.5 min-w-0 flex-1 items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 shadow-sm"
                     >
-                      {file.type === 'application/pdf' ? (
-                        <FileText className="h-3 w-3 text-red-500" />
-                      ) : (
-                        <FileIcon className="h-3 w-3 text-gray-500" />
-                      )}
-                      <span className="max-w-25 truncate">{file.name}</span>
                       <button
                         type="button"
                         onClick={() => removeFile(index)}
-                        className="ml-1 text-gray-400 hover:text-gray-600"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-gray-50 transition-colors group-hover:bg-gray-200"
                       >
-                        <X className="h-3 w-3" />
+                        <div className="group-hover:hidden">
+                          {file.type === 'application/pdf' ? (
+                            <FileText className="h-6 w-6 text-red-500" />
+                          ) : (
+                            <FileIcon className="h-6 w-6 text-gray-500" />
+                          )}
+                        </div>
+                        <X className="hidden h-6 w-6 text-gray-600 group-hover:block" />
                       </button>
+                      <span className="truncate text-sm font-medium text-gray-700">
+                        {file.name}
+                      </span>
                     </div>
                   );
                 })}
