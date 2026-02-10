@@ -113,8 +113,17 @@ export default function AiTutorTabContent() {
 
       try {
         const response = await getChatHistory(modelId);
-        setMessages(response.items);
-        if (response.items.length > 0) {
+        // 응답이 배열이거나 { items: [] } 형태인 경우 모두 대응
+        const items = Array.isArray(response) ? response : response?.items || [];
+        
+        // historyId 기준으로 정렬
+        const sortedItems = [...items].sort((a, b) => {
+          if (a.historyId && b.historyId) return a.historyId - b.historyId;
+          return 0;
+        });
+
+        setMessages(sortedItems);
+        if (sortedItems.length > 0) {
           setShowSuggestions(false);
         }
       } catch (error) {
@@ -167,10 +176,11 @@ export default function AiTutorTabContent() {
       };
 
       const response = await askQuestion(requestData, data.files);
+      const responseItems = Array.isArray(response) ? response : response?.items || [];
       
       setMessages((prev) => {
         // 기존 메시지(낙관적 업데이트 포함)와 새 응답 합치기
-        const combined = [...prev, ...response.items];
+        const combined = [...prev, ...responseItems];
         
         // historyId 기준으로 중복 제거 및 최신 데이터 유지
         const messageMap = new Map<number, ChatMessage>();
@@ -306,100 +316,122 @@ export default function AiTutorTabContent() {
             ) : (
               /* 채팅 메시지 목록 */
               <div className="flex flex-col space-y-4">
-                {messages.map((msg, index) => (
-                  <div key={index} className="flex flex-col space-y-4">
-                    {/* 사용자 질문 */}
-                    {(msg.question || (msg.files && msg.files.length > 0)) && (
-                      <div className="flex justify-end">
-                        <div className="flex max-w-[80%] flex-col items-end space-y-2">
-                          {/* 첨부 파일 표시 */}
-                          {msg.files && msg.files.length > 0 && (
-                            <div className="flex flex-wrap justify-end gap-2">
-                              {msg.files.map((fileInfo, fIdx) => {
-                                // 낙관적 업데이트 데이터(URL|Type|Name) 또는 서버 URL 처리
-                                let displayUrl = fileInfo;
-                                let fileType = '';
-                                let fileName = '첨부 파일';
+                {messages.map((msg, index) => {
+                  const isUser = msg.role === 'USER';
+                  const isAssistant = msg.role === 'ASSISTANT';
+                  // question이나 promptRes가 없으면 message 필드를 대체제로 사용
+                  const userContent = msg.question || (isUser ? msg.message : '');
+                  const assistantContent =
+                    msg.promptRes || (isAssistant ? msg.message : '');
 
-                                if (fileInfo.includes('|')) {
-                                  const parts = fileInfo.split('|');
-                                  displayUrl = parts[0];
-                                  fileType = parts[1];
-                                  fileName = parts[2];
-                                } else {
-                                  displayUrl = fileInfo;
-                                  fileName = fileInfo.split('/').pop() || '첨부 파일';
-                                  const ext = fileName.split('.').pop()?.toLowerCase();
-                                  if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
-                                    fileType = 'image/jpeg';
-                                  } else if (ext === 'pdf') {
-                                    fileType = 'application/pdf';
+                  return (
+                    <div key={index} className="flex flex-col space-y-4">
+                      {/* 사용자 질문 */}
+                      {(userContent || (msg.files && msg.files.length > 0)) && (
+                        <div className="flex justify-end">
+                          <div className="flex max-w-[80%] flex-col items-end space-y-2">
+                            {/* 첨부 파일 표시 */}
+                            {msg.files && msg.files.length > 0 && (
+                              <div className="flex flex-wrap justify-end gap-2">
+                                {msg.files.map((fileInfo, fIdx) => {
+                                  // 낙관적 업데이트 데이터(URL|Type|Name) 또는 서버 URL 처리
+                                  let displayUrl = fileInfo;
+                                  let fileType = '';
+                                  let fileName = '첨부 파일';
+
+                                  if (fileInfo.includes('|')) {
+                                    const parts = fileInfo.split('|');
+                                    displayUrl = parts[0];
+                                    fileType = parts[1];
+                                    fileName = parts[2];
                                   } else {
-                                    fileType = 'text/plain';
+                                    displayUrl = fileInfo;
+                                    fileName =
+                                      fileInfo.split('/').pop() || '첨부 파일';
+                                    const ext = fileName
+                                      .split('.')
+                                      .pop()
+                                      ?.toLowerCase();
+                                    if (
+                                      ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(
+                                        ext || ''
+                                      )
+                                    ) {
+                                      fileType = 'image/jpeg';
+                                    } else if (ext === 'pdf') {
+                                      fileType = 'application/pdf';
+                                    } else {
+                                      fileType = 'text/plain';
+                                    }
                                   }
-                                }
 
-                                const isImage = fileType.startsWith('image/');
+                                  const isImage = fileType.startsWith('image/');
 
-                                if (isImage) {
+                                  if (isImage) {
+                                    return (
+                                      <div
+                                        key={fIdx}
+                                        className="relative h-24 w-24 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer"
+                                        onClick={() =>
+                                          setPreviewImageUrl(displayUrl)
+                                        }
+                                      >
+                                        <img
+                                          src={displayUrl}
+                                          alt={fileName}
+                                          className="h-full w-full object-cover"
+                                        />
+                                      </div>
+                                    );
+                                  }
+
                                   return (
                                     <div
                                       key={fIdx}
-                                      className="relative h-24 w-24 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer"
-                                      onClick={() => setPreviewImageUrl(displayUrl)}
+                                      className="flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 p-2 text-gray-700 shadow-sm min-w-[160px]"
                                     >
-                                      <img
-                                        src={displayUrl}
-                                        alt={fileName}
-                                        className="h-full w-full object-cover"
-                                      />
+                                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white border border-gray-100">
+                                        {fileType === 'application/pdf' ||
+                                        fileName
+                                          .toLowerCase()
+                                          .endsWith('.pdf') ? (
+                                          <FileText className="h-5 w-5 text-red-500" />
+                                        ) : (
+                                          <FileIcon className="h-5 w-5 text-gray-500" />
+                                        )}
+                                      </div>
+                                      <span className="text-xs font-medium truncate max-w-[120px]">
+                                        {fileName}
+                                      </span>
                                     </div>
                                   );
-                                }
-
-                                return (
-                                  <div
-                                    key={fIdx}
-                                    className="flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 p-2 text-gray-700 shadow-sm min-w-[160px]"
-                                  >
-                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white border border-gray-100">
-                                      {fileType === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf') ? (
-                                        <FileText className="h-5 w-5 text-red-500" />
-                                      ) : (
-                                        <FileIcon className="h-5 w-5 text-gray-500" />
-                                      )}
-                                    </div>
-                                    <span className="text-xs font-medium truncate max-w-[120px]">
-                                      {fileName}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                          {msg.question && (
-                            <div className="rounded-2xl bg-blue-500 px-4 py-2 text-white">
-                              <p className="text-sm whitespace-pre-wrap">
-                                {msg.question}
-                              </p>
-                            </div>
-                          )}
+                                })}
+                              </div>
+                            )}
+                            {userContent && (
+                              <div className="rounded-2xl bg-blue-500 px-4 py-2 text-white">
+                                <p className="text-sm whitespace-pre-wrap">
+                                  {userContent}
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* AI 답변 */}
-                    {msg.promptRes && (
-                      <div className="flex justify-start">
-                        <div className="max-w-[80%] rounded-2xl bg-gray-100 px-4 py-2 text-gray-900">
-                          <p className="text-sm whitespace-pre-wrap">
-                            {msg.promptRes}
-                          </p>
+                      {/* AI 답변 */}
+                      {assistantContent && (
+                        <div className="flex justify-start">
+                          <div className="max-w-[80%] rounded-2xl bg-gray-100 px-4 py-2 text-gray-900">
+                            <p className="text-sm whitespace-pre-wrap">
+                              {assistantContent}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  );
+                })}
                 {isLoading && (
                   <div className="flex justify-start">
                     <div className="max-w-[80%] rounded-2xl bg-gray-100 px-4 py-2">
