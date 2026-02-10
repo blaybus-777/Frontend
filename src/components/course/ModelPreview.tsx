@@ -43,7 +43,7 @@ export default function ModelPreview({ urls }: Props) {
   const radius = 0.3;
 
   return (
-    <Canvas camera={{ fov: 45 }}>
+    <Canvas dpr={[1, 1.5]} camera={{ fov: 45 }}>
       <ambientLight intensity={1.2} />
       <directionalLight position={[5, 5, 5]} />
       <Environment preset="studio" />

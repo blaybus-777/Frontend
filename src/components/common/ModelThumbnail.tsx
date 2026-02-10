@@ -16,8 +16,13 @@ export default function ModelThumbnail({ modelUrl }: ModelThumbnailProps) {
     <div className="h-full w-full">
       <Canvas
         frameloop="demand"
+        dpr={[1, 1.5]}
         camera={{ position: [0, 0, 5], fov: 50 }}
-        gl={{ preserveDrawingBuffer: true, alpha: true }}
+        gl={{
+          preserveDrawingBuffer: false,
+          alpha: true,
+          powerPreference: 'high-performance',
+        }}
       >
         <Suspense fallback={null}>
           <Stage
