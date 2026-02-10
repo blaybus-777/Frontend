@@ -29,11 +29,11 @@ export default function CourseHierarchyTree({
   // modelId가 6일 때만 nit 부품을 제외하고 보여줍니다.
   const items = useMemo(() => {
     const allItems = data?.items || [];
-    
+
     if (modelId === '6') {
       return filterNitParts(allItems);
     }
-    
+
     return allItems;
   }, [data, modelId]);
 
