@@ -400,13 +400,6 @@ export default function ModelScene({
 
   const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
 
-  console.log('ModelScene - Props:', {
-    assetKey,
-    urlsCount: urls.length,
-    resolvedUrlsCount: resolvedUrls.length,
-    resolvedUrls,
-  });
-
   useEffect(() => {
     if (!onRegisterClearSelection) return;
     onRegisterClearSelection(() => {
@@ -484,19 +477,15 @@ export default function ModelScene({
   }, [selectedPartId, watchKey, partInfo, orbitControls, camera]);
 
   useEffect(() => {
-    console.log('ModelScene - Mounted/Updated with watchKey:', watchKey);
     if (!groupRef.current) return;
 
     const group = groupRef.current;
-    console.log('ModelScene - Group children count:', group.children.length);
 
     group.position.set(0, 0, 0);
     const box = new THREE.Box3().setFromObject(group);
     const size = box.getSize(new THREE.Vector3()).length();
     const groupSize = size || 1;
     const center = box.getCenter(new THREE.Vector3());
-
-    console.log('ModelScene - Bounding box size:', size, 'center:', center);
 
     group.position.sub(center);
 

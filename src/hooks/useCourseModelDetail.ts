@@ -49,7 +49,8 @@ export const useCourseModelDetail = (modelId: string | undefined) => {
 
     // 2. 만약 ASSETS에는 없지만, 모델 리스트 API에서 직접 URL을 준 경우 처리
     const assetModelUrls = assetData ? Object.values(assetData.parts) : [];
-    const finalModelUrls = assetModelUrls.length > 0 ? assetModelUrls : (model?.modelUrls || []);
+    const finalModelUrls =
+      assetModelUrls.length > 0 ? assetModelUrls : model?.modelUrls || [];
     const hasModels = finalModelUrls.length > 0;
 
     if (!hasModels || !assetData) {
@@ -102,12 +103,6 @@ export const useCourseModelDetail = (modelId: string | undefined) => {
       detail: lastDetailRef.current,
     };
   }
-
-  console.log('useCourseModelDetail - output:', {
-    modelId,
-    detail: computed.detail,
-    isLoading: computed.isLoading,
-  });
 
   return computed;
 };
