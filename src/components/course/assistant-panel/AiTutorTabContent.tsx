@@ -16,7 +16,7 @@ import { useCourseStore } from '@/stores/useCourseStore';
 export default function AiTutorTabContent() {
   const { id } = useParams<{ id: string }>();
   const modelId = id ? parseInt(id, 10) : 0;
-  const { selectedPartId } = useCourseStore();
+  const selectedPartId = useCourseStore((state) => state.selectedPartId);
 
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -30,21 +30,24 @@ export default function AiTutorTabContent() {
     '가장 중요한 설계 요소는 무엇인가요?',
   ];
 
-  // 채팅 기록 불러오기 (비활성화 - 항상 초기 화면으로 시작)
-  // useEffect(() => {
-  //   const loadChatHistory = async () => {
-  //     if (modelId === 0) return;
+  // 채팅 기록 불러오기
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      if (modelId === 0) return;
 
-  //     try {
-  //       const response = await getChatHistory(modelId);
-  //       setMessages(response.items);
-  //     } catch (error) {
-  //       console.error('채팅 기록 불러오기 실패:', error);
-  //     }
-  //   };
+      try {
+        const response = await getChatHistory(modelId);
+        setMessages(response.items);
+        if (response.items.length > 0) {
+          setShowSuggestions(false);
+        }
+      } catch (error) {
+        console.error('채팅 기록 불러오기 실패:', error);
+      }
+    };
 
-  //   loadChatHistory();
-  // }, [modelId]);
+    loadChatHistory();
+  }, [modelId]);
 
   // 메시지 추가 시 스크롤
   useEffect(() => {
@@ -58,13 +61,22 @@ export default function AiTutorTabContent() {
   ) => {
     if (!question.trim() || modelId === 0 || isLoading) return;
 
+    // 사용자 질문 즉시 표시 (Optimistic Update)
+    const newUserMessage: ChatMessage = {
+      question: question,
+      role: 'USER',
+      promptRes: '',
+      message: question,
+    } as ChatMessage;
+
+    setMessages((prev) => [...prev, newUserMessage]);
     setIsLoading(true);
     setInputValue('');
     setShowSuggestions(false);
 
     try {
       // partId 변환 (selectedPartId가 문자열이므로 숫자로 변환, 없으면 null)
-      const partId = selectedPartId ? parseInt(selectedPartId, 10) : null;
+      const partId = selectedPartId ? parseInt(selectedPartId, 10) : 0;
 
       const requestData = {
         modelId,
@@ -76,10 +88,17 @@ export default function AiTutorTabContent() {
 
       const response = await askQuestion(requestData);
       console.log('🟢 응답 데이터:', response);
+
+      // 서버 응답이 전체 히스토리를 포함하는 경우 바로 설정
+      // 만약 서버 응답이 마지막 메시지만 포함한다면 아래와 같이 처리 가능:
+      // setMessages(prev => [...prev.slice(0, -1), ...response.items]);
+      
       setMessages(response.items);
     } catch (error) {
       console.error('질문 전송 실패:', error);
       alert('질문 전송에 실패했습니다.');
+      // 에러 발생 시 낙관적으로 추가했던 메시지 제거
+      setMessages((prev) => prev.filter((msg) => msg !== newUserMessage));
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +167,9 @@ export default function AiTutorTabContent() {
               <div className="flex-1" />
               <div className="space-y-1 text-center">
                 <h3 className="font-medium text-gray-900">안녕하세요.</h3>
-                <p className="text-gray-900">현재 화면에서 궁금한 내용이 있나요?</p>
+                <p className="text-gray-900">
+                  현재 화면에서 궁금한 내용이 있나요?
+                </p>
               </div>
             </>
           ) : (
@@ -160,7 +181,7 @@ export default function AiTutorTabContent() {
                   {msg.question && (
                     <div className="flex justify-end">
                       <div className="max-w-[80%] rounded-2xl bg-blue-500 px-4 py-2 text-white">
-                        <p className="whitespace-pre-wrap text-sm">
+                        <p className="text-sm whitespace-pre-wrap">
                           {msg.question}
                         </p>
                       </div>
@@ -171,7 +192,7 @@ export default function AiTutorTabContent() {
                   {msg.promptRes && (
                     <div className="flex justify-start">
                       <div className="max-w-[80%] rounded-2xl bg-gray-100 px-4 py-2 text-gray-900">
-                        <p className="whitespace-pre-wrap text-sm">
+                        <p className="text-sm whitespace-pre-wrap">
                           {msg.promptRes}
                         </p>
                       </div>
