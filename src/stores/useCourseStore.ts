@@ -84,6 +84,9 @@ export const useCourseStore = create<CourseState>()(
       partialize: (state) => ({
         activeTab: state.activeTab,
         isPanelOpen: state.isPanelOpen,
+        explosionLevel: state.explosionLevel,
+        viewMode: state.viewMode,
+        explodeSpace: state.explodeSpace,
       }),
     }
   )
