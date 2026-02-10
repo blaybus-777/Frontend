@@ -20,7 +20,6 @@ export default function ExploreSidebar({
   selectedCategory,
   onCategoryChange,
 }: ExploreSidebarProps) {
-
   return (
     <SidebarProvider className="h-full min-h-0">
       <Sidebar

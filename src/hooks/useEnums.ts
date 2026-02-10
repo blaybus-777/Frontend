@@ -49,9 +49,9 @@ export const useEnums = () => {
 
   // 난이도 태그 추출 및 순서 정렬 (BEGINNER, INTERMEDIATE, ADVANCED)
   const levelOrder = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
-  const levelTags = (tagData?.items.filter((item) =>
-    levelOrder.includes(item.name)
-  ) || []).sort((a, b) => levelOrder.indexOf(a.name) - levelOrder.indexOf(b.name));
+  const levelTags = (
+    tagData?.items.filter((item) => levelOrder.includes(item.name)) || []
+  ).sort((a, b) => levelOrder.indexOf(a.name) - levelOrder.indexOf(b.name));
 
   // 난이도 태그를 API name -> UI code 매핑으로 변환
   const levelTagMap = levelTags.reduce(
