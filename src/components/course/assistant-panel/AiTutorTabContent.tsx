@@ -12,6 +12,7 @@ import {
   type AIContentType,
 } from '@/apis/ai';
 import { useCourseStore } from '@/stores/useCourseStore';
+import ResetChatConfirmModal from './ResetChatConfirmModal';
 
 export default function AiTutorTabContent() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,7 @@ export default function AiTutorTabContent() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestions = [
@@ -108,13 +110,11 @@ export default function AiTutorTabContent() {
   const handleResetChat = async () => {
     if (modelId === 0) return;
 
-    const confirmed = window.confirm('채팅 기록을 모두 삭제하시겠습니까?');
-    if (!confirmed) return;
-
     try {
       await resetChat(modelId);
       setMessages([]);
       setShowSuggestions(true);
+      setIsResetModalOpen(false);
     } catch (error) {
       console.error('채팅 초기화 실패:', error);
       alert('채팅 초기화에 실패했습니다.');
@@ -143,7 +143,7 @@ export default function AiTutorTabContent() {
         </div>
         <button
           className="text-gray-500 hover:text-gray-700"
-          onClick={handleResetChat}
+          onClick={() => setIsResetModalOpen(true)}
           title="새 대화 시작"
         >
           <SquarePen className="h-4 w-4" />
@@ -278,6 +278,12 @@ export default function AiTutorTabContent() {
           </div>
         </div>
       </div>
+
+      <ResetChatConfirmModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onConfirm={handleResetChat}
+      />
     </div>
   );
 }
