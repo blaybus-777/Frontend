@@ -6,11 +6,13 @@ export interface Model {
   code: string;
   title: string;
   tag: string[];
+  assetKey?: string;
+  modelUrls?: string[];
+  image?: string;
 }
 
 export interface ModelListResponse {
   items: Model[];
-  page: number;
 }
 
 export const getModelList = async (): Promise<ModelListResponse> => {

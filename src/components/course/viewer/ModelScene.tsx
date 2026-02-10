@@ -42,6 +42,7 @@ interface MeshExplodeData {
   originalPosition: THREE.Vector3;
   localDirection: THREE.Vector3;
   worldDirection: THREE.Vector3;
+  sizeRatio: number;
 }
 
 function hasColor(
@@ -189,33 +190,61 @@ function resolveSinglePartUrls(
   selectedPartId: string | null | undefined,
   assetKey: string | undefined
 ) {
-  if (!selectedPartId || assetKey !== 'Quadcopter_DRONE')
+  if (assetKey && assetKey !== 'Quadcopter_DRONE') {
+    const finalUrl = FINAL_ASSET_URLS[assetKey];
+    return finalUrl ? [finalUrl] : urls.slice(0, 1);
+  }
+  if (!selectedPartId || assetKey !== 'Quadcopter_DRONE') {
     return urls.slice(0, 1);
+  }
   const file = DRONE_PART_ID_TO_FILE[selectedPartId];
   if (!file) return urls.slice(0, 1);
   const match = urls.find((url) => url.endsWith(`/${file}`));
   return match ? [match] : urls.slice(0, 1);
 }
 
-function resolveAssemblyUrls(
-  assetKey: string | undefined,
-  urls: string[],
-  explodeDistance: number
-) {
+function resolveAssemblyUrls(assetKey: string | undefined, urls: string[]) {
   if (!assetKey) return urls;
   const finalUrl = FINAL_ASSET_URLS[assetKey];
 
-  // Drone2.glb supports explode in a single file, keep using final for drone
+  // Use single final glb for all non-drone models.
+  if (assetKey !== 'Quadcopter_DRONE') {
+    return finalUrl ? [finalUrl] : urls;
+  }
+
+  // Drone keeps its existing behavior.
   if (assetKey === 'Quadcopter_DRONE') {
     return finalUrl ? [finalUrl] : urls;
   }
 
-  // Other models: if explode is active, fall back to multi-part URLs
-  if (explodeDistance > 0.001) {
-    return urls;
-  }
+  return urls;
+}
 
-  return finalUrl ? [finalUrl] : urls;
+function getExplodeScale(assetKey: string | undefined) {
+  if (assetKey === 'SUSPENSION') return 0.85;
+  if (assetKey === 'ROBOT_ARM') return 0.75;
+  return 1;
+}
+
+function weightDirection(
+  assetKey: string | undefined,
+  direction: THREE.Vector3
+) {
+  if (assetKey === 'SUSPENSION') {
+    return new THREE.Vector3(
+      direction.x * 0.6,
+      direction.y * 1.4,
+      direction.z * 0.8
+    ).normalize();
+  }
+  if (assetKey === 'ROBOT_ARM') {
+    return new THREE.Vector3(
+      direction.x * 1.2,
+      direction.y * 0.8,
+      direction.z * 1.1
+    ).normalize();
+  }
+  return direction;
 }
 
 function saveSceneTransforms(
@@ -358,12 +387,20 @@ export default function ModelScene({
       return resolveSinglePartUrls(urls, selectedPartId, assetKey);
     }
     if (assemblyMode === 'assembly') {
-      return resolveAssemblyUrls(assetKey, urls, explodeDistance);
+      return resolveAssemblyUrls(assetKey, urls);
     }
     return urls;
-  }, [urls, assemblyMode, selectedPartId, assetKey, explodeDistance]);
+  }, [urls, assemblyMode, selectedPartId, assetKey]);
 
   const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
+
+  console.log('ModelScene - Props:', {
+    assetKey,
+    urlsCount: urls.length,
+    assemblyMode,
+    resolvedUrlsCount: resolvedUrls.length,
+    resolvedUrls,
+  });
 
   useEffect(() => {
     if (!onRegisterClearSelection) return;
@@ -381,23 +418,56 @@ export default function ModelScene({
   }, [onRegisterClearSelection, onSelect, setSelectedPartTransform]);
 
   useEffect(() => {
+    console.log('ModelScene - Mounted/Updated with watchKey:', watchKey);
     if (!groupRef.current) return;
 
     const group = groupRef.current;
+    console.log('ModelScene - Group children count:', group.children.length);
+    
     group.position.set(0, 0, 0);
     const box = new THREE.Box3().setFromObject(group);
     const size = box.getSize(new THREE.Vector3()).length();
+    const groupSize = size || 1;
     const center = box.getCenter(new THREE.Vector3());
+    
+    console.log('ModelScene - Bounding box size:', size, 'center:', center);
 
     group.position.sub(center);
 
     restoreSceneTransforms(group, transformsKey);
 
     const distance = Math.max(size * 0.8, 2);
+    const defaultDistance = Math.max(size * 0.8, 2);
+
     if (!hasStoredView && (!orbitControls || canSetDefaultView)) {
       camera.position.set(distance, distance * 0.75, distance);
       camera.lookAt(0, 0, 0);
       if (orbitControls) {
+        orbitControls.target.set(0, 0, 0);
+        orbitControls.update();
+        orbitControls.saveState();
+      }
+    }
+    if (hasStoredView && orbitControls) {
+      const centerWorld = new THREE.Vector3(0, 0, 0);
+      const cameraDistance = camera.position.distanceTo(centerWorld);
+      const targetDistance = orbitControls.target.distanceTo(centerWorld);
+      const minDistance = Math.max(size * 0.2, 0.8);
+      const maxDistance = Math.max(size * 6, 12);
+      const maxTargetDistance = Math.max(size * 1.5, 3);
+      const invalidCamera =
+        !Number.isFinite(cameraDistance) ||
+        cameraDistance < minDistance ||
+        cameraDistance > maxDistance;
+      const invalidTarget =
+        !Number.isFinite(targetDistance) || targetDistance > maxTargetDistance;
+      if (invalidCamera || invalidTarget) {
+        camera.position.set(
+          defaultDistance,
+          defaultDistance * 0.75,
+          defaultDistance
+        );
+        camera.lookAt(0, 0, 0);
         orbitControls.target.set(0, 0, 0);
         orbitControls.update();
         orbitControls.saveState();
@@ -412,23 +482,27 @@ export default function ModelScene({
       if (!(child instanceof THREE.Mesh)) return;
 
       const originalPosition = child.position.clone();
-      const parent = child.parent ?? group;
-      const meshWorld = child.getWorldPosition(new THREE.Vector3());
+      const meshBox = new THREE.Box3().setFromObject(child);
+      const meshCenterWorld = meshBox.getCenter(new THREE.Vector3());
       const centerWorld = new THREE.Vector3(0, 0, 0);
-      const meshLocal = parent.worldToLocal(meshWorld.clone());
-      const centerLocal = parent.worldToLocal(centerWorld.clone());
-      const worldDirection = meshLocal.sub(centerLocal).normalize();
+      const worldDirection = meshCenterWorld
+        .clone()
+        .sub(centerWorld)
+        .normalize();
 
       let localDirection = originalPosition.clone().normalize();
       if (localDirection.length() === 0 && worldDirection.length() > 0) {
         localDirection = worldDirection.clone();
       }
+      const meshSize = meshBox.getSize(new THREE.Vector3()).length();
+      const sizeRatio = Math.min(1, meshSize / groupSize);
 
       meshes.push({
         mesh: child,
         originalPosition,
         localDirection,
         worldDirection,
+        sizeRatio,
       });
     });
     explodeDataRef.current = meshes;
@@ -497,15 +571,20 @@ export default function ModelScene({
 
   useEffect(() => {
     explodeDataRef.current.forEach((item) => {
-      const direction =
+      const baseDirection =
         explodeSpace === 'local' ? item.localDirection : item.worldDirection;
+      const direction = weightDirection(assetKey, baseDirection.clone());
+      const distance =
+        explodeDistance *
+        getExplodeScale(assetKey) *
+        (1 + item.sizeRatio * 0.6);
       item.mesh.position.copy(
         item.originalPosition
           .clone()
-          .add(direction.clone().multiplyScalar(explodeDistance))
+          .add(direction.clone().multiplyScalar(distance))
       );
     });
-  }, [explodeDistance, explodeSpace]);
+  }, [explodeDistance, explodeSpace, assetKey]);
 
   useFrame(() => {
     if (!labelAnchorRef.current || !labelGroupRef.current) return;

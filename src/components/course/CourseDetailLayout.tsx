@@ -4,6 +4,7 @@ import CourseRightSidebar from '@/components/course/CourseRightSidebar';
 import CourseAssistantPanel from '@/components/course/assistant-panel';
 import ModelViewer from '@/components/course/ModelViewer';
 import { useCourseDetail } from '@/hooks/useCourseDetail';
+import { useEffect, useRef } from 'react';
 import { useCourseModelDetail } from '@/hooks/useCourseModelDetail';
 import { useParams } from 'react-router-dom';
 
@@ -17,11 +18,33 @@ export default function CourseDetailLayout({
   onSelectPart,
 }: CourseDetailLayoutProps) {
   const { id } = useParams();
-  const { viewMode, assemblyMode, explosionLevel, explodeSpace } =
-    useCourseDetail();
+  const {
+    viewMode,
+    assemblyMode,
+    explosionLevel,
+    explodeSpace,
+    setExplosionLevel,
+    setAssemblyMode,
+    setExplodeSpace,
+    setSelectedPartId,
+  } = useCourseDetail();
   const { detail, isLoading, isError } = useCourseModelDetail(id);
+  const lastDetailRef = useRef(detail);
 
-  const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 2;
+  useEffect(() => {
+    if (detail) {
+      lastDetailRef.current = detail;
+    }
+  }, [detail]);
+
+  const explodeDistance = ((explosionLevel?.[0] ?? 0) / 100) * 0.6;
+
+  useEffect(() => {
+    setExplosionLevel([0]);
+    setAssemblyMode('assembly');
+    setExplodeSpace('local');
+    setSelectedPartId(null);
+  }, [id, setAssemblyMode, setExplodeSpace, setExplosionLevel, setSelectedPartId]);
 
   return (
     <div className="w-full">
@@ -45,25 +68,27 @@ export default function CourseDetailLayout({
         <div className="flex flex-1 overflow-hidden">
           {/* Center: 3D Viewer Placeholder */}
           <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gray-100">
-            {isLoading ? (
+            {isLoading && !lastDetailRef.current ? (
               <div className="text-center text-sm text-gray-500">
                 3D 모델을 불러오는 중입니다.
               </div>
-            ) : isError || !detail ? (
+            ) : isError && !lastDetailRef.current ? (
               <div className="text-center text-sm text-gray-500">
                 3D 모델을 불러올 수 없습니다.
               </div>
             ) : (
               <div className="h-full w-full">
                 <ModelViewer
-                  urls={detail.modelUrls}
+                  urls={(detail ?? lastDetailRef.current)?.modelUrls ?? []}
                   selectedPartId={selectedPartId}
                   viewMode={viewMode}
                   assemblyMode={assemblyMode}
                   explodeDistance={explodeDistance}
                   explodeSpace={explodeSpace}
-                  assetKey={detail.assetKey}
-                  storageKey={`viewer:${detail.assetKey}:${id ?? 'unknown'}`}
+                  assetKey={(detail ?? lastDetailRef.current)?.assetKey}
+                  storageKey={`viewer:${
+                    (detail ?? lastDetailRef.current)?.assetKey ?? 'unknown'
+                  }:${id ?? 'unknown'}`}
                 />
               </div>
             )}

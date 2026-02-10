@@ -62,7 +62,7 @@ export default function CourseControlPanel() {
             <Slider
               value={explosionLevel}
               onValueChange={setExplosionLevel}
-              max={100}
+              max={10}
               step={1}
               className="flex-1 **:data-[slot=slider-range]:bg-[#3469FF] **:data-[slot=slider-thumb]:border-0 **:data-[slot=slider-thumb]:bg-[#3469FF]"
             />

@@ -41,7 +41,7 @@ export const useEnums = () => {
   const modelCodeMap =
     modelData?.items.reduce(
       (acc, item) => {
-        acc[item.name.toLowerCase()] = item.name;
+        acc[item.name.trim().toLowerCase()] = item.name;
         return acc;
       },
       {} as Record<string, string>
