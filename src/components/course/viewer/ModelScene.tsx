@@ -11,7 +11,11 @@ import {
 } from 'react';
 import * as THREE from 'three';
 import type { PartInfoMap, SelectedPart } from './types';
-import { PART_NAME_MAPPING, PART_ID_TO_CODE, ASSET_KEY_TO_MODEL_ID } from '@/data/partMapping';
+import {
+  PART_NAME_MAPPING,
+  PART_ID_TO_CODE,
+  ASSET_KEY_TO_MODEL_ID,
+} from '@/data/partMapping';
 import { FINAL_ASSET_URLS, ASSETS } from '@/constants/assets';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useCourseStore } from '@/stores/useCourseStore';
@@ -371,7 +375,12 @@ export default function ModelScene({
         if (code) {
           const partUrl = ASSETS[assetKey]?.parts[code];
           if (partUrl) {
-            console.log('[ModelScene] Found via Model ID:', { modelId, selectedPartId, code, partUrl });
+            console.log('[ModelScene] Found via Model ID:', {
+              modelId,
+              selectedPartId,
+              code,
+              partUrl,
+            });
             return [partUrl];
           }
         }
@@ -379,7 +388,12 @@ export default function ModelScene({
 
       // 2. Fallback: Mesh 이름 기반 매칭 (하위 호환성)
       const meshName = PART_NAME_MAPPING[selectedPartId];
-      console.log('[ModelScene] Trying mesh name fallback:', selectedPartId, '→', meshName);
+      console.log(
+        '[ModelScene] Trying mesh name fallback:',
+        selectedPartId,
+        '→',
+        meshName
+      );
       if (meshName) {
         const match = urls.find((url) => {
           const decodedUrl = decodeURIComponent(url).toLowerCase();

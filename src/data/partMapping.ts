@@ -1,7 +1,8 @@
 // 1. Model ID별 백엔드 Code -> Part ID 매핑
 // Model ID: 드론(1), 로봇암(4), 서스펜션(6), V4엔진(7)
 export const PART_CODE_TO_ID: Record<string, Record<string, string>> = {
-  '1': { // 드론 (Part ID: 1-10)
+  '1': {
+    // 드론 (Part ID: 1-10)
     arm_gear: '1',
     beater_disc: '2',
     gearing: '3',
@@ -13,7 +14,8 @@ export const PART_CODE_TO_ID: Record<string, Record<string, string>> = {
     screw: '9',
     xyz: '10',
   },
-  '4': { // 로봇 암 (Part ID: 30-37)
+  '4': {
+    // 로봇 암 (Part ID: 30-37)
     rotary_base: '30',
     joint_bracket: '31',
     link_arm: '32',
@@ -23,14 +25,16 @@ export const PART_CODE_TO_ID: Record<string, Record<string, string>> = {
     end_effector_mount: '36',
     parallel_gripper: '37',
   },
-  '6': { // 서스펜션 (Part ID: 71-75)
+  '6': {
+    // 서스펜션 (Part ID: 71-75)
     base: '71',
     nit: '72',
     nut: '73',
     rod: '74',
     spring: '75',
   },
-  '7': { // V4 엔진 (Part ID: 51-57)
+  '7': {
+    // V4 엔진 (Part ID: 51-57)
     connecting_rod_cap: '51',
     connecting_rod: '52',
     conrod_bolt: '53',
@@ -48,7 +52,6 @@ export const ASSET_KEY_TO_MODEL_ID: Record<string, string> = {
   SUSPENSION: '6',
   V4_ENGINE: '7',
 };
-
 
 // 2. 3D Mesh 이름 -> 백엔드 Code 매핑
 // GLB 파일 내부의 Mesh 명칭을 시스템 시스템 코드(snake_case)로 연결합니다.
