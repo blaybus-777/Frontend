@@ -350,7 +350,7 @@ export default function ModelScene({
     }
 
     return urls;
-  }, [urls, selectedPartId, assetKey, explodeDistance]);
+  }, [urls, selectedPartId, assetKey]);
 
   const watchKey = useMemo(() => resolvedUrls.join('|'), [resolvedUrls]);
 
