@@ -19,11 +19,27 @@ export default function HierarchyNode({
 }: HierarchyNodeProps) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
+  const normalizedEnglishName = (node.englishName || '').toLowerCase();
+  const normalizedName = (node.name || '').toLowerCase();
+  const normalizedCode = (node.code || '').toLowerCase();
+  const isWholeAssembly =
+    level === 0 ||
+    node.parentId === null ||
+    normalizedEnglishName.includes('whole drone') ||
+    normalizedName.includes('whole drone') ||
+    normalizedCode === 'whole_drone' ||
+    normalizedCode === 'whole drone';
 
-  const isSelected = selectedPartId === String(node.partId);
+  const isSelected =
+    selectedPartId === String(node.partId) ||
+    (isWholeAssembly && !selectedPartId);
 
   const handleSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isWholeAssembly) {
+      onSelectPart?.(null);
+      return;
+    }
     onSelectPart?.(String(node.partId));
   };
 
