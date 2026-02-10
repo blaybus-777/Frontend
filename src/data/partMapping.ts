@@ -24,7 +24,6 @@ export const PART_CODE_TO_ID: Record<string, string> = {
 
   // 6. 서스펜션 (46-50)
   base: '46',
-  nit: '47',
   // nut: '48',
   rod: '49',
   spring: '50',
@@ -66,7 +65,6 @@ export const MESH_NAME_TO_CODE: Record<string, string> = {
 
   // 서스펜션
   BASE: 'base',
-  NIT: 'nit',
   NUT: 'nut',
   ROD: 'rod',
   SPRING: 'spring',

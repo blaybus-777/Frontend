@@ -31,16 +31,18 @@ export default function PartListSection({
   const hookParts = useMemo(() => {
     if (!apiPartData || !detail) return [];
 
-    return apiPartData.items.map((apiPart): Part => {
-      const matchingUrl = detail.parts[apiPart.code] || '';
+    return apiPartData.items
+      .filter((apiPart) => apiPart.code !== 'nit') // nit 부품 제외
+      .map((apiPart): Part => {
+        const matchingUrl = detail.parts[apiPart.code] || '';
 
-      return {
-        id: String(apiPart.partId),
-        name: apiPart.name,
-        image: matchingUrl, // GLB URL을 이미지로 사용
-        englishName: apiPart.englishName,
-      };
-    });
+        return {
+          id: String(apiPart.partId),
+          name: apiPart.name,
+          image: matchingUrl, // GLB URL을 이미지로 사용
+          englishName: apiPart.englishName,
+        };
+      });
   }, [apiPartData, detail]);
 
   // 외부에서 주입된 parts가 있으면 사용, 없으면 hook에서 가져온 parts 사용
