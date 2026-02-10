@@ -57,32 +57,13 @@ export default function StudyTabContent() {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {/* 자식 노드들이 있는 경우 (중간 카테고리 선택 시, 단 루트 노드는 제외) */}
-            {partDetail?.children &&
-            partDetail.children.length > 0 &&
-            partDetail.parentId !== null ? (
-              <>
-                {partDetail.children.map((child) => (
-                  <PartInfoCard
-                    key={child.partId}
-                    title={`${child.name} (${child.englishName})`}
-                    description={[child.description]}
-                    materials={child.commonMaterials}
-                    theory={child.keyEngineeringTheories}
-                    role={child.functionalRoles}
-                  />
-                ))}
-              </>
-            ) : (
-              /* 자식 노드가 없는 경우(단일 부품) 또는 루트 노드/전체 선택 시 */
-              <PartInfoCard
-                title={learningContent.title}
-                description={learningContent.description}
-                materials={learningContent.materials}
-                theory={learningContent.theory}
-                role={learningContent.role}
-              />
-            )}
+            <PartInfoCard
+              title={learningContent.title}
+              description={learningContent.description}
+              materials={learningContent.materials}
+              theory={learningContent.theory}
+              role={learningContent.role}
+            />
           </div>
         )}
       </div>
