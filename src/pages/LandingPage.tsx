@@ -15,10 +15,10 @@ const LandingPage = () => {
   // 캐러셀 상태 관리
   const [currentIndex, setCurrentIndex] = useState(0);
   const images = [
-    '/public/landing/탐색탭.png',
-    '/public/landing/학습탭_AI 패널.png',
-    '/public/landing/학습탭_메모 패널.png',
-    '/public/landing/학습탭_학습 패널.png',
+    '/public/landing/main_1.png',
+    '/public/landing/main_2.png',
+    '/public/landing/main_3.png',
+    '/public/landing/main_4.png',
   ];
 
   // 좌우 이동 핸들러
@@ -114,16 +114,117 @@ const LandingPage = () => {
           <span className="text-foundation-blue-9 text-4xl">성장</span>하고
           있습니다.
         </h2>
-        <div className="grid max-w-6xl grid-cols-2 gap-x-12 gap-y-8 opacity-60 grayscale transition-all duration-500 hover:grayscale-0 md:grid-cols-4 lg:grid-cols-6">
-          {[1, 2, 3, 4, 5, 6, 7].map((num) => (
-            <img
-              key={num}
-              src={`/img/${num}.png`}
-              alt={`University ${num}`}
-              className="mx-auto h-10 object-contain"
-            />
-          ))}
+        {/* 대학교 로고 무한 스크롤 */}
+        <div className="w-full max-w-7xl space-y-8 overflow-hidden">
+          {/* 첫 번째 줄 - 왼쪽으로 스크롤 */}
+          <div className="relative flex">
+            <div className="flex animate-scroll-left gap-12">
+              {[
+                'university1.png',
+                'university2.png',
+                'university3.png',
+                'university4.png',
+                'university5.png',
+                'university6.png',
+                'university7.png',
+              ].map((logo, idx) => (
+                <img
+                  key={idx}
+                  src={`/university/${logo}`}
+                  alt={`University ${idx + 1}`}
+                  className="h-12 w-auto shrink-0 object-contain opacity-80 transition-all duration-500 hover:opacity-100"
+                />
+              ))}
+              {/* 무한 반복을 위한 복제 */}
+              {[
+                'university1.png',
+                'university2.png',
+                'university3.png',
+                'university4.png',
+                'university5.png',
+                'university6.png',
+                'university7.png',
+              ].map((logo, idx) => (
+                <img
+                  key={`duplicate-${idx}`}
+                  src={`/university/${logo}`}
+                  alt={`University ${idx + 1}`}
+                  className="h-12 w-auto shrink-0 object-contain opacity-80 transition-all duration-500 hover:opacity-100"
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* 두 번째 줄 - 오른쪽으로 스크롤 */}
+          <div className="relative flex">
+            <div className="flex animate-scroll-right gap-12">
+              {[
+                'university8.png',
+                'university9.png',
+                'university10.png',
+                'university11.png',
+                'university12.png',
+                'university13.png',
+              ].map((logo, idx) => (
+                <img
+                  key={idx}
+                  src={`/university/${logo}`}
+                  alt={`University ${idx + 8}`}
+                  className="h-12 w-auto shrink-0 object-contain opacity-80 transition-all duration-500 hover:opacity-100"
+                />
+              ))}
+              {/* 무한 반복을 위한 복제 */}
+              {[
+                'university8.png',
+                'university9.png',
+                'university10.png',
+                'university11.png',
+                'university12.png',
+                'university13.png',
+              ].map((logo, idx) => (
+                <img
+                  key={`duplicate-${idx}`}
+                  src={`/university/${logo}`}
+                  alt={`University ${idx + 8}`}
+                  className="h-12 w-auto shrink-0 object-contain opacity-80 transition-all duration-500 hover:opacity-100"
+                />
+              ))}
+            </div>
+          </div>
         </div>
+
+        <style>{`
+          @keyframes scroll-left {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-50%);
+            }
+          }
+
+          @keyframes scroll-right {
+            0% {
+              transform: translateX(-50%);
+            }
+            100% {
+              transform: translateX(0);
+            }
+          }
+
+          .animate-scroll-left {
+            animation: scroll-left 30s linear infinite;
+          }
+
+          .animate-scroll-right {
+            animation: scroll-right 35s linear infinite;
+          }
+
+          .animate-scroll-left:hover,
+          .animate-scroll-right:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
       </section>
 
       {/* How It Works Section */}
@@ -156,7 +257,7 @@ const LandingPage = () => {
             </div>
             <div className="border-foundation-gray-4 overflow-hidden rounded-2xl border bg-white shadow-xl lg:w-1/2">
               <img
-                src="/img/1.png"
+                src="/landing/middle1.png"
                 className="bg-foundation-gray-3 h-80 w-full object-cover"
                 alt="Feature 1"
               />
@@ -181,7 +282,7 @@ const LandingPage = () => {
             </div>
             <div className="border-foundation-gray-4 overflow-hidden rounded-2xl border bg-white shadow-xl lg:w-1/2">
               <img
-                src="/img/3.jpg"
+                src="/public/landing/middle2.png"
                 className="bg-foundation-gray-3 h-80 w-full object-cover"
                 alt="Feature 2"
               />
@@ -206,7 +307,7 @@ const LandingPage = () => {
             </div>
             <div className="border-foundation-gray-4 overflow-hidden rounded-2xl border bg-white shadow-xl lg:w-1/2">
               <img
-                src="/img/5.png"
+                src="/landing/middle3.png"
                 className="bg-foundation-gray-3 h-80 w-full object-cover"
                 alt="Feature 3"
               />
@@ -238,21 +339,25 @@ const LandingPage = () => {
               step: '1단계',
               title: '단일 부품 학습',
               desc: '부품 별 학습 포인트를 확인',
+              img: '/landing/bottom1.png',
             },
             {
               step: '2단계',
               title: '조립도 분해',
               desc: '결합 구조를 직관적으로 이해',
+              img: '/landing/bottom2.png',
             },
             {
               step: '3단계',
               title: 'AI 학습',
               desc: '실시간 이론적/학습적 학습 보조 AI',
+              img: '/landing/bottom3.png',
             },
             {
               step: '4단계',
               title: '학습 기록',
               desc: '학습 내용을 기록하여 체계적으로 관리',
+              img: '/landing/bottom4.png',
             },
           ].map((item, idx) => (
             <div key={idx} className="flex flex-col items-center gap-4">
@@ -263,10 +368,10 @@ const LandingPage = () => {
               <p className="text-foundation-black-text text-center text-sm font-semibold">
                 {item.desc}
               </p>
-              <div className="bg-foundation-gray-3 border-foundation-gray-4 mt-2 h-48 w-full overflow-hidden rounded-xl border">
+              <div className="mt-2 h-48 w-full overflow-hidden rounded-xl">
                 <img
-                  src={`/img/${idx + 1}.png`}
-                  className="h-full w-full object-cover"
+                  src={item.img}
+                  className="h-full w-full object-contain"
                   alt={item.title}
                 />
               </div>
