@@ -10,6 +10,7 @@ import { useEnums } from '@/hooks/useEnums';
 import type { ExtendedModel } from '@/hooks/useModelList';
 
 function ExplorePage() {
+  const [selectedCategory, setSelectedCategory] = useState('전체'); // 사이드바 카테고리
   const [selectedTag, setSelectedTag] = useState('전체');
   const [searchQuery, setSearchQuery] = useState(''); // 실제 검색에 사용되는 쿼리
   const [inputValue, setInputValue] = useState(''); // 입력 필드의 값
@@ -39,6 +40,16 @@ function ExplorePage() {
   const isLoading = shouldUseSearch ? isSearchLoading || isEnumsLoading : isListLoading;
   const isError = shouldUseSearch ? isSearchError : isListError;
 
+  // 카테고리별 필터링 (부분 일치 허용)
+  const filteredByCategory = useMemo(() => {
+    if (!displayData || selectedCategory === '전체') return displayData;
+    
+    return displayData.filter((model: ExtendedModel) => {
+      // 제목에 카테고리 이름이 포함되어 있는지 확인
+      return model.title.includes(selectedCategory);
+    });
+  }, [displayData, selectedCategory]);
+
   // 검색 실행 함수
   const handleSearch = () => {
     setSearchQuery(inputValue);
@@ -55,7 +66,10 @@ function ExplorePage() {
     <>
       <div className="mx-auto my-20 flex h-full w-full max-w-[1200px] gap-10 px-4 md:px-6">
         <div>
-          <ExploreSidebar />
+          <ExploreSidebar
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
         </div>
         <div className="flex w-full flex-col justify-between gap-6">
           {/* Header Section */}
@@ -115,7 +129,7 @@ function ExplorePage() {
             ) : isError ? (
               <div>Error loading courses</div>
             ) : (
-              displayData
+              filteredByCategory
                 ?.filter(
                   (course: ExtendedModel) =>
                     course.assetKey &&
