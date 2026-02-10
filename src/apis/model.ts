@@ -19,3 +19,20 @@ export const getModelList = async (): Promise<ModelListResponse> => {
   const response = await api.get('/v1/study/list');
   return response.data.data;
 };
+
+export interface SearchRequest {
+  tag: string[];
+  search: string;
+}
+
+export interface SearchResponse {
+  items: Model[];
+  page: number;
+}
+
+export const searchModels = async (
+  request: SearchRequest
+): Promise<SearchResponse> => {
+  const response = await api.post('/v1/study/search', request);
+  return response.data.data;
+};
