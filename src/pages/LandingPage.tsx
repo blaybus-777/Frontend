@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,6 +11,33 @@ import Footer from '@/components/layout/Footer';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  
+  // 캐러셀 상태 관리
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const images = [
+    '/public/landing/탐색탭.png',
+    '/public/landing/학습탭_AI 패널.png',
+    '/public/landing/학습탭_메모 패널.png',
+    '/public/landing/학습탭_학습 패널.png',
+  ];
+
+  // 좌우 이동 핸들러
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  // 자동 슬라이드 (5초마다)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleNext();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex]);
 
   return (
     <div className="font-pretendard flex w-full flex-col bg-white">
@@ -33,10 +61,42 @@ const LandingPage = () => {
         </button>
 
         <div className="relative w-full max-w-5xl px-4">
-          <button className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -left-5 -translate-y-1/2 rounded-full p-2 transition-colors cursor-pointer">
+          <button 
+            onClick={handlePrevious}
+            className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -left-5 -translate-y-1/2 rounded-full p-2 transition-colors cursor-pointer z-10"
+          >
             <ChevronLeft className="h-8 w-8" />
           </button>
-          <button className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -right-5 -translate-y-1/2 rounded-full p-2 transition-colors cursor-pointer">
+          
+          {/* 캐러셀 이미지 */}
+          <div className="overflow-hidden rounded-2xl">
+            <img
+              src={images[currentIndex]}
+              alt={`랜딩 이미지 ${currentIndex + 1}`}
+              className="h-96 w-full object-contain transition-all duration-500"
+            />
+          </div>
+
+          {/* 인디케이터 점 */}
+          <div className="mt-6 flex justify-center gap-2">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`h-2 w-2 rounded-full transition-all cursor-pointer ${
+                  idx === currentIndex
+                    ? 'bg-foundation-blue-9 w-8'
+                    : 'bg-foundation-gray-4 hover:bg-foundation-gray-5'
+                }`}
+                aria-label={`이미지 ${idx + 1}로 이동`}
+              />
+            ))}
+          </div>
+          
+          <button 
+            onClick={handleNext}
+            className="text-foundation-gray-7 hover:text-foundation-black-text absolute top-1/2 -right-5 -translate-y-1/2 rounded-full p-2 transition-colors cursor-pointer z-10"
+          >
             <ChevronRight className="h-8 w-8" />
           </button>
         </div>
