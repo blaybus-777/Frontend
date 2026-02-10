@@ -11,8 +11,8 @@ import {
 } from 'react';
 import * as THREE from 'three';
 import type { PartInfoMap, SelectedPart } from './types';
-import { DRONE_PART_ID_TO_FILE, PART_NAME_MAPPING } from '@/data/partMapping';
-import { FINAL_ASSET_URLS } from '@/constants/assets';
+import { PART_NAME_MAPPING, PART_ID_TO_CODE } from '@/data/partMapping';
+import { FINAL_ASSET_URLS, ASSETS } from '@/constants/assets';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useCourseStore } from '@/stores/useCourseStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -362,19 +362,22 @@ export default function ModelScene({
   );
 
   const resolvedUrls = useMemo(() => {
-    // 1. 선택된 부품이 있는 경우, 해당 부품의 개별 GLB만 보여줌
+    // 선택된 부품이 있는 경우, 해당 부품의 개별 GLB만 보여줌
     if (selectedPartId) {
-      const fileName = DRONE_PART_ID_TO_FILE[selectedPartId];
-      if (fileName) {
-        const match = urls.find((url) => {
-          const decodedUrl = decodeURIComponent(url).toLowerCase();
-          return decodedUrl.endsWith(`/${fileName.toLowerCase()}`);
-        });
-        if (match) return [match];
+      // 1. Part ID → Code 변환 후 ASSETS에서 직접 URL 가져오기 (권장)
+      const code = PART_ID_TO_CODE[selectedPartId];
+      if (code && assetKey) {
+        const assetData = ASSETS[assetKey];
+        const partUrl = assetData?.parts[code];
+        if (partUrl) {
+          console.log('[ModelScene] Found part URL via code:', code, '→', partUrl);
+          return [partUrl];
+        }
       }
 
-      // DRONE_PART_ID_TO_FILE에 없더라도 PART_NAME_MAPPING을 통해 유추 시도
+      // 2. Fallback: Mesh 이름 기반 매칭 (하위 호환성)
       const meshName = PART_NAME_MAPPING[selectedPartId];
+      console.log('[ModelScene] Trying mesh name fallback:', selectedPartId, '→', meshName);
       if (meshName) {
         const match = urls.find((url) => {
           const decodedUrl = decodeURIComponent(url).toLowerCase();
@@ -385,7 +388,10 @@ export default function ModelScene({
             decodedUrl.endsWith(`/${targetBase.replace(/_/g, ' ')}.glb`)
           );
         });
-        if (match) return [match];
+        if (match) {
+          console.log('[ModelScene] Found match via mesh name:', match);
+          return [match];
+        }
       }
     }
     // if (assemblyMode === 'assembly') {
