@@ -6,6 +6,7 @@ import NotFoundPage from '../pages/NotFoundPage';
 
 const CourseDetailPage = lazy(() => import('../pages/CourseDetailPage'));
 const LabPage = lazy(() => import('../pages/LabPage'));
+const LandingPage = lazy(() => import('../pages/LandingPage'));
 
 const withSuspense = (element: ReactElement) => (
   <Suspense
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     errorElement: <NotFoundPage />,
     children: [
+      {
+        index: true,
+        element: withSuspense(<LandingPage />),
+      },
       {
         path: 'topic',
         element: <ExplorePage />,
