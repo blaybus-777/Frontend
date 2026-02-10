@@ -90,19 +90,12 @@ export default function AiTutorTabContent() {
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
 
   useEffect(() => {
-    const newPreviews = selectedFiles.map((file) => {
-      if (file.type.startsWith('image/')) {
-        return URL.createObjectURL(file);
-      }
-      return '';
-    });
+    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
 
     setFilePreviews(newPreviews);
 
     return () => {
-      newPreviews.forEach((url) => {
-        if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-      });
+      newPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [selectedFiles]);
 
@@ -148,11 +141,15 @@ export default function AiTutorTabContent() {
       (data.files.length > 0 ? `${data.files.length}개의 파일 첨부` : '');
 
     // 사용자 질문 즉시 표시 (Optimistic Update)
+    // 모든 파일에 대해 URL|Type|Name 형식으로 인코딩하여 프리뷰가 정확히 나오도록 함
     const newUserMessage: ChatMessage = {
       question: displayQuestion,
       role: 'USER',
       promptRes: '',
       message: displayQuestion,
+      files: data.files.map(
+        (f, i) => `${filePreviews[i]}|${f.type}|${f.name}`
+      ),
     } as ChatMessage;
 
     setMessages((prev) => [...prev, newUserMessage]);
@@ -170,7 +167,31 @@ export default function AiTutorTabContent() {
       };
 
       const response = await askQuestion(requestData, data.files);
-      setMessages(response.items);
+      
+      setMessages((prev) => {
+        // 기존 메시지(낙관적 업데이트 포함)와 새 응답 합치기
+        const combined = [...prev, ...response.items];
+        
+        // historyId 기준으로 중복 제거 및 최신 데이터 유지
+        const messageMap = new Map<number, ChatMessage>();
+        const temporaryMessages: ChatMessage[] = [];
+
+        combined.forEach((msg) => {
+          if (msg.historyId) {
+            messageMap.set(msg.historyId, msg);
+          } else if (msg !== newUserMessage) {
+            // 낙관적 업데이트 메시지(newUserMessage)는 제외하고 나머지 임시 메시지 유지
+            temporaryMessages.push(msg);
+          }
+        });
+
+        // historyId순으로 정렬하여 반환
+        const sortedHistory = Array.from(messageMap.values()).sort(
+          (a, b) => a.historyId - b.historyId
+        );
+
+        return [...sortedHistory, ...temporaryMessages];
+      });
     } catch (error) {
       console.error('질문 전송 실패:', error);
       alert('질문 전송에 실패했습니다.');
@@ -288,12 +309,81 @@ export default function AiTutorTabContent() {
                 {messages.map((msg, index) => (
                   <div key={index} className="flex flex-col space-y-4">
                     {/* 사용자 질문 */}
-                    {msg.question && (
+                    {(msg.question || (msg.files && msg.files.length > 0)) && (
                       <div className="flex justify-end">
-                        <div className="max-w-[80%] rounded-2xl bg-blue-500 px-4 py-2 text-white">
-                          <p className="text-sm whitespace-pre-wrap">
-                            {msg.question}
-                          </p>
+                        <div className="flex max-w-[80%] flex-col items-end space-y-2">
+                          {/* 첨부 파일 표시 */}
+                          {msg.files && msg.files.length > 0 && (
+                            <div className="flex flex-wrap justify-end gap-2">
+                              {msg.files.map((fileInfo, fIdx) => {
+                                // 낙관적 업데이트 데이터(URL|Type|Name) 또는 서버 URL 처리
+                                let displayUrl = fileInfo;
+                                let fileType = '';
+                                let fileName = '첨부 파일';
+
+                                if (fileInfo.includes('|')) {
+                                  const parts = fileInfo.split('|');
+                                  displayUrl = parts[0];
+                                  fileType = parts[1];
+                                  fileName = parts[2];
+                                } else {
+                                  displayUrl = fileInfo;
+                                  fileName = fileInfo.split('/').pop() || '첨부 파일';
+                                  const ext = fileName.split('.').pop()?.toLowerCase();
+                                  if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
+                                    fileType = 'image/jpeg';
+                                  } else if (ext === 'pdf') {
+                                    fileType = 'application/pdf';
+                                  } else {
+                                    fileType = 'text/plain';
+                                  }
+                                }
+
+                                const isImage = fileType.startsWith('image/');
+
+                                if (isImage) {
+                                  return (
+                                    <div
+                                      key={fIdx}
+                                      className="relative h-24 w-24 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer"
+                                      onClick={() => setPreviewImageUrl(displayUrl)}
+                                    >
+                                      <img
+                                        src={displayUrl}
+                                        alt={fileName}
+                                        className="h-full w-full object-cover"
+                                      />
+                                    </div>
+                                  );
+                                }
+
+                                return (
+                                  <div
+                                    key={fIdx}
+                                    className="flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 p-2 text-gray-700 shadow-sm min-w-[160px]"
+                                  >
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white border border-gray-100">
+                                      {fileType === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf') ? (
+                                        <FileText className="h-5 w-5 text-red-500" />
+                                      ) : (
+                                        <FileIcon className="h-5 w-5 text-gray-500" />
+                                      )}
+                                    </div>
+                                    <span className="text-xs font-medium truncate max-w-[120px]">
+                                      {fileName}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                          {msg.question && (
+                            <div className="rounded-2xl bg-blue-500 px-4 py-2 text-white">
+                              <p className="text-sm whitespace-pre-wrap">
+                                {msg.question}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -368,14 +458,17 @@ export default function AiTutorTabContent() {
           <div className="flex grid-cols-2 flex-col gap-2 rounded-2xl bg-gray-100 p-4">
             {/* Selected Files Preview */}
             {selectedFiles.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-2">
+              <div className="mb-2 flex w-full gap-2">
                 {selectedFiles.map((file, index) => {
                   const isImage = file.type.startsWith('image/');
                   const previewUrl = filePreviews[index];
 
                   if (isImage && previewUrl) {
                     return (
-                      <div key={index} className="group relative h-13.5 w-13.5">
+                      <div
+                        key={index}
+                        className="group relative h-13.5 flex-1 min-w-0"
+                      >
                         <div
                           className="h-full w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer"
                           onClick={() => setPreviewImageUrl(previewUrl)}
@@ -386,12 +479,12 @@ export default function AiTutorTabContent() {
                             className="h-full w-full object-cover"
                           />
                           {/* Hover Overlay */}
-                          <div className="absolute inset-0 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100" />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100" />
                         </div>
                         <button
                           type="button"
                           onClick={() => removeFile(index)}
-                          className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center text-white opacity-0 transition-opacity group-hover:opacity-100"
+                          className="absolute top-1 right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/20 text-white opacity-0 transition-opacity hover:bg-black/40 group-hover:opacity-100"
                           title="삭제"
                         >
                           <X className="h-3.5 w-3.5" />
