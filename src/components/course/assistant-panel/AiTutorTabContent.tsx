@@ -140,8 +140,8 @@ export default function AiTutorTabContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 질문 전송 (Form Submit)
-  const onSubmit = async (data: ChatFormValues) => {
+  // 질문 전송 핵심 로직
+  const submitQuestion = async (data: ChatFormValues, contentType: AIContentType) => {
     const question = data.question.trim();
 
     if ((!question && data.files.length === 0) || modelId === 0 || isLoading)
@@ -172,7 +172,7 @@ export default function AiTutorTabContent() {
         modelId,
         partId,
         question: question,
-        contentType: 'QUESTION' as AIContentType,
+        contentType: contentType,
       };
 
       const response = await askQuestion(requestData, data.files);
@@ -229,10 +229,20 @@ export default function AiTutorTabContent() {
     }
   };
 
+  // 일반 질문 전송 (react-hook-form용)
+  const onSubmit = async (data: ChatFormValues) => {
+    await submitQuestion(data, 'QUESTION');
+  };
+
+  // 퀵액션 질문 전송 (react-hook-form용)
+  const onQuickSubmit = async (data: ChatFormValues) => {
+    await submitQuestion(data, 'QUICK');
+  };
+
   // 추천 질문 클릭
   const handleSuggestionClick = (question: string) => {
     setValue('question', question);
-    handleSubmit(onSubmit)();
+    handleSubmit(onQuickSubmit)();
   };
 
   // 파일 첨부 클릭
